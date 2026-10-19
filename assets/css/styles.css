@@ -11,6 +11,8 @@
   --brand:        #0ebf43;
   --brand-soft:   #34d06c;
   --brand-deep:   #0a8f33;
+  --brand-cta:    #0a7f2f;   /* white label passes AA at 5.13:1 */
+  --brand-cta-h:  #0a8530;
   --brand-2:      #34d06c;
   --brand-3:      #f66135;
   --amber:        #f8bf39;
@@ -458,11 +460,14 @@ body.is-locked { overflow: hidden; }
 .btn:active { transform: translateY(0); }
 
 .btn--primary {
-  background: var(--brand-grad);
-  color: #04210e;
-  box-shadow: 0 8px 20px -14px rgba(14, 191, 67, .34);
+  background: var(--brand-cta);
+  color: #ffffff;
+  box-shadow: 0 8px 20px -14px rgba(10, 127, 47, .4);
 }
-.btn--primary:hover { box-shadow: 0 12px 28px -14px rgba(14, 191, 67, .44); }
+.btn--primary:hover {
+  background: var(--brand-cta-h);
+  box-shadow: 0 12px 28px -14px rgba(10, 127, 47, .5);
+}
 
 .btn--ghost {
   background: var(--surface);
@@ -1391,7 +1396,7 @@ body.is-locked { overflow: hidden; }
   position: absolute;
   inset: 0;
   z-index: -1;
-  background: linear-gradient(110deg, transparent 20%, rgba(255, 255, 255, .42) 50%, transparent 80%);
+  background: linear-gradient(110deg, transparent 20%, rgba(255, 255, 255, .2) 50%, transparent 80%);
   transform: translateX(-120%);
   transition: transform .7s var(--ease-out);
 }
