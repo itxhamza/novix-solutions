@@ -1,0 +1,19 @@
+<svg viewBox="0 0 320 200" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="AI assistant and knowledge graph">
+<rect fill="#f1f4f8" x="0" y="0" width="320" height="200"/>
+  <g>
+    <rect fill="#ffffff" stroke="rgba(15,23,32,.09)" x="24" y="38" width="128" height="46" rx="12"/>
+    <rect fill="#6a7682" opacity=".5" x="40" y="54" width="68" height="6" rx="3"/>
+    <rect fill="#6a7682" opacity=".5" x="40" y="66" width="44" height="6" rx="3"/>
+    <rect fill="#0a7f2f" x="60" y="110" width="128" height="52" rx="12"/>
+    <rect x="76" y="126" width="74" height="6" rx="3" fill="#ffffff" opacity=".9"/>
+    <rect x="76" y="140" width="52" height="6" rx="3" fill="#ffffff" opacity=".55"/>
+  </g>
+  <g>
+    <path stroke="rgba(15,23,32,.16)" fill="none" d="M214 56 L258 82 M214 56 L214 110 M258 82 L214 110 M258 82 L286 128 M214 110 L286 128" stroke-width="1.8"/>
+    <circle fill="#0ebf43" cx="214" cy="56" r="9"/>
+    <circle fill="#0ebf43" cx="258" cy="82" r="7" opacity=".72"/>
+    <circle fill="#0ebf43" cx="214" cy="110" r="7" opacity=".72"/>
+    <circle fill="#0a7f2f" cx="286" cy="128" r="9"/>
+  </g>
+  <path fill="#f8bf39" d="M176 28 l4 10 10 4 -10 4 -4 10 -4-10 -10-4 10-4z"/>
+</svg>

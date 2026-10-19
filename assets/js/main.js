@@ -135,49 +135,237 @@
     gsap.defaults({ ease: 'power3.out' });
     setBarHeights();
 
-    /* Hero: one entrance timeline, staggered by role. */
-    var hero = document.querySelectorAll('[data-hero]');
-    if (hero.length) {
-      /* fromTo, not from: CSS already sets these to opacity 0, so a plain
-         .from() would animate back to 0 and leave the hero invisible. */
-      gsap.timeline({ delay: 0.15 })
-        .fromTo(hero,
-          { y: 26, opacity: 0 },
-          { y: 0, opacity: 1, duration: 0.85, stagger: 0.09 })
-        .from('.console', { y: 40, opacity: 0, scale: 0.97, duration: 1 }, '-=0.6')
-        .from('.float-card', { y: 16, opacity: 0, duration: 0.6, stagger: 0.12 }, '-=0.45');
+    var claimed = new Set();
+    var claim = function (el) { claimed.add(el); };
+    var ST = function (trigger, start) {
+      return { trigger: trigger, start: start || 'top 85%', once: true };
+    };
+
+    /* --- Type animation ------------------------------------------------
+       Wrap each word in a clipping span so lines can rise into view. Only
+       text nodes are replaced, so nested markup (<br>, the gradient span)
+       survives, and the readable text is unchanged for selection and
+       screen readers. */
+    function splitWords(el) {
+      if (el.dataset.splitDone) return el.querySelectorAll('.word > i');
+      var walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT, null);
+      var texts = [];
+      while (walker.nextNode()) texts.push(walker.currentNode);
+
+      texts.forEach(function (node) {
+        if (!node.nodeValue.trim()) return;
+        var frag = document.createDocumentFragment();
+        node.nodeValue.split(/(\s+)/).forEach(function (chunk) {
+          if (!chunk) return;
+          if (/^\s+$/.test(chunk)) { frag.appendChild(document.createTextNode(chunk)); return; }
+          var word = document.createElement('span');
+          var inner = document.createElement('i');
+          word.className = 'word';
+          inner.textContent = chunk;
+          word.appendChild(inner);
+          frag.appendChild(word);
+        });
+        node.parentNode.replaceChild(frag, node);
+      });
+      el.dataset.splitDone = '1';
+      return el.querySelectorAll('.word > i');
     }
 
-    /* Reveals: siblings inside one grid animate together as a stagger. */
-    var grouped = new Set();
-    document.querySelectorAll('.grid, .steps, .faq, .stat-band').forEach(function (group) {
-      var items = group.querySelectorAll(':scope > [data-reveal]');
-      if (items.length < 2) return;
-      items.forEach(function (i) { grouped.add(i); });
-      gsap.to(items, {
-        y: 0, opacity: 1, duration: 0.8, stagger: 0.09,
-        scrollTrigger: { trigger: group, start: 'top 82%', once: true }
+    function riseWords(el, trigger, pos) {
+      var words = splitWords(el);
+      if (!words.length) return null;
+      return gsap.fromTo(words, { yPercent: 110 },
+        { yPercent: 0, duration: 0.9, stagger: 0.03, ease: 'power4.out',
+          scrollTrigger: trigger ? ST(trigger) : undefined }, pos);
+    }
+
+    /* --- Hero ----------------------------------------------------------- */
+    var heroEls = [].slice.call(document.querySelectorAll('[data-hero]'));
+    var heroHeading = document.querySelector('h1[data-hero][data-split]');
+    if (heroEls.length) {
+      var rest = heroEls.filter(function (e) { return e !== heroHeading; });
+      var tl = gsap.timeline({ delay: 0.15 });
+      if (heroHeading) {
+        gsap.set(heroHeading, { opacity: 1 });
+        tl.fromTo(splitWords(heroHeading), { yPercent: 110 },
+          { yPercent: 0, duration: 1, stagger: 0.045, ease: 'power4.out' }, 0.1);
+      }
+      tl.fromTo(rest, { y: 26, opacity: 0 },
+        { y: 0, opacity: 1, duration: 0.85, stagger: 0.09 }, 0)
+        .from('.console', { y: 44, opacity: 0, scale: 0.97, duration: 1 }, 0.35)
+        .from('.float-card', { y: 16, opacity: 0, duration: 0.6, stagger: 0.12 }, 0.9);
+      heroEls.forEach(claim);
+    }
+
+    /* --- Section headings ------------------------------------------------ */
+    document.querySelectorAll('.section-head, .page-hero').forEach(function (head) {
+      gsap.set(head, { opacity: 1, y: 0 });
+      claim(head);
+      var eyebrow = head.querySelector('.eyebrow');
+      var heading = head.querySelector('[data-split]');
+      var lede = head.querySelector('p');
+      var crumbs = head.querySelector('.crumbs');
+      var t = gsap.timeline({ scrollTrigger: ST(head) });
+      [eyebrow, crumbs, heading, lede].forEach(claim);
+      if (crumbs) t.fromTo(crumbs, { opacity: 0, y: 8 }, { opacity: 1, y: 0, duration: 0.4 }, 0);
+      if (eyebrow) t.fromTo(eyebrow, { opacity: 0, x: -12 }, { opacity: 1, x: 0, duration: 0.5 }, 0.05);
+      if (heading) {
+        gsap.set(heading, { opacity: 1 });
+        t.fromTo(splitWords(heading), { yPercent: 110 },
+          { yPercent: 0, duration: 0.9, stagger: 0.03, ease: 'power4.out' }, 0.2);
+      }
+      if (lede) t.fromTo(lede, { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.6 }, 0.45);
+    });
+
+    /* Any remaining split heading (e.g. inside a split layout). */
+    document.querySelectorAll('[data-split]').forEach(function (h) {
+      if (claimed.has(h) || h.dataset.splitDone) return;
+      gsap.set(h, { opacity: 1 });
+      claim(h);
+      riseWords(h, h);
+    });
+
+    /* --- Marquee: a seamless GSAP loop, paused on hover ------------------ */
+    var track = document.querySelector('.marquee__track');
+    if (track) {
+      var loop = gsap.to(track, { xPercent: -50, duration: 32, ease: 'none', repeat: -1 });
+      var marquee = track.closest('.marquee');
+      marquee.addEventListener('mouseenter', function () { gsap.to(loop, { timeScale: 0, duration: 0.4 }); });
+      marquee.addEventListener('mouseleave', function () { gsap.to(loop, { timeScale: 1, duration: 0.4 }); });
+    }
+
+    /* --- Card grids: stagger in, then the icons pop ---------------------- */
+    document.querySelectorAll('.grid').forEach(function (grid) {
+      // Work cards have their own richer timeline below; don't animate twice.
+      var items = [].slice.call(grid.querySelectorAll(':scope > [data-reveal]'))
+        .filter(function (el) { return !el.classList.contains('work-card'); });
+      if (!items.length) return;
+      items.forEach(claim);
+      var t = gsap.timeline({ scrollTrigger: ST(grid, 'top 82%') });
+      t.fromTo(items, { y: 30, opacity: 0, scale: 0.98 },
+        { y: 0, opacity: 1, scale: 1, duration: 0.75, stagger: 0.08 });
+      var icons = grid.querySelectorAll('.icon-tile svg, .member__photo, .quote__stars svg');
+      if (icons.length) {
+        t.from(icons, { scale: 0.4, opacity: 0, duration: 0.5, stagger: 0.04,
+                        ease: 'back.out(2)' }, '-=0.55');
+      }
+    });
+
+    /* --- Stat band -------------------------------------------------------- */
+    document.querySelectorAll('.stat-band').forEach(function (band) {
+      claim(band);
+      gsap.fromTo(band, { opacity: 0, y: 24 },
+        { opacity: 1, y: 0, duration: 0.7, scrollTrigger: ST(band) });
+      gsap.from(band.querySelectorAll('.stat'), {
+        opacity: 0, y: 18, duration: 0.6, stagger: 0.09, scrollTrigger: ST(band)
       });
     });
 
+    /* --- Process: the pipeline draws, then the steps land ---------------- */
+    var rail = document.querySelector('.process-rail');
+    var steps = document.querySelector('.steps');
+    if (steps) {
+      var stepItems = steps.querySelectorAll(':scope > [data-reveal]');
+      stepItems.forEach(claim);
+      var pt = gsap.timeline({ scrollTrigger: ST(steps, 'top 80%') });
+      if (rail) {
+        claim(rail);
+        gsap.set(rail, { opacity: 1 });
+        var live = rail.querySelector('.pipeline__live');
+        var nodes = rail.querySelectorAll('.pipeline__node');
+        if (live) {
+          var len = live.getTotalLength();
+          pt.fromTo(live, { strokeDasharray: len, strokeDashoffset: len },
+            { strokeDashoffset: 0, duration: 1.4, ease: 'power2.inOut' }, 0);
+        }
+        if (nodes.length) {
+          pt.from(nodes, { scale: 0, transformOrigin: 'center',
+                           duration: 0.45, stagger: 0.3, ease: 'back.out(2.4)' }, 0.15);
+        }
+      }
+      pt.fromTo(stepItems, { y: 30, opacity: 0 },
+        { y: 0, opacity: 1, duration: 0.7, stagger: 0.12 }, 0.2);
+      pt.from(steps.querySelectorAll('.step__num'), {
+        scale: 0.3, opacity: 0, duration: 0.5, stagger: 0.12, ease: 'back.out(2.2)'
+      }, 0.35);
+    }
+
+    /* --- Work cards: the illustration assembles itself ------------------- */
+    document.querySelectorAll('.work-card').forEach(function (card) {
+      claim(card);
+      var t = gsap.timeline({ scrollTrigger: ST(card, 'top 84%') });
+      t.fromTo(card, { y: 32, opacity: 0 }, { y: 0, opacity: 1, duration: 0.7 }, 0);
+      t.from(card.querySelectorAll('.il-rise > *'), {
+        y: 14, opacity: 0, duration: 0.5, stagger: 0.05
+      }, 0.2);
+      t.from(card.querySelectorAll('.il-float, .il-stack > *, .il-pins > *'), {
+        y: 12, opacity: 0, scale: 0.9, duration: 0.5, stagger: 0.06, ease: 'back.out(1.6)'
+      }, 0.35);
+      t.from(card.querySelectorAll('.il-pop'), {
+        scale: 0, transformOrigin: 'center', duration: 0.5, ease: 'back.out(3)'
+      }, 0.6);
+
+      card.querySelectorAll('.il-draw').forEach(function (path, i) {
+        // Dashed strokes already use stroke-dasharray for their pattern,
+        // so draw only the solid ones and fade the dashed ones in.
+        if (path.getAttribute('stroke-dasharray')) {
+          t.from(path, { opacity: 0, duration: 0.6 }, 0.4 + i * 0.1);
+          return;
+        }
+        var len = path.getTotalLength ? path.getTotalLength() : 0;
+        if (!len) return;
+        t.fromTo(path, { strokeDasharray: len, strokeDashoffset: len },
+          { strokeDashoffset: 0, duration: 1, ease: 'power2.inOut' }, 0.3 + i * 0.12);
+      });
+    });
+
+    /* --- FAQ -------------------------------------------------------------- */
+    document.querySelectorAll('.faq').forEach(function (faq) {
+      var items = faq.querySelectorAll(':scope > [data-reveal]');
+      if (!items.length) return;
+      items.forEach(claim);
+      gsap.fromTo(items, { x: -18, opacity: 0 },
+        { x: 0, opacity: 1, duration: 0.6, stagger: 0.07, scrollTrigger: ST(faq, 'top 82%') });
+    });
+
+    /* --- CTA band --------------------------------------------------------- */
+    document.querySelectorAll('.cta').forEach(function (cta) {
+      claim(cta);
+      var t = gsap.timeline({ scrollTrigger: ST(cta, 'top 82%') });
+      t.fromTo(cta, { opacity: 0, scale: 0.97, y: 24 },
+        { opacity: 1, scale: 1, y: 0, duration: 0.8 });
+      t.from(cta.querySelectorAll('.pill, .btn, .cta__note'), {
+        y: 16, opacity: 0, duration: 0.5, stagger: 0.08
+      }, '-=0.45');
+    });
+
+    /* --- Footer ----------------------------------------------------------- */
+    var footer = document.querySelector('.footer__grid');
+    if (footer) {
+      gsap.from(footer.children, {
+        y: 24, opacity: 0, duration: 0.6, stagger: 0.09,
+        scrollTrigger: ST(footer, 'top 92%')
+      });
+    }
+
+    /* --- Anything not claimed by a section ------------------------------- */
     revealables.forEach(function (el) {
-      if (grouped.has(el)) return;
+      if (claimed.has(el)) return;
       gsap.to(el, {
         y: 0, opacity: 1, duration: 0.85,
         delay: (parseInt(el.getAttribute('data-reveal-delay') || '0', 10)) / 1000,
-        scrollTrigger: { trigger: el, start: 'top 88%', once: true }
+        scrollTrigger: ST(el, 'top 88%')
       });
     });
 
-    /* Chart bars grow in sequence. */
+    /* --- Chrome: chart, progress, parallax, tilt -------------------------- */
     if (bars.length) {
       gsap.from(bars, {
         scaleY: 0, transformOrigin: 'bottom', duration: 0.8, stagger: 0.05,
-        scrollTrigger: { trigger: '.chart', start: 'top 90%', once: true }
+        scrollTrigger: ST('.chart', 'top 90%')
       });
     }
 
-    /* Scroll progress. */
     var progress = document.querySelector('.scroll-progress span');
     if (progress) {
       gsap.to(progress, {
@@ -186,21 +374,19 @@
       });
     }
 
-    /* Gentle parallax on the hero console as the page scrolls. */
-    var console_ = document.querySelector('.console');
-    if (console_ && window.innerWidth > 1040) {
-      gsap.to(console_, {
+    var panel = document.querySelector('.console');
+    if (panel && window.innerWidth > 1040) {
+      gsap.to(panel, {
         y: -46, ease: 'none',
         scrollTrigger: { trigger: '.hero', start: 'top top', end: 'bottom top', scrub: 0.5 }
       });
     }
 
-    /* Pointer tilt — small enough to feel like depth, not a toy. */
     var visual = document.querySelector('.hero__visual');
-    if (visual && console_ && window.matchMedia('(pointer: fine)').matches) {
-      var rx = gsap.quickTo(console_, 'rotationX', { duration: 0.6, ease: 'power3.out' });
-      var ry = gsap.quickTo(console_, 'rotationY', { duration: 0.6, ease: 'power3.out' });
-      gsap.set(console_, { transformPerspective: 1100 });
+    if (visual && panel && window.matchMedia('(pointer: fine)').matches) {
+      var rx = gsap.quickTo(panel, 'rotationX', { duration: 0.6, ease: 'power3.out' });
+      var ry = gsap.quickTo(panel, 'rotationY', { duration: 0.6, ease: 'power3.out' });
+      gsap.set(panel, { transformPerspective: 1100 });
       visual.addEventListener('mousemove', function (e) {
         var r = visual.getBoundingClientRect();
         rx(((e.clientY - r.top) / r.height - 0.5) * -6);
@@ -210,6 +396,11 @@
     }
 
     counters.forEach(countUp);
+
+    /* Webfonts change metrics after load, which moves every trigger. */
+    if (document.fonts && document.fonts.ready) {
+      document.fonts.ready.then(function () { ScrollTrigger.refresh(); });
+    }
     ScrollTrigger.refresh();
 
   } else {

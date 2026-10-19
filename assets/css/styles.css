@@ -788,6 +788,7 @@ body.is-locked { overflow: hidden; }
   border-block: 1px solid var(--border);
   mask-image: linear-gradient(90deg, transparent, #000 10%, #000 90%, transparent);
 }
+.gsap .marquee__track { animation: none; }
 .marquee__track {
   display: flex;
   gap: 60px;
@@ -928,7 +929,7 @@ body.is-locked { overflow: hidden; }
     var(--surface-2);
   overflow: hidden;
 }
-.work-card__media svg { width: 52px; height: 52px; color: var(--brand); opacity: .75; }
+.work-card__media > svg:not(.il) { width: 52px; height: 52px; color: var(--brand); opacity: .75; }
 .work-card__media::after {
   content: "";
   position: absolute;
@@ -1407,16 +1408,67 @@ body.is-locked { overflow: hidden; }
 .btn--primary:hover::after { transform: translateX(120%); }
 
 /* Work card media: slow zoom on hover -------------------------------------- */
-.work-card__media svg {
+.work-card__media .il {
   transition: transform var(--t-slow) var(--ease-out);
 }
-.work-card:hover .work-card__media svg { transform: scale(1.12); }
+.work-card:hover .work-card__media .il { transform: scale(1.04); }
 
 /* FAQ answer slides open instead of snapping ------------------------------- */
 .faq__item > p { transform-origin: top; }
 
 /* Hero elements start hidden only when GSAP will animate them -------------- */
 .gsap [data-hero] { opacity: 0; }
+
+
+/* --------------------------------------------------------------------------
+   24. Custom illustrations
+   Inlined SVG so the artwork reads from the theme's CSS variables and GSAP
+   can reach the individual shapes.
+   -------------------------------------------------------------------------- */
+.il { display: block; width: 100%; height: 100%; }
+.il-bg      { fill: var(--surface-2); }
+.il-card    { fill: var(--bg-2); stroke: var(--border); }
+.il-line    { stroke: var(--border-strong); fill: none; }
+.il-brand   { fill: var(--brand); }
+.il-brand-s { stroke: var(--brand); fill: none; }
+.il-deep    { fill: var(--brand-cta); }
+.il-amber   { fill: var(--amber); }
+.il-muted   { fill: var(--muted); opacity: .45; }
+
+:root[data-theme="dark"] .il-card { fill: var(--surface-solid); }
+
+/* The illustration fills the work-card media panel. */
+.work-card__media { padding: 0; }
+.work-card__media .il { position: absolute; inset: 0; }
+.work-card__media::after { display: none; }
+
+/* --------------------------------------------------------------------------
+   25. Process pipeline
+   -------------------------------------------------------------------------- */
+.process-rail { position: relative; margin-bottom: 26px; height: 40px; }
+.pipeline { width: 100%; height: 40px; display: block; }
+.pipeline__track { stroke: var(--border-strong); }
+.pipeline__live  { stroke: var(--brand); }
+.pipeline__node  { fill: var(--brand-cta); }
+@media (max-width: 880px) { .process-rail { display: none; } }
+
+/* --------------------------------------------------------------------------
+   26. Type animation
+   Words are wrapped in a clipping span so each line can rise into view.
+   -------------------------------------------------------------------------- */
+.word {
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: top;
+  /* room for descenders, removed again so line-height is unchanged */
+  padding-bottom: .14em;
+  margin-bottom: -.14em;
+}
+.word > i { display: inline-block; font-style: inherit; will-change: transform; }
+
+/* Hide the heading (not the word) before GSAP splits it: a CSS transform
+   here would become GSAP's base offset and the words would never land. */
+.gsap [data-split] { opacity: 0; }
 
 /* --------------------------------------------------------------------------
    22. Responsive
@@ -1464,8 +1516,10 @@ body.is-locked { overflow: hidden; }
     transition-duration: .001ms !important;
   }
   .js [data-reveal],
-  .gsap [data-hero] { opacity: 1 !important; transform: none !important; }
-  .scroll-progress { display: none; }
+  .gsap [data-hero],
+  .gsap [data-split] { opacity: 1 !important; transform: none !important; }
+  .scroll-progress, .process-rail { display: none; }
+  .gsap .marquee__track { animation: slide 32s linear infinite; }
 }
 
 @media print {

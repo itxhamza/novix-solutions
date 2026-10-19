@@ -1,0 +1,8 @@
+<svg viewBox="0 0 1200 40" fill="none" preserveAspectRatio="none" aria-hidden="true">
+  <path stroke="rgba(15,23,32,.16)" d="M150 20 H1050" stroke-width="2" stroke-dasharray="7 7" stroke-linecap="round"/>
+  <path stroke="#0ebf43" d="M150 20 H1050" stroke-width="2.5" stroke-linecap="round"/>
+  <circle fill="#0a7f2f" cx="150" cy="20" r="6"/>
+  <circle fill="#0a7f2f" cx="450" cy="20" r="6"/>
+  <circle fill="#0a7f2f" cx="750" cy="20" r="6"/>
+  <circle fill="#0a7f2f" cx="1050" cy="20" r="6"/>
+</svg>

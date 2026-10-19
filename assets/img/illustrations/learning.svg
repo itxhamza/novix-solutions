@@ -1,0 +1,19 @@
+<svg viewBox="0 0 320 200" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Learning platform">
+<rect fill="#f1f4f8" x="0" y="0" width="320" height="200"/>
+  <g>
+    <rect fill="#ffffff" stroke="rgba(15,23,32,.09)" x="24" y="34" width="166" height="98" rx="12"/>
+    <circle fill="#0ebf43" cx="107" cy="83" r="26" opacity=".16"/>
+    <circle stroke="#0ebf43" fill="none" cx="107" cy="83" r="26" stroke-width="2.5"/>
+    <path fill="#0ebf43" d="M101 73 l18 10 -18 10z"/>
+    <rect fill="#6a7682" opacity=".5" x="24" y="146" width="104" height="7" rx="3.5"/>
+    <rect fill="#0ebf43" x="24" y="146" width="62" height="7" rx="3.5"/>
+  </g>
+  <g>
+    <rect fill="#ffffff" stroke="rgba(15,23,32,.09)" x="206" y="34" width="90" height="44" rx="11"/>
+    <rect fill="#ffffff" stroke="rgba(15,23,32,.09)" x="206" y="88" width="90" height="44" rx="11"/>
+    <rect fill="#0ebf43" x="220" y="48" width="24" height="8" rx="4"/>
+    <rect fill="#0ebf43" x="220" y="102" width="24" height="8" rx="4" opacity=".6"/>
+    <rect fill="#6a7682" opacity=".5" x="220" y="62" width="50" height="5" rx="2.5"/>
+    <rect fill="#6a7682" opacity=".5" x="220" y="116" width="42" height="5" rx="2.5"/>
+  </g>
+</svg>

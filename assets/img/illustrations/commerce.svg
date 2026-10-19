@@ -1,0 +1,23 @@
+<svg viewBox="0 0 320 200" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Headless commerce architecture">
+<rect fill="#f1f4f8" x="0" y="0" width="320" height="200"/>
+  <g>
+    <rect fill="#ffffff" stroke="rgba(15,23,32,.09)" x="24" y="40" width="58" height="58" rx="10"/>
+    <rect fill="#ffffff" stroke="rgba(15,23,32,.09)" x="24" y="106" width="58" height="58" rx="10"/>
+    <rect fill="#ffffff" stroke="rgba(15,23,32,.09)" x="90" y="40" width="58" height="58" rx="10"/>
+    <rect fill="#ffffff" stroke="rgba(15,23,32,.09)" x="90" y="106" width="58" height="58" rx="10"/>
+    <rect fill="#0ebf43" x="38" y="56" width="30" height="20" rx="5"/>
+    <rect fill="#0ebf43" x="104" y="122" width="30" height="20" rx="5" opacity=".7"/>
+    <rect fill="#6a7682" opacity=".5" x="38" y="82" width="22" height="5" rx="2.5"/>
+    <rect fill="#6a7682" opacity=".5" x="104" y="82" width="22" height="5" rx="2.5"/>
+    <rect fill="#6a7682" opacity=".5" x="38" y="148" width="22" height="5" rx="2.5"/>
+    <rect fill="#6a7682" opacity=".5" x="104" y="148" width="22" height="5" rx="2.5"/>
+  </g>
+  <path stroke="rgba(15,23,32,.16)" fill="none" d="M148 70 C182 70 182 102 214 102" stroke-width="2" stroke-dasharray="5 5"/>
+  <path stroke="rgba(15,23,32,.16)" fill="none" d="M148 134 C182 134 182 102 214 102" stroke-width="2" stroke-dasharray="5 5"/>
+  <g>
+    <rect fill="#ffffff" stroke="rgba(15,23,32,.09)" x="214" y="74" width="82" height="56" rx="11"/>
+    <path stroke="#0ebf43" fill="none" d="M232 96 l-7 6 7 6" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+    <path stroke="#0ebf43" fill="none" d="M252 96 l7 6 -7 6" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+    <rect fill="#6a7682" opacity=".5" x="268" y="99" width="16" height="5" rx="2.5"/>
+  </g>
+</svg>

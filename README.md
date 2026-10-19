@@ -23,6 +23,7 @@ assets/
   img/novix-lockup.svg  primary logo (mark + wordmark), exported from Figma
   img/novix-mark.svg    logo mark on its own
   img/favicon.svg       mark on a dark rounded tile
+  img/illustrations/    custom project artwork + the process pipeline
 robots.txt, sitemap.xml
 ```
 
@@ -61,9 +62,21 @@ large type is what made the first pass read as neon rather than professional.
 
 ## Behaviour notes
 
-- Animation runs on **GSAP 3.12.5 + ScrollTrigger** (CDN): a hero entrance timeline,
-  staggered scroll reveals, count-up statistics, growing chart bars, a scrubbed
-  scroll-progress bar, and parallax plus a small pointer tilt on the hero console.
+- Animation runs on **GSAP 3.12.5 + ScrollTrigger** (CDN). Each section has its own
+  timeline rather than one generic fade: the hero entrance, a looping marquee,
+  card grids that stagger then pop their icons, the stat band, a process pipeline
+  that draws itself before the steps land, work cards whose illustrations assemble
+  piece by piece, the FAQ, the CTA and the footer. Plus count-up statistics, growing
+  chart bars, a scrubbed scroll-progress bar, hero parallax and a pointer tilt.
+- **Type animation**: headings marked `data-split` are split into words at runtime
+  and rise out of a clipping mask. The splitter only replaces text nodes, so nested
+  markup (`<br>`, the gradient span) and the readable text survive.
+  Note the heading is hidden with `opacity`, never a CSS `transform` — GSAP treats an
+  existing transform as its base offset, which leaves tweened words stranded.
+- **Illustrations** are inlined rather than linked as `<img>`, so the artwork reads
+  the theme's CSS variables and GSAP can animate the individual shapes. The same
+  source also writes standalone files to `assets/img/illustrations/`, which carry
+  literal colours since CSS variables do not resolve for an externally referenced SVG.
 - There are three motion paths, and all three leave content visible:
   1. GSAP present — GSAP drives everything.
   2. GSAP blocked or failed — falls back to IntersectionObserver reveals and a

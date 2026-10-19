@@ -1,0 +1,17 @@
+<svg viewBox="0 0 320 200" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Fleet tracking map">
+<rect fill="#f1f4f8" x="0" y="0" width="320" height="200"/>
+  <path stroke="rgba(15,23,32,.16)" fill="none" d="M0 60 H320 M0 100 H320 M0 140 H320 M80 0 V200 M160 0 V200 M240 0 V200" stroke-width="1" opacity=".5"/>
+  <path stroke="rgba(15,23,32,.16)" fill="none" d="M34 150 C90 150 76 70 132 70 C188 70 176 132 232 132 C266 132 272 104 288 96" stroke-width="2.5" stroke-dasharray="6 6" stroke-linecap="round"/>
+  <path stroke="#0ebf43" fill="none" d="M34 150 C90 150 76 70 132 70 C188 70 176 132 232 132" stroke-width="3" stroke-linecap="round"/>
+  <g>
+    <circle fill="#0a7f2f" cx="34" cy="150" r="8"/>
+    <circle fill="#0ebf43" cx="132" cy="70" r="8"/>
+    <circle fill="#0ebf43" cx="232" cy="132" r="8"/>
+    <circle fill="#ffffff" stroke="rgba(15,23,32,.09)" cx="288" cy="96" r="8"/>
+  </g>
+  <g>
+    <rect fill="#ffffff" stroke="rgba(15,23,32,.09)" x="192" y="22" width="104" height="44" rx="11"/>
+    <rect fill="#0ebf43" x="206" y="36" width="30" height="8" rx="4"/>
+    <rect fill="#6a7682" opacity=".5" x="206" y="50" width="54" height="5" rx="2.5"/>
+  </g>
+</svg>
