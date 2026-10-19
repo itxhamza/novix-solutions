@@ -62,5 +62,6 @@ Dark is the default theme; light is opt-in via the header toggle and remembered 
 
 ## Deployment
 
-`.github/workflows/static.yml` publishes the repository root to GitHub Pages on every
+The site is served at **https://novixsolutions.com** (custom domain, pinned by the
+`CNAME` file). `.github/workflows/static.yml` publishes the repository root on every
 push to `main`, and can also be run manually from the Actions tab.
