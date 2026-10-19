@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<html lang="en" data-theme="light">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Services — Novix Solutions</title>
 <meta name="description" content="Web platforms, mobile apps, cloud and DevOps, AI automation, product design and data analytics — delivered by one senior team.">
-<meta name="theme-color" content="#0a0c0f">
+<meta name="theme-color" content="#ffffff">
 <link rel="canonical" href="https://novixsolutions.com/services.html">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Novix Solutions">
@@ -27,13 +27,15 @@
   try {
     document.documentElement.classList.add('js');
     var t = localStorage.getItem('novix-theme');
-    if (t) document.documentElement.setAttribute('data-theme', t);
+    document.documentElement.setAttribute('data-theme', t === 'dark' ? 'dark' : 'light');
   } catch (e) {}
 </script>
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7067611061240760" crossorigin="anonymous"></script>
 </head>
 <body>
 <a class="skip-link" href="#main">Skip to content</a>
+
+<div class="scroll-progress" aria-hidden="true"><span></span></div>
 
 <div class="ambient" aria-hidden="true">
   <span class="orb orb--1"></span>
@@ -362,6 +364,8 @@
 
 <button class="to-top" type="button" aria-label="Back to top" onclick="window.scrollTo({top:0,behavior:'smooth'})"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5M5 12l7-7 7 7"/></svg></button>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js" defer></script>
 <script src="assets/js/main.js" defer></script>
 </body>
 </html>

@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<html lang="en" data-theme="light">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Novix Solutions — Software, Cloud &amp; AI Engineering Studio</title>
 <meta name="description" content="Novix Solutions designs and builds web platforms, mobile apps, cloud infrastructure and AI automation for ambitious teams. Discovery to launch, with engineers who ship.">
-<meta name="theme-color" content="#0a0c0f">
+<meta name="theme-color" content="#ffffff">
 <link rel="canonical" href="https://novixsolutions.com/">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Novix Solutions">
@@ -27,7 +27,7 @@
   try {
     document.documentElement.classList.add('js');
     var t = localStorage.getItem('novix-theme');
-    if (t) document.documentElement.setAttribute('data-theme', t);
+    document.documentElement.setAttribute('data-theme', t === 'dark' ? 'dark' : 'light');
   } catch (e) {}
 </script>
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7067611061240760" crossorigin="anonymous"></script>
@@ -50,6 +50,8 @@
 </head>
 <body>
 <a class="skip-link" href="#main">Skip to content</a>
+
+<div class="scroll-progress" aria-hidden="true"><span></span></div>
 
 <div class="ambient" aria-hidden="true">
   <span class="orb orb--1"></span>
@@ -116,22 +118,22 @@
   <section class="hero">
     <div class="container hero__grid">
       <div class="hero__copy">
-        <span class="pill"><i class="dot"></i> Available for Q1 projects</span>
+        <span class="pill" data-hero><i class="dot"></i> Available for Q1 projects</span>
 
-        <h1>Digital products,<br><span class="text-grad">engineered to last.</span></h1>
+        <h1 data-hero>Digital products,<br><span class="text-grad">engineered to last.</span></h1>
 
-        <p class="lede hero__sub">
+        <p class="lede hero__sub" data-hero>
           We are a product and engineering studio building web platforms, mobile apps,
           cloud infrastructure and AI automation — for teams who care how it works a year
           after launch, not just on launch day.
         </p>
 
-        <div class="btn-row">
+        <div class="btn-row" data-hero>
           <a class="btn btn--primary btn--lg" href="contact.html">Start a project <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
           <a class="btn btn--ghost btn--lg" href="work.html">See our work</a>
         </div>
 
-        <div class="hero__meta">
+        <div class="hero__meta" data-hero>
           <div><strong class="text-grad">120+</strong><span>Projects shipped</span></div>
           <div><strong class="text-grad">48</strong><span>Clients worldwide</span></div>
           <div><strong class="text-grad">4.9/5</strong><span>Client rating</span></div>
@@ -505,6 +507,8 @@
 
 <button class="to-top" type="button" aria-label="Back to top" onclick="window.scrollTo({top:0,behavior:'smooth'})"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5M5 12l7-7 7 7"/></svg></button>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js" defer></script>
 <script src="assets/js/main.js" defer></script>
 </body>
 </html>

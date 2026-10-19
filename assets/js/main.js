@@ -32,7 +32,7 @@
     });
   });
 
-  applyTheme(root.getAttribute('data-theme') || 'dark');
+  applyTheme(root.getAttribute('data-theme') || 'light');
 
   /* ----- Sticky header -------------------------------------------------- */
   var header = document.querySelector('.header');
@@ -80,27 +80,17 @@
     if (window.innerWidth > 880 && drawer && drawer.classList.contains('is-open')) setDrawer(false);
   });
 
-  /* ----- Scroll reveal -------------------------------------------------- */
+  /* ----- Motion: GSAP when available, IntersectionObserver as fallback ---- */
   var revealables = document.querySelectorAll('[data-reveal]');
-
-  if (reduceMotion || !('IntersectionObserver' in window)) {
-    revealables.forEach(function (el) { el.classList.add('is-visible'); });
-  } else {
-    var revealer = new IntersectionObserver(function (entries) {
-      entries.forEach(function (entry) {
-        if (!entry.isIntersecting) return;
-        var el = entry.target;
-        var delay = parseInt(el.getAttribute('data-reveal-delay') || '0', 10);
-        setTimeout(function () { el.classList.add('is-visible'); }, delay);
-        revealer.unobserve(el);
-      });
-    }, { threshold: 0.12, rootMargin: '0px 0px -8% 0px' });
-
-    revealables.forEach(function (el) { revealer.observe(el); });
-  }
-
-  /* ----- Count-up stats ------------------------------------------------- */
   var counters = document.querySelectorAll('[data-count]');
+  var bars = document.querySelectorAll('.chart i');
+  var hasGSAP = typeof window.gsap !== 'undefined' && typeof window.ScrollTrigger !== 'undefined';
+
+  function setBarHeights() {
+    bars.forEach(function (bar) {
+      bar.style.height = (bar.getAttribute('data-h') || '50') + '%';
+    });
+  }
 
   function countUp(el) {
     var target = parseFloat(el.getAttribute('data-count'));
@@ -111,25 +101,137 @@
       el.textContent = target.toFixed(decimals) + suffix;
       return;
     }
-
+    if (hasGSAP) {
+      var proxy = { v: 0 };
+      gsap.to(proxy, {
+        v: target,
+        duration: 1.6,
+        ease: 'power2.out',
+        scrollTrigger: { trigger: el, start: 'top 85%', once: true },
+        onUpdate: function () { el.textContent = proxy.v.toFixed(decimals) + suffix; }
+      });
+      return;
+    }
     var started = null;
-    var duration = 1500;
-
     function frame(now) {
       if (started === null) started = now;
-      var p = Math.min((now - started) / duration, 1);
-      var eased = 1 - Math.pow(1 - p, 3);
-      el.textContent = (target * eased).toFixed(decimals) + suffix;
+      var p = Math.min((now - started) / 1500, 1);
+      el.textContent = (target * (1 - Math.pow(1 - p, 3))).toFixed(decimals) + suffix;
       if (p < 1) requestAnimationFrame(frame);
     }
-
     requestAnimationFrame(frame);
   }
 
-  if (counters.length) {
+  if (reduceMotion) {
+    /* Show everything, animate nothing. */
+    revealables.forEach(function (el) { el.classList.add('is-visible'); });
+    document.querySelectorAll('[data-hero]').forEach(function (el) { el.style.opacity = 1; });
+    setBarHeights();
+    counters.forEach(countUp);
+
+  } else if (hasGSAP) {
+    root.classList.add('gsap');
+    gsap.registerPlugin(ScrollTrigger);
+    gsap.defaults({ ease: 'power3.out' });
+    setBarHeights();
+
+    /* Hero: one entrance timeline, staggered by role. */
+    var hero = document.querySelectorAll('[data-hero]');
+    if (hero.length) {
+      /* fromTo, not from: CSS already sets these to opacity 0, so a plain
+         .from() would animate back to 0 and leave the hero invisible. */
+      gsap.timeline({ delay: 0.15 })
+        .fromTo(hero,
+          { y: 26, opacity: 0 },
+          { y: 0, opacity: 1, duration: 0.85, stagger: 0.09 })
+        .from('.console', { y: 40, opacity: 0, scale: 0.97, duration: 1 }, '-=0.6')
+        .from('.float-card', { y: 16, opacity: 0, duration: 0.6, stagger: 0.12 }, '-=0.45');
+    }
+
+    /* Reveals: siblings inside one grid animate together as a stagger. */
+    var grouped = new Set();
+    document.querySelectorAll('.grid, .steps, .faq, .stat-band').forEach(function (group) {
+      var items = group.querySelectorAll(':scope > [data-reveal]');
+      if (items.length < 2) return;
+      items.forEach(function (i) { grouped.add(i); });
+      gsap.to(items, {
+        y: 0, opacity: 1, duration: 0.8, stagger: 0.09,
+        scrollTrigger: { trigger: group, start: 'top 82%', once: true }
+      });
+    });
+
+    revealables.forEach(function (el) {
+      if (grouped.has(el)) return;
+      gsap.to(el, {
+        y: 0, opacity: 1, duration: 0.85,
+        delay: (parseInt(el.getAttribute('data-reveal-delay') || '0', 10)) / 1000,
+        scrollTrigger: { trigger: el, start: 'top 88%', once: true }
+      });
+    });
+
+    /* Chart bars grow in sequence. */
+    if (bars.length) {
+      gsap.from(bars, {
+        scaleY: 0, transformOrigin: 'bottom', duration: 0.8, stagger: 0.05,
+        scrollTrigger: { trigger: '.chart', start: 'top 90%', once: true }
+      });
+    }
+
+    /* Scroll progress. */
+    var progress = document.querySelector('.scroll-progress span');
+    if (progress) {
+      gsap.to(progress, {
+        scaleX: 1, ease: 'none',
+        scrollTrigger: { trigger: document.body, start: 'top top', end: 'bottom bottom', scrub: 0.3 }
+      });
+    }
+
+    /* Gentle parallax on the hero console as the page scrolls. */
+    var console_ = document.querySelector('.console');
+    if (console_ && window.innerWidth > 1040) {
+      gsap.to(console_, {
+        y: -46, ease: 'none',
+        scrollTrigger: { trigger: '.hero', start: 'top top', end: 'bottom top', scrub: 0.5 }
+      });
+    }
+
+    /* Pointer tilt — small enough to feel like depth, not a toy. */
+    var visual = document.querySelector('.hero__visual');
+    if (visual && console_ && window.matchMedia('(pointer: fine)').matches) {
+      var rx = gsap.quickTo(console_, 'rotationX', { duration: 0.6, ease: 'power3.out' });
+      var ry = gsap.quickTo(console_, 'rotationY', { duration: 0.6, ease: 'power3.out' });
+      gsap.set(console_, { transformPerspective: 1100 });
+      visual.addEventListener('mousemove', function (e) {
+        var r = visual.getBoundingClientRect();
+        rx(((e.clientY - r.top) / r.height - 0.5) * -6);
+        ry(((e.clientX - r.left) / r.width - 0.5) * 6);
+      });
+      visual.addEventListener('mouseleave', function () { rx(0); ry(0); });
+    }
+
+    counters.forEach(countUp);
+    ScrollTrigger.refresh();
+
+  } else {
+    /* No GSAP (CDN blocked or failed): fall back to IntersectionObserver. */
+    setBarHeights();
+    bars.forEach(function (bar, i) { bar.style.animationDelay = (i * 0.07) + 's'; });
+
     if (!('IntersectionObserver' in window)) {
+      revealables.forEach(function (el) { el.classList.add('is-visible'); });
       counters.forEach(countUp);
     } else {
+      var revealer = new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
+          if (!entry.isIntersecting) return;
+          var el = entry.target;
+          setTimeout(function () { el.classList.add('is-visible'); },
+                     parseInt(el.getAttribute('data-reveal-delay') || '0', 10));
+          revealer.unobserve(el);
+        });
+      }, { threshold: 0.12, rootMargin: '0px 0px -8% 0px' });
+      revealables.forEach(function (el) { revealer.observe(el); });
+
       var counterObs = new IntersectionObserver(function (entries) {
         entries.forEach(function (entry) {
           if (!entry.isIntersecting) return;
@@ -139,14 +241,8 @@
       }, { threshold: 0.5 });
       counters.forEach(function (el) { counterObs.observe(el); });
     }
+    document.querySelectorAll('[data-hero]').forEach(function (el) { el.style.opacity = 1; });
   }
-
-  /* ----- Chart bars (hero mock) ----------------------------------------- */
-  document.querySelectorAll('.chart i').forEach(function (bar, i) {
-    var h = bar.getAttribute('data-h') || '50';
-    bar.style.height = h + '%';
-    bar.style.animationDelay = (i * 0.07) + 's';
-  });
 
   /* ----- FAQ: one open at a time ---------------------------------------- */
   var faqItems = document.querySelectorAll('.faq__item');

@@ -40,15 +40,26 @@ Colours come from the Figma logo file and are defined once at the top of
 | `--brand-3` | `#f66135` | Orange accent (from "Solutions") |
 | `--amber` | `#f8bf39` | Highlight, star ratings |
 
-Dark is the default theme; light is opt-in via the header toggle and remembered in
-`localStorage`. To change the palette, edit the tokens in `:root` and
+Light is the default theme; dark is opt-in via the header toggle and remembered in
+`localStorage`. To change the palette, edit the tokens in `:root` (dark) and
 `:root[data-theme="light"]` — nothing else hardcodes a brand colour.
+
+Green is deliberately used as an accent only — eyebrows, icons, links, buttons and
+status marks. Headlines and statistics stay in neutral ink; letting the accent carry
+large type is what made the first pass read as neon rather than professional.
 
 ## Behaviour notes
 
-- Every page works without JavaScript. Scroll-reveal styles are gated behind a `js`
-  class so content is never left invisible if the script fails to load.
-- `prefers-reduced-motion` disables animation and reveals everything immediately.
+- Animation runs on **GSAP 3.12.5 + ScrollTrigger** (CDN): a hero entrance timeline,
+  staggered scroll reveals, count-up statistics, growing chart bars, a scrubbed
+  scroll-progress bar, and parallax plus a small pointer tilt on the hero console.
+- There are three motion paths, and all three leave content visible:
+  1. GSAP present — GSAP drives everything.
+  2. GSAP blocked or failed — falls back to IntersectionObserver reveals and a
+     `requestAnimationFrame` counter.
+  3. No JavaScript at all — reveal styles are gated behind a `js` class, so nothing
+     is ever left at `opacity: 0`.
+- `prefers-reduced-motion` skips animation entirely and shows everything at once.
 - The contact form has no backend (GitHub Pages serves static files only). It
   validates in the browser, then opens the visitor's mail client with the enquiry
   pre-filled. To collect submissions server-side instead, point the `<form>` at a
