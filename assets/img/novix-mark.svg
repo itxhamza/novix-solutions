@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="758" height="539" viewBox="161 271 758 539" fill="none" role="img" aria-label="Novix">
+<g id="Finalized">
+<g id="Frame 1">
+<g id="Group 3">
+<g id="Group 1">
+<g id="Vector 6">
+<path d="M919 273.269L658.059 809.619H502.131L575.322 654.455L758.617 272.513L919 273.269Z" fill="url(#paint0_linear_0_1)"/>
+</g>
+<path id="Vector 9" d="M575.191 660.591L509.638 517.614L434.667 673.451L503.274 808.862L539.233 734.726L575.191 660.591Z" fill="url(#paint1_linear_0_1)"/>
+</g>
+<g id="Group 2">
+<path id="Vector 7" d="M422.577 271.756L161 808.862H241.51H322.02L505.444 427.592L580.415 271.756H422.577Z" fill="url(#paint2_linear_0_1)"/>
+<path id="Vector 9_2" d="M645.204 413.976L579.651 271L504.68 426.837L573.286 562.248L609.245 488.112L645.204 413.976Z" fill="url(#paint3_linear_0_1)"/>
+</g>
+</g>
+</g>
+</g>
+<defs>
+<linearGradient id="paint0_linear_0_1" x1="709.929" y1="272.513" x2="709.929" y2="809.619" gradientUnits="userSpaceOnUse">
+<stop stop-color="#427052"/>
+<stop offset="1" stop-color="#0EBF43"/>
+</linearGradient>
+<linearGradient id="paint1_linear_0_1" x1="476.036" y1="609.149" x2="560.844" y2="657.502" gradientUnits="userSpaceOnUse">
+<stop stop-color="#0EBF43"/>
+<stop offset="0.4375" stop-color="#0F9A3A" stop-opacity="0.95"/>
+<stop offset="0.740385" stop-color="#13933D"/>
+<stop offset="1" stop-color="#10652C"/>
+</linearGradient>
+<linearGradient id="paint2_linear_0_1" x1="370.707" y1="271.756" x2="370.707" y2="808.862" gradientUnits="userSpaceOnUse">
+<stop stop-color="#0EBF43"/>
+<stop offset="1" stop-color="#427052"/>
+</linearGradient>
+<linearGradient id="paint3_linear_0_1" x1="548.594" y1="367.83" x2="639.584" y2="416.332" gradientUnits="userSpaceOnUse">
+<stop stop-color="#10652C"/>
+<stop offset="0.259615" stop-color="#13933D"/>
+<stop offset="0.5625" stop-color="#0F9A3A" stop-opacity="0.95"/>
+<stop offset="1" stop-color="#0EBF43"/>
+</linearGradient>
+</defs>
+</svg>
