@@ -12,6 +12,7 @@
   --brand-soft:   #34d06c;
   --brand-deep:   #0a8f33;
   --brand-cta:    #0a7f2f;   /* white label passes AA at 5.13:1 */
+  --brand-grad-cta: linear-gradient(135deg, #0a8530 0%, #09702a 100%);
   --brand-cta-h:  #0a8530;
   --brand-2:      #34d06c;
   --brand-3:      #f66135;
@@ -157,8 +158,8 @@ p { text-wrap: pretty; }
   z-index: 200;
   padding: 12px 20px;
   border-radius: var(--r-sm);
-  background: var(--brand);
-  color: #04210e;
+  background: var(--brand-cta);
+  color: #ffffff;
   font-weight: 700;
   transition: top var(--t) var(--ease);
 }
@@ -894,8 +895,8 @@ body.is-locked { overflow: hidden; }
   font-family: var(--font-display);
   font-weight: 800;
   font-size: 1.02rem;
-  color: #04210e;
-  background: var(--brand-grad);
+  color: #ffffff;
+  background: var(--brand-grad-cta);
   box-shadow: none;
 }
 .step h3 { margin-bottom: 9px; }
@@ -984,12 +985,15 @@ body.is-locked { overflow: hidden; }
   font-family: var(--font-display);
   font-weight: 800;
   font-size: .92rem;
-  color: #04210e;
-  background: var(--brand-grad);
+  color: #ffffff;
+  background: var(--brand-grad-cta);
   flex-shrink: 0;
 }
 .quote__person b { display: block; font-size: .93rem; }
 .quote__person span { font-size: .81rem; color: var(--muted); }
+/* .quote__person span also matches the avatar and beats .avatar on
+   specificity, which left the initials muted grey on green. */
+.quote__person .avatar { font-size: .92rem; color: #ffffff; }
 
 /* --------------------------------------------------------------------------
    14. FAQ accordion
@@ -1198,8 +1202,8 @@ body.is-locked { overflow: hidden; }
   transform: translateX(-50%);
   padding: 5px 15px;
   border-radius: var(--r-pill);
-  background: var(--brand-grad);
-  color: #04210e;
+  background: var(--brand-grad-cta);
+  color: #ffffff;
   font-size: .72rem;
   font-weight: 800;
   letter-spacing: .06em;
@@ -1239,8 +1243,8 @@ body.is-locked { overflow: hidden; }
   font-family: var(--font-display);
   font-size: 1.9rem;
   font-weight: 800;
-  color: #04210e;
-  background: var(--brand-grad);
+  color: #ffffff;
+  background: var(--brand-grad-cta);
   box-shadow: 0 14px 32px -18px rgba(0, 0, 0, .6);
   transition: transform var(--t) var(--ease);
 }
@@ -1297,8 +1301,8 @@ body.is-locked { overflow: hidden; }
   transition: all var(--t-fast) var(--ease);
 }
 .social:hover {
-  color: #04210e;
-  background: var(--brand-grad);
+  color: #ffffff;
+  background: var(--brand-grad-cta);
   border-color: transparent;
   transform: translateY(-3px);
   box-shadow: 0 12px 26px -12px rgba(14, 191, 67, .8);
@@ -1339,7 +1343,7 @@ body.is-locked { overflow: hidden; }
   transition: all var(--t) var(--ease);
 }
 .to-top.is-visible { opacity: 1; visibility: visible; transform: none; }
-.to-top:hover { color: #04210e; background: var(--brand-grad); border-color: transparent; }
+.to-top:hover { color: #ffffff; background: var(--brand-grad-cta); border-color: transparent; }
 .to-top svg { width: 20px; height: 20px; }
 
 /* --------------------------------------------------------------------------
