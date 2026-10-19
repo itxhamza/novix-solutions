@@ -73,6 +73,19 @@ large type is what made the first pass read as neon rather than professional.
   markup (`<br>`, the gradient span) and the readable text survive.
   Note the heading is hidden with `opacity`, never a CSS `transform` — GSAP treats an
   existing transform as its base offset, which leaves tweened words stranded.
+- **Section backgrounds** are original vector motifs — tech (circuit traces, blueprint
+  grid, isometric layers, radar, contours, signal waves) and AI (neural network,
+  latent-space clusters, attention weights, token stream, node constellation). Each
+  carries a `viewBox` so it scales to cover and stays centred; percentages are not
+  valid in an SVG `transform`, so all placement is in user units. They sit at low
+  opacity behind content, which keeps text contrast untouched.
+- **Animations must not depend on firing to be correct.** Several entrance effects were
+  stranded because a ScrollTrigger start resolved above the top of the page, or a
+  refresh reverted a `once` trigger mid-flight. The rule now: apply the rest state
+  first and withhold the start value (`immediateRender: false`), so anything that
+  never runs still reads correctly. Counters use IntersectionObserver for the same
+  reason. A CSS `animation` also outranks inline styles, so the pre-GSAP keyframes
+  are disabled under `.gsap`.
 - **Illustrations** are inlined rather than linked as `<img>`, so the artwork reads
   the theme's CSS variables and GSAP can animate the individual shapes. The same
   source also writes standalone files to `assets/img/illustrations/`, which carry

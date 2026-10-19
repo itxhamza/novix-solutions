@@ -92,23 +92,26 @@
     });
   }
 
-  function countUp(el) {
+  function finalValue(el) {
     var target = parseFloat(el.getAttribute('data-count'));
     var suffix = el.getAttribute('data-count-suffix') || '';
     var decimals = (String(target).split('.')[1] || '').length;
+    return { target: target, suffix: suffix, decimals: decimals,
+             text: target.toFixed(decimals) + suffix };
+  }
 
-    if (reduceMotion) {
-      el.textContent = target.toFixed(decimals) + suffix;
-      return;
-    }
+  /* Run the count. The final figure is already on screen before this, so a
+     counter that is never triggered still reads correctly. */
+  function runCount(el) {
+    var f = finalValue(el);
+    var write = function (v) { el.textContent = v.toFixed(f.decimals) + f.suffix; };
+
     if (hasGSAP) {
       var proxy = { v: 0 };
       gsap.to(proxy, {
-        v: target,
-        duration: 1.6,
-        ease: 'power2.out',
-        scrollTrigger: { trigger: el, start: 'top 85%', once: true },
-        onUpdate: function () { el.textContent = proxy.v.toFixed(decimals) + suffix; }
+        v: f.target, duration: 1.6, ease: 'power2.out',
+        onUpdate: function () { write(proxy.v); },
+        onComplete: function () { el.textContent = f.text; }
       });
       return;
     }
@@ -116,10 +119,31 @@
     function frame(now) {
       if (started === null) started = now;
       var p = Math.min((now - started) / 1500, 1);
-      el.textContent = (target * (1 - Math.pow(1 - p, 3))).toFixed(decimals) + suffix;
-      if (p < 1) requestAnimationFrame(frame);
+      write(f.target * (1 - Math.pow(1 - p, 3)));
+      if (p < 1) requestAnimationFrame(frame); else el.textContent = f.text;
     }
     requestAnimationFrame(frame);
+  }
+
+  /* Counters are triggered by IntersectionObserver rather than ScrollTrigger:
+     a ScrollTrigger refresh mid-flight can revert a `once` trigger and leave
+     the number stranded at zero. */
+  function startCounters() {
+    counters.forEach(function (el) { el.textContent = finalValue(el).text; });
+    if (reduceMotion) return;
+
+    if (!('IntersectionObserver' in window)) {
+      counters.forEach(runCount);
+      return;
+    }
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (!entry.isIntersecting) return;
+        io.unobserve(entry.target);
+        runCount(entry.target);
+      });
+    }, { threshold: 0.4 });
+    counters.forEach(function (el) { io.observe(el); });
   }
 
   if (reduceMotion) {
@@ -127,7 +151,7 @@
     revealables.forEach(function (el) { el.classList.add('is-visible'); });
     document.querySelectorAll('[data-hero]').forEach(function (el) { el.style.opacity = 1; });
     setBarHeights();
-    counters.forEach(countUp);
+    startCounters();
 
   } else if (hasGSAP) {
     root.classList.add('gsap');
@@ -358,12 +382,75 @@
       });
     });
 
+    /* --- Section backgrounds: slow parallax drift + AI motif life -------- */
+    document.querySelectorAll('.sbg').forEach(function (layer, i) {
+      // Each layer drifts at its own rate as the section passes through.
+      gsap.fromTo(layer, { yPercent: -6 }, {
+        yPercent: 6, ease: 'none',
+        scrollTrigger: {
+          trigger: layer.parentElement,
+          start: 'top bottom', end: 'bottom top', scrub: 0.6
+        }
+      });
+    });
+
+    /* Synapses pulse along their length; neurons breathe. */
+    document.querySelectorAll('.sbg-synapse path').forEach(function (path, i) {
+      var len = path.getTotalLength ? path.getTotalLength() : 0;
+      if (!len) return;
+      gsap.set(path, { strokeDasharray: len * 0.22 + ' ' + len });
+      gsap.fromTo(path, { strokeDashoffset: len * 0.6 }, {
+        strokeDashoffset: -len * 0.6, duration: 3 + (i % 7) * 0.5,
+        ease: 'none', repeat: -1, delay: (i % 11) * 0.22
+      });
+    });
+
+    document.querySelectorAll('.sbg-neuron circle').forEach(function (dot, i) {
+      gsap.to(dot, {
+        opacity: 0.22, scale: 0.78, transformOrigin: 'center',
+        duration: 1.4 + (i % 5) * 0.35, repeat: -1, yoyo: true,
+        ease: 'sine.inOut', delay: (i % 9) * 0.18
+      });
+    });
+
+    /* Latent-space points settle into their clusters. */
+    document.querySelectorAll('.sbg-embed circle').forEach(function (dot, i) {
+      gsap.from(dot, {
+        scale: 0, transformOrigin: 'center', duration: 0.6, delay: (i % 20) * 0.03,
+        ease: 'back.out(2)', scrollTrigger: ST(dot.closest('.sbg').parentElement, 'top 85%')
+      });
+    });
+
+    /* Attention weights and token stream flicker like live inference. */
+    document.querySelectorAll('.sbg-cell rect').forEach(function (cell, i) {
+      gsap.to(cell, {
+        opacity: '+=0.18', duration: 1 + (i % 6) * 0.3, repeat: -1, yoyo: true,
+        ease: 'sine.inOut', delay: (i % 17) * 0.11
+      });
+    });
+
+    /* Radar and orbit rings turn slowly. */
+    document.querySelectorAll('.sbg-ring, .sbg-orbit').forEach(function (ring, i) {
+      gsap.to(ring, { rotation: i % 2 ? -360 : 360, transformOrigin: 'center',
+                      duration: 180 + i * 40, repeat: -1, ease: 'none' });
+    });
+
+    /* Contours and waves breathe horizontally. */
+    document.querySelectorAll('.sbg-wave path, .sbg-topo path').forEach(function (path, i) {
+      gsap.to(path, { x: (i % 2 ? -1 : 1) * 46, duration: 9 + i * 1.3,
+                      repeat: -1, yoyo: true, ease: 'sine.inOut' });
+    });
+
     /* --- Chrome: chart, progress, parallax, tilt -------------------------- */
     if (bars.length) {
-      gsap.from(bars, {
-        scaleY: 0, transformOrigin: 'bottom', duration: 0.8, stagger: 0.05,
-        scrollTrigger: ST('.chart', 'top 90%')
-      });
+      // The chart lives in the hero. Rest state is applied first and the
+      // start state is withheld until the tween actually runs, so the bars
+      // can never be stranded at zero height if it is delayed or never
+      // plays — a ScrollTrigger here would resolve its start above the top
+      // of the page and never receive a crossing event at all.
+      gsap.set(bars, { scaleY: 1, transformOrigin: 'bottom' });
+      gsap.fromTo(bars, { scaleY: 0 },
+        { scaleY: 1, duration: 0.8, stagger: 0.05, delay: 0.4, immediateRender: false });
     }
 
     var progress = document.querySelector('.scroll-progress span');
@@ -395,7 +482,7 @@
       visual.addEventListener('mouseleave', function () { rx(0); ry(0); });
     }
 
-    counters.forEach(countUp);
+    startCounters();
 
     /* Webfonts change metrics after load, which moves every trigger. */
     if (document.fonts && document.fonts.ready) {
@@ -410,7 +497,6 @@
 
     if (!('IntersectionObserver' in window)) {
       revealables.forEach(function (el) { el.classList.add('is-visible'); });
-      counters.forEach(countUp);
     } else {
       var revealer = new IntersectionObserver(function (entries) {
         entries.forEach(function (entry) {
@@ -423,15 +509,8 @@
       }, { threshold: 0.12, rootMargin: '0px 0px -8% 0px' });
       revealables.forEach(function (el) { revealer.observe(el); });
 
-      var counterObs = new IntersectionObserver(function (entries) {
-        entries.forEach(function (entry) {
-          if (!entry.isIntersecting) return;
-          countUp(entry.target);
-          counterObs.unobserve(entry.target);
-        });
-      }, { threshold: 0.5 });
-      counters.forEach(function (el) { counterObs.observe(el); });
     }
+    startCounters();
     document.querySelectorAll('[data-hero]').forEach(function (el) { el.style.opacity = 1; });
   }
 
