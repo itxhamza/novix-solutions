@@ -28,6 +28,17 @@ robots.txt, sitemap.xml
 
 There is no build step. Edit the HTML directly and commit.
 
+### URLs
+
+GitHub Pages serves `foo.html` at `/foo`, so the site links to extensionless
+paths — `/services`, not `/services.html`. Keep it that way when adding links:
+the files stay named `*.html` on disk, but nothing in the markup should reference
+the extension. Canonical tags and the sitemap use the clean paths too. Note that
+a trailing slash (`/services/`) is **not** served and returns 404.
+
+Asset paths are root-relative (`/assets/...`) so they resolve the same from any
+URL depth.
+
 ## Brand
 
 Colours come from the Figma logo file and are defined once at the top of
