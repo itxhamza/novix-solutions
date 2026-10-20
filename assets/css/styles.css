@@ -919,35 +919,36 @@ body.is-locked { overflow: hidden; }
 }
 .work-card:hover { transform: translateY(-6px); border-color: var(--border-strong); box-shadow: var(--shadow); }
 
+/* The media box holds the chrome bar (sites only) and the well below it, so
+   it carries no ratio of its own — the well does. */
 .work-card__media {
   position: relative;
-  aspect-ratio: 16 / 10;
-  display: grid;
-  place-items: center;
   border-bottom: 1px solid var(--border);
-  background:
-    radial-gradient(420px 220px at 30% 20%, rgba(14, 191, 67, .12), transparent 70%),
-    var(--surface-2);
   overflow: hidden;
 }
-.work-card__media > svg { width: 52px; height: 52px; color: var(--brand); opacity: .75; }
 /* Project shots are trimmed device mockups on transparent ground, so they are
-   contained inside the panel rather than cropped to fill it — cropping a phone
+   contained inside the well rather than cropped to fill it — cropping a phone
    mockup cuts the device in half. */
-.work-card__media .shot {
+.work-card__well .shot {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
   object-fit: contain;
   padding: clamp(14px, 2.4vw, 26px);
-  /* Above the panel's grid overlay, which is drawn by ::after and would
+  /* Above the well's grid overlay, which is drawn by ::after and would
      otherwise rule lines across the screenshot. */
   z-index: 1;
   transition: transform var(--t-slow) var(--ease-out);
 }
-.work-card:hover .work-card__media .shot { transform: scale(1.045); }
-.work-card__media::after {
+.work-card:hover .work-card__well .shot { transform: scale(1.045); }
+.work-card__well {
+  background:
+    radial-gradient(420px 220px at 30% 20%, rgba(14, 191, 67, .12), transparent 70%),
+    var(--surface-2);
+  overflow: hidden;
+}
+.work-card__well::after {
   content: "";
   position: absolute;
   inset: 0;
@@ -1004,7 +1005,103 @@ body.is-locked { overflow: hidden; }
 
 /* The featured card on the Work page sits in a split rather than a grid
    column, so the shot gets a little more room. */
-.work-card--feature .work-card__media { aspect-ratio: 16 / 11; }
+.work-card--feature .work-card__well { aspect-ratio: 16 / 11; }
+
+/* --------------------------------------------------------------------------
+   12b. Project showcase
+   The media frame follows the platform. A site gets browser chrome and a
+   landscape well; an app gets a taller one, because the app mockups are
+   phone-shaped composites and a 16:10 slot was shrinking them to fit a
+   width they never needed.
+   -------------------------------------------------------------------------- */
+/* The well is the part the screenshot lives in; the media box above it also
+   holds the chrome bar, so the aspect ratio belongs on the well. */
+.work-card__well {
+  position: relative;
+  aspect-ratio: 16 / 10;
+}
+/* Square rather than portrait: the app mockups are multi-phone composites,
+   so they need height a landscape well denies them, but a full 4:5 left the
+   rows beside them visibly ragged. */
+.work-card--app .work-card__well { aspect-ratio: 1 / 1; }
+
+/* Browser chrome: three dots and the real domain. */
+.chrome {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 9px 13px;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface-2);
+}
+.chrome__dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: var(--border-strong);
+  flex: 0 0 auto;
+}
+.chrome__bar {
+  margin-left: 6px;
+  flex: 1;
+  min-width: 0;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  font-size: .7rem;
+  /* The domain is small real text, not decoration: --muted lands at 3.96:1
+     against the chrome fill in light mode. */
+  color: var(--text-dim);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Cards keep their own height so the two frame shapes can sit in one grid
+   without the shorter one growing a void beneath it. */
+.showcase { align-items: start; }
+.showcase .work-card { transition: opacity .35s var(--ease), transform .35s var(--ease); }
+.work-card.is-out { display: none; }
+.showcase__empty { text-align: center; color: var(--muted); padding: 40px 0; }
+
+/* Filter chips */
+.filter-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: clamp(26px, 3vw, 40px);
+}
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 18px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text-dim);
+  font: inherit;
+  font-size: .9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background var(--t) var(--ease), color var(--t) var(--ease),
+              border-color var(--t) var(--ease);
+}
+.chip span {
+  font-size: .74rem;
+  font-weight: 700;
+  padding: 1px 7px;
+  border-radius: 999px;
+  background: var(--surface-2);
+  color: var(--muted);
+}
+.chip:hover { border-color: var(--border-strong); color: var(--text); }
+.chip.is-on {
+  background: var(--brand-cta);
+  border-color: var(--brand-cta);
+  color: #fff;
+}
+.chip.is-on span { background: rgba(255, 255, 255, .22); color: #fff; }
 
 /* Horizontal work rail — applied by script only when it can run. */
 .section.is-rail { overflow: hidden; }
@@ -1035,8 +1132,16 @@ body.is-locked { overflow: hidden; }
   transition: transform var(--t) var(--ease), border-color var(--t) var(--ease);
 }
 .quote:hover { transform: translateY(-5px); border-color: var(--border-strong); }
-.quote__stars { display: flex; gap: 3px; color: var(--amber); }
-.quote__stars svg { width: 16px; height: 16px; }
+/* A quote mark in place of the star row: these reviews are real, but none of
+   them carries a rating to display. */
+.quote__mark {
+  font-family: var(--font-display);
+  font-size: 3rem;
+  line-height: .7;
+  height: 22px;
+  color: var(--brand);
+  opacity: .34;
+}
 .quote blockquote { font-size: 1.01rem; line-height: 1.7; color: var(--text-dim); }
 .quote__person { display: flex; align-items: center; gap: 13px; margin-top: auto; }
 .avatar {

@@ -403,6 +403,7 @@
       var grids = document.querySelectorAll('.grid');
       for (var g = 0; g < grids.length; g++) {
         var grid = grids[g];
+        if (grid.hasAttribute('data-no-rail')) continue;
         var cards = grid.querySelectorAll('.work-card');
         if (cards.length < 4) continue;
         var section = grid.closest('.section');
@@ -1050,12 +1051,59 @@
       el.classList.add('magnetic');
       var mx = gsap.quickTo(el, 'x', { duration: 0.4, ease: 'power3' });
       var my = gsap.quickTo(el, 'y', { duration: 0.4, ease: 'power3' });
+      /* Vertical pull is kept much weaker than horizontal, and capped: a
+         button sitting next to another one has a shared line, and a few
+         pixels of drift off it reads as a misaligned row rather than as a
+         magnet. Sideways there is no line to break. */
+      function clamp(v, lim) { return v < -lim ? -lim : (v > lim ? lim : v); }
       el.addEventListener('mousemove', function (e) {
         var r = el.getBoundingClientRect();
-        mx((e.clientX - (r.left + r.width / 2)) * 0.22);
-        my((e.clientY - (r.top + r.height / 2)) * 0.32);
+        mx(clamp((e.clientX - (r.left + r.width / 2)) * 0.18, 14));
+        my(clamp((e.clientY - (r.top + r.height / 2)) * 0.10, 3));
       });
       el.addEventListener('mouseleave', function () { mx(0); my(0); });
+    });
+  }());
+
+  /* ----- Project filter --------------------------------------------------
+     Chips hide cards by class, so the grid is correct with or without GSAP;
+     when GSAP is there the surviving cards settle in rather than snap. */
+  (function projectFilter() {
+    var bar = document.querySelector('.filter-bar');
+    var grid = document.getElementById('showcase');
+    if (!bar || !grid) return;
+    var cards = [].slice.call(grid.querySelectorAll('.work-card'));
+    var empty = document.querySelector('.showcase__empty');
+
+    bar.addEventListener('click', function (e) {
+      var chip = e.target.closest('.chip');
+      if (!chip) return;
+      var want = chip.getAttribute('data-filter');
+
+      [].forEach.call(bar.querySelectorAll('.chip'), function (c) {
+        var on = c === chip;
+        c.classList.toggle('is-on', on);
+        c.setAttribute('aria-pressed', on ? 'true' : 'false');
+      });
+
+      var shown = [];
+      cards.forEach(function (card) {
+        /* data-plat is a token list: a product that is both a site and an
+           app belongs under both chips. */
+        var plats = (card.getAttribute('data-plat') || '').split(' ');
+        var keep = want === 'all' || plats.indexOf(want) !== -1;
+        card.classList.toggle('is-out', !keep);
+        if (keep) shown.push(card);
+      });
+      if (empty) empty.hidden = shown.length > 0;
+
+      if (window.gsap && !reduceMotion) {
+        gsap.fromTo(shown, { opacity: 0, y: 14 }, {
+          opacity: 1, y: 0, duration: 0.45, ease: 'power3.out',
+          stagger: 0.04, overwrite: true, clearProps: 'transform'
+        });
+      }
+      if (window.ScrollTrigger) ScrollTrigger.refresh();
     });
   }());
 

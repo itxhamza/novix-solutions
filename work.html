@@ -139,10 +139,19 @@
   <path d="M0 -42 L112 24 L0 90 L-112 24Z"/>
 </g></svg></div>
     <div class="container">
-      <div class="grid grid--3">
-        <article class="work-card" data-reveal data-reveal-delay="0">
+      <div class="filter-bar" role="group" aria-label="Filter projects by platform" data-reveal>
+        <button class="chip is-on" type="button" data-filter="all" aria-pressed="true">Everything <span>8</span></button>
+        <button class="chip" type="button" data-filter="app" aria-pressed="false">Mobile apps <span>6</span></button>
+        <button class="chip" type="button" data-filter="web" aria-pressed="false">Websites <span>4</span></button>
+      </div>
+      <div class="grid grid--3 showcase" id="showcase" data-no-rail>
+        <article class="work-card work-card--web" data-plat="web app" data-reveal data-reveal-delay="0">
           <div class="work-card__media">
-            <img class="shot" src="/assets/img/work/kwot-creator.webp" alt="Kwot Creator shown on device" loading="lazy" decoding="async">
+          <div class="chrome" aria-hidden="true">
+              <span class="chrome__dot"></span><span class="chrome__dot"></span><span class="chrome__dot"></span>
+              <span class="chrome__bar">creator.kwot.com</span>
+            </div>
+            <div class="work-card__well"><img class="shot" src="/assets/img/work/kwot-creator.webp" alt="Kwot Creator shown on device" loading="lazy" decoding="async"></div>
           </div>
           <div class="work-card__body">
             <span class="tag">Web &amp; Mobile</span>
@@ -151,9 +160,13 @@
             <div class="work-card__foot"><span class="work-card__year">2023</span><a class="work-card__link" href="https://creator.kwot.com" target="_blank" rel="noopener">Visit <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></a></div>
           </div>
         </article>
-        <article class="work-card" data-reveal data-reveal-delay="90">
+        <article class="work-card work-card--web" data-plat="web app" data-reveal data-reveal-delay="90">
           <div class="work-card__media">
-            <img class="shot" src="/assets/img/work/edufeel.webp" alt="Edufeel shown on device" loading="lazy" decoding="async">
+          <div class="chrome" aria-hidden="true">
+              <span class="chrome__dot"></span><span class="chrome__dot"></span><span class="chrome__dot"></span>
+              <span class="chrome__bar">edufeel.co.uk</span>
+            </div>
+            <div class="work-card__well"><img class="shot" src="/assets/img/work/edufeel.webp" alt="Edufeel shown on device" loading="lazy" decoding="async"></div>
           </div>
           <div class="work-card__body">
             <span class="tag">Web &amp; Mobile</span>
@@ -162,53 +175,13 @@
             <div class="work-card__foot"><span class="work-card__year">2022</span><a class="work-card__link" href="https://edufeel.co.uk" target="_blank" rel="noopener">Visit <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></a></div>
           </div>
         </article>
-        <article class="work-card" data-reveal data-reveal-delay="180">
+        <article class="work-card work-card--web" data-plat="web" data-reveal data-reveal-delay="180">
           <div class="work-card__media">
-            <img class="shot" src="/assets/img/work/bizly.webp" alt="Bizly shown on device" loading="lazy" decoding="async">
-          </div>
-          <div class="work-card__body">
-            <span class="tag">Mobile</span>
-            <h3>Bizly</h3>
-            <p>A creative network and jobs app &mdash; profiles, portfolios and connections between freelancers and the people hiring them.</p>
-            <div class="work-card__foot"><span class="work-card__year">2023</span><a class="work-card__link" href="https://apps.apple.com/us/app/bizly-creative-network-jobs/id6443831329" target="_blank" rel="noopener">Visit <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></a></div>
-          </div>
-        </article>
-        <article class="work-card" data-reveal data-reveal-delay="0">
-          <div class="work-card__media">
-            <img class="shot" src="/assets/img/work/presence.webp" alt="Presence — Spiritual Dating shown on device" loading="lazy" decoding="async">
-          </div>
-          <div class="work-card__body">
-            <span class="tag">Mobile</span>
-            <h3>Presence &mdash; Spiritual Dating</h3>
-            <p>A dating app built around shared practice rather than proximity, with profile matching and in-app chat.</p>
-            <div class="work-card__foot"><span class="work-card__year">2023</span><a class="work-card__link" href="https://www.spiritualdatingapp.com/" target="_blank" rel="noopener">Visit <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></a></div>
-          </div>
-        </article>
-        <article class="work-card" data-reveal data-reveal-delay="90">
-          <div class="work-card__media">
-            <img class="shot" src="/assets/img/work/hisnul-muslim.webp" alt="Hisnul Muslim Plus shown on device" loading="lazy" decoding="async">
-          </div>
-          <div class="work-card__body">
-            <span class="tag">Mobile</span>
-            <h3>Hisnul Muslim Plus</h3>
-            <p>Du&rsquo;as from the Qur&rsquo;an and Sunnah, organised by time of day and occasion, with Arabic, transliteration and audio.</p>
-            <div class="work-card__foot"><span class="work-card__year">2023</span><a class="work-card__link" href="https://apps.apple.com/us/app/hisnul-muslim-plus/id1585750523" target="_blank" rel="noopener">Visit <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></a></div>
-          </div>
-        </article>
-        <article class="work-card" data-reveal data-reveal-delay="180">
-          <div class="work-card__media">
-            <img class="shot" src="/assets/img/work/easy-hvac.webp" alt="Easy HVAC shown on device" loading="lazy" decoding="async">
-          </div>
-          <div class="work-card__body">
-            <span class="tag">Mobile</span>
-            <h3>Easy HVAC</h3>
-            <p>Service requests for residential and commercial HVAC: customers report the fault, contractors assign a technician, and both sides track the job to payment.</p>
-            <div class="work-card__foot"><span class="work-card__year">2023</span></div>
-          </div>
-        </article>
-        <article class="work-card" data-reveal data-reveal-delay="0">
-          <div class="work-card__media">
-            <img class="shot" src="/assets/img/work/nft-watcher.webp" alt="NFT Watcher shown on device" loading="lazy" decoding="async">
+          <div class="chrome" aria-hidden="true">
+              <span class="chrome__dot"></span><span class="chrome__dot"></span><span class="chrome__dot"></span>
+              <span class="chrome__bar">nftwatcher.net</span>
+            </div>
+            <div class="work-card__well"><img class="shot" src="/assets/img/work/nft-watcher.webp" alt="NFT Watcher shown on device" loading="lazy" decoding="async"></div>
           </div>
           <div class="work-card__body">
             <span class="tag">Web</span>
@@ -217,9 +190,13 @@
             <div class="work-card__foot"><span class="work-card__year">2020</span><a class="work-card__link" href="https://nftwatcher.net" target="_blank" rel="noopener">Visit <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></a></div>
           </div>
         </article>
-        <article class="work-card" data-reveal data-reveal-delay="90">
+        <article class="work-card work-card--web" data-plat="web" data-reveal data-reveal-delay="0">
           <div class="work-card__media">
-            <img class="shot" src="/assets/img/work/cryptegridy.webp" alt="Cryptegridy shown on device" loading="lazy" decoding="async">
+          <div class="chrome" aria-hidden="true">
+              <span class="chrome__dot"></span><span class="chrome__dot"></span><span class="chrome__dot"></span>
+              <span class="chrome__bar"></span>
+            </div>
+            <div class="work-card__well"><img class="shot" src="/assets/img/work/cryptegridy.webp" alt="Cryptegridy shown on device" loading="lazy" decoding="async"></div>
           </div>
           <div class="work-card__body">
             <span class="tag">Web</span>
@@ -228,7 +205,52 @@
             <div class="work-card__foot"><span class="work-card__year">2021</span></div>
           </div>
         </article>
+        <article class="work-card work-card--app" data-plat="app" data-reveal data-reveal-delay="90">
+          <div class="work-card__media">
+          <div class="work-card__well"><img class="shot" src="/assets/img/work/bizly.webp" alt="Bizly shown on device" loading="lazy" decoding="async"></div>
+          </div>
+          <div class="work-card__body">
+            <span class="tag">Mobile</span>
+            <h3>Bizly</h3>
+            <p>A creative network and jobs app &mdash; profiles, portfolios and connections between freelancers and the people hiring them.</p>
+            <div class="work-card__foot"><span class="work-card__year">2023</span><a class="work-card__link" href="https://apps.apple.com/us/app/bizly-creative-network-jobs/id6443831329" target="_blank" rel="noopener">Visit <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></a></div>
+          </div>
+        </article>
+        <article class="work-card work-card--app" data-plat="app" data-reveal data-reveal-delay="180">
+          <div class="work-card__media">
+          <div class="work-card__well"><img class="shot" src="/assets/img/work/presence.webp" alt="Presence — Spiritual Dating shown on device" loading="lazy" decoding="async"></div>
+          </div>
+          <div class="work-card__body">
+            <span class="tag">Mobile</span>
+            <h3>Presence &mdash; Spiritual Dating</h3>
+            <p>A dating app built around shared practice rather than proximity, with profile matching and in-app chat.</p>
+            <div class="work-card__foot"><span class="work-card__year">2023</span><a class="work-card__link" href="https://www.spiritualdatingapp.com/" target="_blank" rel="noopener">Visit <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></a></div>
+          </div>
+        </article>
+        <article class="work-card work-card--app" data-plat="app" data-reveal data-reveal-delay="0">
+          <div class="work-card__media">
+          <div class="work-card__well"><img class="shot" src="/assets/img/work/hisnul-muslim.webp" alt="Hisnul Muslim Plus shown on device" loading="lazy" decoding="async"></div>
+          </div>
+          <div class="work-card__body">
+            <span class="tag">Mobile</span>
+            <h3>Hisnul Muslim Plus</h3>
+            <p>Du&rsquo;as from the Qur&rsquo;an and Sunnah, organised by time of day and occasion, with Arabic, transliteration and audio.</p>
+            <div class="work-card__foot"><span class="work-card__year">2023</span><a class="work-card__link" href="https://apps.apple.com/us/app/hisnul-muslim-plus/id1585750523" target="_blank" rel="noopener">Visit <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></a></div>
+          </div>
+        </article>
+        <article class="work-card work-card--app" data-plat="app" data-reveal data-reveal-delay="90">
+          <div class="work-card__media">
+          <div class="work-card__well"><img class="shot" src="/assets/img/work/easy-hvac.webp" alt="Easy HVAC shown on device" loading="lazy" decoding="async"></div>
+          </div>
+          <div class="work-card__body">
+            <span class="tag">Mobile</span>
+            <h3>Easy HVAC</h3>
+            <p>Service requests for residential and commercial HVAC: customers report the fault, contractors assign a technician, and both sides track the job to payment.</p>
+            <div class="work-card__foot"><span class="work-card__year">2023</span></div>
+          </div>
+        </article>
       </div>
+      <p class="showcase__empty" hidden>Nothing in that category yet.</p>
     </div>
   </section>
 
@@ -236,20 +258,20 @@
     <div class="container">
     <div class="stat-band" data-reveal>
       <div class="stat">
-        <b data-count="120" data-count-suffix="+">0+</b>
-        <span>Projects delivered</span>
+        <b data-count="8" data-count-suffix="">0</b>
+        <span>Products shipped</span>
       </div>
       <div class="stat">
-        <b data-count="48" data-count-suffix="">0</b>
-        <span>Clients worldwide</span>
+        <b data-count="6" data-count-suffix="">0</b>
+        <span>Live right now</span>
       </div>
       <div class="stat">
-        <b data-count="99.9" data-count-suffix="%">0%</b>
-        <span>Uptime maintained</span>
+        <b data-count="2" data-count-suffix="">0</b>
+        <span>On the App Store</span>
       </div>
       <div class="stat">
-        <b data-count="14" data-count-suffix="">0</b>
-        <span>Specialists on team</span>
+        <b>2020</b>
+        <span>Shipping since</span>
       </div>
     </div>
     </div>
@@ -257,9 +279,13 @@
 
   <section class="section">
     <div class="container split split--reverse">
-        <article class="work-card work-card--feature" data-reveal data-reveal-delay="120">
+        <article class="work-card work-card--web work-card--feature" data-plat="web app" data-reveal data-reveal-delay="120">
           <div class="work-card__media">
-            <img class="shot" src="/assets/img/work/edufeel.webp" alt="Edufeel shown on device" loading="lazy" decoding="async">
+          <div class="chrome" aria-hidden="true">
+              <span class="chrome__dot"></span><span class="chrome__dot"></span><span class="chrome__dot"></span>
+              <span class="chrome__bar">edufeel.co.uk</span>
+            </div>
+            <div class="work-card__well"><img class="shot" src="/assets/img/work/edufeel.webp" alt="Edufeel shown on device" loading="lazy" decoding="async"></div>
           </div>
           <div class="work-card__body">
             <span class="tag">Web &amp; Mobile</span>
@@ -361,27 +387,27 @@
       </div>
       <div class="grid grid--3">
         <figure class="quote" data-reveal data-reveal-delay="0">
-          <div class="quote__stars" aria-label="Rated 5 out of 5"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l2.9 6.1 6.6.9-4.8 4.6 1.2 6.6L12 17.1 6.1 20.2l1.2-6.6L2.5 9l6.6-.9z"/></svg><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l2.9 6.1 6.6.9-4.8 4.6 1.2 6.6L12 17.1 6.1 20.2l1.2-6.6L2.5 9l6.6-.9z"/></svg><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l2.9 6.1 6.6.9-4.8 4.6 1.2 6.6L12 17.1 6.1 20.2l1.2-6.6L2.5 9l6.6-.9z"/></svg><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l2.9 6.1 6.6.9-4.8 4.6 1.2 6.6L12 17.1 6.1 20.2l1.2-6.6L2.5 9l6.6-.9z"/></svg><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l2.9 6.1 6.6.9-4.8 4.6 1.2 6.6L12 17.1 6.1 20.2l1.2-6.6L2.5 9l6.6-.9z"/></svg></div>
-          <blockquote>&ldquo;Novix rebuilt our checkout in six weeks and the numbers moved in the first month. They pushed back where it mattered and shipped on the date they gave us.&rdquo;</blockquote>
+          <div class="quote__mark" aria-hidden="true">&ldquo;</div>
+          <blockquote>&ldquo;His expertise was evident in the robust API solutions provided. He handled complex challenges efficiently, significantly enhancing our app&rsquo;s performance. Deliveries were on time and well-documented, making handovers seamless.&rdquo;</blockquote>
           <figcaption class="quote__person">
-            <span class="avatar" aria-hidden="true">AH</span>
-            <span><b>Amelia Hart</b><span>COO, Northbridge Retail</span></span>
+            <span class="avatar" aria-hidden="true">XC</span>
+            <span><b>Xaiver Cooper</b></span>
           </figcaption>
         </figure>
         <figure class="quote" data-reveal data-reveal-delay="90">
-          <div class="quote__stars" aria-label="Rated 5 out of 5"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l2.9 6.1 6.6.9-4.8 4.6 1.2 6.6L12 17.1 6.1 20.2l1.2-6.6L2.5 9l6.6-.9z"/></svg><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l2.9 6.1 6.6.9-4.8 4.6 1.2 6.6L12 17.1 6.1 20.2l1.2-6.6L2.5 9l6.6-.9z"/></svg><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l2.9 6.1 6.6.9-4.8 4.6 1.2 6.6L12 17.1 6.1 20.2l1.2-6.6L2.5 9l6.6-.9z"/></svg><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l2.9 6.1 6.6.9-4.8 4.6 1.2 6.6L12 17.1 6.1 20.2l1.2-6.6L2.5 9l6.6-.9z"/></svg><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l2.9 6.1 6.6.9-4.8 4.6 1.2 6.6L12 17.1 6.1 20.2l1.2-6.6L2.5 9l6.6-.9z"/></svg></div>
-          <blockquote>&ldquo;The clearest engineering partner we have worked with. Weekly demos, honest estimates, and documentation our in-house team could actually pick up.&rdquo;</blockquote>
+          <div class="quote__mark" aria-hidden="true">&ldquo;</div>
+          <blockquote>&ldquo;Exceptional work integrating a secure payment gateway tailored for Bangladesh &mdash; SSL encryption and two-factor authentication, ensuring reliable and safe transactions. Highly recommend for their dedication and technical expertise.&rdquo;</blockquote>
           <figcaption class="quote__person">
-            <span class="avatar" aria-hidden="true">DO</span>
-            <span><b>Daniel Okafor</b><span>CTO, Vellum Health</span></span>
+            <span class="avatar" aria-hidden="true">JL</span>
+            <span><b>John Lim</b></span>
           </figcaption>
         </figure>
         <figure class="quote" data-reveal data-reveal-delay="180">
-          <div class="quote__stars" aria-label="Rated 5 out of 5"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l2.9 6.1 6.6.9-4.8 4.6 1.2 6.6L12 17.1 6.1 20.2l1.2-6.6L2.5 9l6.6-.9z"/></svg><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l2.9 6.1 6.6.9-4.8 4.6 1.2 6.6L12 17.1 6.1 20.2l1.2-6.6L2.5 9l6.6-.9z"/></svg><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l2.9 6.1 6.6.9-4.8 4.6 1.2 6.6L12 17.1 6.1 20.2l1.2-6.6L2.5 9l6.6-.9z"/></svg><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l2.9 6.1 6.6.9-4.8 4.6 1.2 6.6L12 17.1 6.1 20.2l1.2-6.6L2.5 9l6.6-.9z"/></svg><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l2.9 6.1 6.6.9-4.8 4.6 1.2 6.6L12 17.1 6.1 20.2l1.2-6.6L2.5 9l6.6-.9z"/></svg></div>
-          <blockquote>&ldquo;They treated our roadmap like their own. What started as a two-month project has become the platform the whole company runs on.&rdquo;</blockquote>
+          <div class="quote__mark" aria-hidden="true">&ldquo;</div>
+          <blockquote>&ldquo;He built the system from scratch, paying close attention to our needs and making it easy to use. Communication was clear and consistent, and he solved any issues quickly. I highly recommend Hamza to anyone looking for a skilled, reliable developer.&rdquo;</blockquote>
           <figcaption class="quote__person">
-            <span class="avatar" aria-hidden="true">SR</span>
-            <span><b>Sofia Reyes</b><span>Founder, Arc Logistics</span></span>
+            <span class="avatar" aria-hidden="true">JR</span>
+            <span><b>Jade Ruzzo</b><span>Jade Ruzzo (jewellery)</span></span>
           </figcaption>
         </figure>
       </div>
