@@ -514,6 +514,127 @@
     document.querySelectorAll('[data-hero]').forEach(function (el) { el.style.opacity = 1; });
   }
 
+  /* ----- Custom cursor ---------------------------------------------------
+     A tracking reticle with a trailing spark field. Built only for a fine
+     pointer with motion allowed, and the native cursor is hidden only once
+     ours exists — so touch, a failed script and JS-off all keep the real
+     cursor. */
+  (function cursor() {
+    var fine = window.matchMedia('(pointer: fine)').matches &&
+               window.matchMedia('(hover: hover)').matches;
+    if (!fine || reduceMotion || !hasGSAP) return;
+
+    var layer = document.createElement('div');
+    layer.className = 'cursor-layer';
+    layer.setAttribute('aria-hidden', 'true');
+    layer.style.opacity = '0';
+
+    var SPARKS = 5;
+    var sparks = [];
+    for (var i = 0; i < SPARKS; i++) {
+      var sp = document.createElement('div');
+      sp.className = 'cur cur-spark';
+      sp.style.opacity = (0.3 - i * 0.05).toFixed(2);
+      // Sized in px, not via the `scale` property: GSAP resets
+      // translate/rotate/scale when it takes over an element's transform.
+      var d = 5 - i * 0.7;
+      sp.style.width = sp.style.height = d.toFixed(1) + 'px';
+      sp.style.margin = (-d / 2).toFixed(2) + 'px 0 0 ' + (-d / 2).toFixed(2) + 'px';
+      layer.appendChild(sp);
+      sparks.push(sp);
+    }
+    var ring = document.createElement('div');
+    var dot = document.createElement('div');
+    ring.className = 'cur cur-ring';
+    dot.className = 'cur cur-dot';
+    layer.appendChild(ring);
+    layer.appendChild(dot);
+    document.body.appendChild(layer);
+    root.classList.add('has-cursor');
+
+    var qx = [], qy = [];
+    var setters = [
+      [gsap.quickTo(dot, 'x', { duration: 0.08, ease: 'power3' }),
+       gsap.quickTo(dot, 'y', { duration: 0.08, ease: 'power3' })],
+      [gsap.quickTo(ring, 'x', { duration: 0.42, ease: 'power3' }),
+       gsap.quickTo(ring, 'y', { duration: 0.42, ease: 'power3' })]
+    ];
+    sparks.forEach(function (sp, i) {
+      setters.push([
+        gsap.quickTo(sp, 'x', { duration: 0.5 + i * 0.13, ease: 'power2' }),
+        gsap.quickTo(sp, 'y', { duration: 0.5 + i * 0.13, ease: 'power2' })
+      ]);
+    });
+
+    var shown = false;
+    window.addEventListener('mousemove', function (e) {
+      if (!shown) { shown = true; gsap.to(layer, { opacity: 1, duration: 0.3 }); }
+      setters.forEach(function (pair) { pair[0](e.clientX); pair[1](e.clientY); });
+    }, { passive: true });
+
+    document.addEventListener('mouseleave', function () {
+      gsap.to(layer, { opacity: 0, duration: 0.25 });
+      shown = false;
+    });
+
+    /* The reticle keeps scanning. */
+    gsap.to(ring, { rotation: 360, duration: 9, repeat: -1, ease: 'none' });
+
+    /* State by what is under the pointer. */
+    var WIDE = '.card--hover, .work-card, .quote, .price-card, .step, .member';
+    var TEXTY = 'input, textarea, select';
+    var TAP = 'a, button, summary, [role="button"], .faq__item summary, label.check';
+
+    /* Luminance of the nearest painted background, so the reticle can
+       invert over dark fills (the brand button, dark surfaces) instead of
+       disappearing into them. */
+    function onDark(el) {
+      for (var n = el; n && n !== document.documentElement; n = n.parentElement) {
+        var bg = getComputedStyle(n).backgroundColor;
+        var m = bg.match(/[\d.]+/g);
+        if (!m || m.length < 3) continue;
+        if (m.length > 3 && parseFloat(m[3]) < 0.5) continue;
+        var c = m.slice(0, 3).map(function (v) {
+          v = v / 255;
+          return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4);
+        });
+        return 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2] < 0.3;
+      }
+      return false;
+    }
+
+    document.addEventListener('mouseover', function (e) {
+      var t = e.target;
+      if (!t.closest) return;
+      root.classList.toggle('cur-text', !!t.closest(TEXTY));
+      root.classList.toggle('cur-active', !!t.closest(TAP));
+      root.classList.toggle('cur-wide', !t.closest(TAP) && !!t.closest(WIDE));
+      root.classList.toggle('cur-on-dark', onDark(t));
+    });
+
+    document.addEventListener('mousedown', function () {
+      root.classList.add('cur-down');
+      gsap.to(ring, { scale: 0.82, duration: 0.18 });
+    });
+    document.addEventListener('mouseup', function () {
+      root.classList.remove('cur-down');
+      gsap.to(ring, { scale: 1, duration: 0.35, ease: 'back.out(3)' });
+    });
+
+    /* Magnetic pull: primary actions lean toward the pointer. */
+    document.querySelectorAll('.btn--primary, .icon-btn, .social').forEach(function (el) {
+      el.classList.add('magnetic');
+      var mx = gsap.quickTo(el, 'x', { duration: 0.4, ease: 'power3' });
+      var my = gsap.quickTo(el, 'y', { duration: 0.4, ease: 'power3' });
+      el.addEventListener('mousemove', function (e) {
+        var r = el.getBoundingClientRect();
+        mx((e.clientX - (r.left + r.width / 2)) * 0.22);
+        my((e.clientY - (r.top + r.height / 2)) * 0.32);
+      });
+      el.addEventListener('mouseleave', function () { mx(0); my(0); });
+    });
+  }());
+
   /* ----- FAQ: one open at a time ---------------------------------------- */
   var faqItems = document.querySelectorAll('.faq__item');
   faqItems.forEach(function (item) {

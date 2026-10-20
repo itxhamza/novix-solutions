@@ -1564,6 +1564,112 @@ body.is-locked { overflow: hidden; }
   .sbg { animation: none !important; }
 }
 
+
+/* --------------------------------------------------------------------------
+   29. Custom cursor
+   Only ever active when JS has confirmed a fine pointer and built the
+   cursor — `.has-cursor` is set from script, so the native cursor is never
+   hidden on touch, on a failed script, or with JS off.
+   -------------------------------------------------------------------------- */
+.cursor-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  pointer-events: none;
+  contain: layout style paint;
+}
+
+.cur {
+  position: absolute;
+  top: 0; left: 0;
+  will-change: transform;
+  transform: translate3d(-100px, -100px, 0);
+}
+
+/* Reticle: a dashed ring that scans slowly, like a tracking marker. */
+.cur-ring {
+  width: 38px; height: 38px;
+  margin: -19px 0 0 -19px;
+  border-radius: 50%;
+  border: 1.5px dashed var(--brand);
+  opacity: .75;
+  transition: width .28s var(--ease), height .28s var(--ease),
+              margin .28s var(--ease), opacity .28s var(--ease),
+              border-color .28s var(--ease), background .28s var(--ease);
+}
+
+/* Core: the precise point. */
+.cur-dot {
+  width: 7px; height: 7px;
+  margin: -3.5px 0 0 -3.5px;
+  border-radius: 50%;
+  background: var(--brand);
+  transition: width .2s var(--ease), height .2s var(--ease), margin .2s var(--ease);
+}
+
+/* Trail: decaying sparks that lag further behind each step. */
+.cur-spark {
+  width: 5px; height: 5px;
+  margin: -2.5px 0 0 -2.5px;
+  border-radius: 50%;
+  background: var(--brand);
+}
+
+/* Over something interactive the reticle opens up and the core shrinks. */
+.has-cursor.cur-active .cur-ring {
+  width: 62px; height: 62px;
+  margin: -31px 0 0 -31px;
+  opacity: 1;
+  background: color-mix(in srgb, var(--brand) 10%, transparent);
+}
+.has-cursor.cur-active .cur-dot { width: 0; height: 0; margin: 0; }
+
+/* Over a card the reticle fills softly. */
+.has-cursor.cur-wide .cur-ring {
+  width: 86px; height: 86px;
+  margin: -43px 0 0 -43px;
+  border-style: solid;
+  border-color: color-mix(in srgb, var(--brand) 45%, transparent);
+  background: color-mix(in srgb, var(--brand) 8%, transparent);
+}
+
+/* Over text input the reticle gets out of the way. */
+.has-cursor.cur-text .cur-ring { opacity: 0; }
+.has-cursor.cur-text .cur-dot  { width: 2px; height: 20px; margin: -10px 0 0 -1px; border-radius: 1px; }
+
+.has-cursor.cur-down .cur-ring { border-color: var(--brand-cta); }
+
+/* Over a dark fill the reticle inverts so it never disappears into it. */
+.has-cursor.cur-on-dark .cur-ring  { border-color: #ffffff; }
+.has-cursor.cur-on-dark .cur-dot,
+.has-cursor.cur-on-dark .cur-spark { background: #ffffff; }
+.has-cursor.cur-on-dark.cur-active .cur-ring {
+  background: rgba(255, 255, 255, .14);
+}
+
+/* Hide the system cursor only once ours is live, and never over form
+   controls, where the native caret is the clearer affordance. */
+.has-cursor,
+.has-cursor a,
+.has-cursor button,
+.has-cursor summary,
+.has-cursor [role="button"] { cursor: none; }
+.has-cursor input,
+.has-cursor textarea,
+.has-cursor select { cursor: auto; }
+
+/* Magnetic pull on the primary calls to action. */
+.magnetic { will-change: transform; }
+
+@media (hover: none), (pointer: coarse) {
+  .cursor-layer { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cursor-layer { display: none; }
+  .has-cursor, .has-cursor a, .has-cursor button,
+  .has-cursor summary, .has-cursor [role="button"] { cursor: auto; }
+}
+
 /* --------------------------------------------------------------------------
    22. Responsive
    -------------------------------------------------------------------------- */

@@ -86,6 +86,13 @@ large type is what made the first pass read as neon rather than professional.
   never runs still reads correctly. Counters use IntersectionObserver for the same
   reason. A CSS `animation` also outranks inline styles, so the pre-GSAP keyframes
   are disabled under `.gsap`.
+- **Custom cursor**: a dashed reticle that scans, a precise core, and five trailing
+  sparks, plus magnetic pull on the primary actions. It reads the luminance of the
+  nearest painted background and inverts to white over dark fills. Guarded hard —
+  it is built only for a fine pointer with motion allowed and GSAP present, and the
+  native cursor is hidden only via a `has-cursor` class set from script, so touch,
+  reduced motion, a blocked CDN and JS-off all keep the real cursor. Form controls
+  always keep the native caret.
 - **Illustrations** are inlined rather than linked as `<img>`, so the artwork reads
   the theme's CSS variables and GSAP can animate the individual shapes. The same
   source also writes standalone files to `assets/img/illustrations/`, which carry
