@@ -86,6 +86,25 @@ large type is what made the first pass read as neon rather than professional.
   never runs still reads correctly. Counters use IntersectionObserver for the same
   reason. A CSS `animation` also outranks inline styles, so the pre-GSAP keyframes
   are disabled under `.gsap`.
+- **Load sequence & page transitions**: first visit in a session runs a counter
+  and curtain reveal; later navigations get a fast curtain lift, so moving around
+  never feels gated. Links are only intercepted for plain same-origin clicks and
+  navigate regardless of whether the animation finishes. A preloader that cannot be
+  dismissed hides the entire site, so there are four exits: `window.load`, a 3.2s
+  hard stop, a 5s hero failsafe, and a CSS keyframe that clears the overlay even if
+  `main.js` never runs at all.
+- **Live neural field**: a canvas in the hero whose nodes drift, link to neighbours
+  and energise around the pointer. It replaces the static SVG constellation only
+  once it is actually running, pauses off-screen and when the tab is hidden, and
+  re-reads the brand colour when the theme changes.
+- **Horizontal work rail**: the Work page pins and scrolls its cards sideways. It
+  engages only above 1040px and only with enough cards to make the travel worth a
+  pin; the markup is a plain grid, so everywhere else it is a normal section.
+- **Pinned process**: phases lift and their numbers scale as you scroll through.
+  Progress is never shown by dimming — text stays fully legible at any scroll
+  position, including if the pin never engages.
+- **Decode labels**: section eyebrows resolve out of noise, and always settle on the
+  real text via `onComplete`.
 - **Custom cursor**: a dashed reticle that scans, a precise core, and five trailing
   sparks, plus magnetic pull on the primary actions. It reads the luminance of the
   nearest painted background and inverts to white over dark fills. Guarded hard —

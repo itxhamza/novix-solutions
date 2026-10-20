@@ -195,6 +195,26 @@
       return el.querySelectorAll('.word > i');
     }
 
+    /* Decode effect: letters resolve out of noise. Used on the small
+       labels, where it reads as a system settling rather than decoration. */
+    var GLYPHS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789#%&/<>*';
+    function scramble(el, duration) {
+      var final = el.textContent;
+      var letters = final.split('');
+      var state = { p: 0 };
+      return gsap.to(state, {
+        p: 1, duration: duration || 0.9, ease: 'power2.out',
+        onUpdate: function () {
+          var reveal = Math.floor(state.p * letters.length * 1.25);
+          el.textContent = letters.map(function (ch, i) {
+            if (ch === ' ' || i < reveal) return ch;
+            return GLYPHS[(Math.random() * GLYPHS.length) | 0];
+          }).join('');
+        },
+        onComplete: function () { el.textContent = final; }
+      });
+    }
+
     function riseWords(el, trigger, pos) {
       var words = splitWords(el);
       if (!words.length) return null;
@@ -208,7 +228,8 @@
     var heroHeading = document.querySelector('h1[data-hero][data-split]');
     if (heroEls.length) {
       var rest = heroEls.filter(function (e) { return e !== heroHeading; });
-      var tl = gsap.timeline({ delay: 0.15 });
+      var tl = gsap.timeline({ paused: true });
+      window.__novixHero = tl;
       if (heroHeading) {
         gsap.set(heroHeading, { opacity: 1 });
         tl.fromTo(splitWords(heroHeading), { yPercent: 110 },
@@ -219,6 +240,7 @@
         .from('.console', { y: 44, opacity: 0, scale: 0.97, duration: 1 }, 0.35)
         .from('.float-card', { y: 16, opacity: 0, duration: 0.6, stagger: 0.12 }, 0.9);
       heroEls.forEach(claim);
+      window.__novixHeroReady = true;
     }
 
     /* --- Section headings ------------------------------------------------ */
@@ -232,7 +254,10 @@
       var t = gsap.timeline({ scrollTrigger: ST(head) });
       [eyebrow, crumbs, heading, lede].forEach(claim);
       if (crumbs) t.fromTo(crumbs, { opacity: 0, y: 8 }, { opacity: 1, y: 0, duration: 0.4 }, 0);
-      if (eyebrow) t.fromTo(eyebrow, { opacity: 0, x: -12 }, { opacity: 1, x: 0, duration: 0.5 }, 0.05);
+      if (eyebrow) {
+        t.fromTo(eyebrow, { opacity: 0, x: -12 }, { opacity: 1, x: 0, duration: 0.5 }, 0.05);
+        t.add(scramble(eyebrow, 0.8), 0.1);
+      }
       if (heading) {
         gsap.set(heading, { opacity: 1 });
         t.fromTo(splitWords(heading), { yPercent: 110 },
@@ -342,6 +367,81 @@
           { strokeDashoffset: 0, duration: 1, ease: 'power2.inOut' }, 0.3 + i * 0.12);
       });
     });
+
+    /* --- Work: pin and run the cards sideways ---------------------------
+       Only where there are enough cards to make the travel worth a pin, and
+       only above 1040px. The markup is a plain grid, so everywhere else it
+       stays a normal stacked section. */
+    (function horizontalWork() {
+      if (window.innerWidth <= 1040) return;
+      var grids = document.querySelectorAll('.grid');
+      for (var g = 0; g < grids.length; g++) {
+        var grid = grids[g];
+        var cards = grid.querySelectorAll('.work-card');
+        if (cards.length < 4) continue;
+        var section = grid.closest('.section');
+        if (!section) continue;
+
+        section.classList.add('is-rail');
+        var dist = (function (grid) {
+          return function () {
+            return Math.max(0, grid.scrollWidth - grid.parentElement.clientWidth);
+          };
+        }(grid));
+        if (dist() < 320) { section.classList.remove('is-rail'); continue; }
+
+        var endStr = (function (dist) {
+          return function () { return '+=' + (dist() + window.innerHeight * 0.6); };
+        }(dist));
+
+        gsap.to(grid, {
+          x: function () { return -dist(); },
+          ease: 'none',
+          scrollTrigger: {
+            trigger: section, start: 'top top', end: endStr,
+            pin: true, scrub: 0.6, anticipatePin: 1, invalidateOnRefresh: true
+          }
+        });
+        gsap.fromTo(cards, { rotate: 1.2, y: 14 }, {
+          rotate: -1.2, y: -14, ease: 'none',
+          scrollTrigger: { trigger: section, start: 'top top', end: endStr, scrub: 0.8 }
+        });
+      }
+    }());
+
+    /* --- Process: pin, then light each phase in turn --------------------- */
+    (function pinnedProcess() {
+      var section = document.getElementById('process');
+      if (!section || window.innerWidth <= 1040 || !window.ScrollTrigger) return;
+      var steps = section.querySelectorAll('.step');
+      var live = section.querySelector('.pipeline__live');
+      if (steps.length < 2) return;
+
+      var t = gsap.timeline({
+        scrollTrigger: {
+          trigger: section, start: 'top top',
+          end: '+=' + (steps.length * 260), pin: true, scrub: 0.5,
+          anticipatePin: 1, invalidateOnRefresh: true
+        }
+      });
+
+      if (live) {
+        var len = live.getTotalLength();
+        gsap.set(live, { strokeDasharray: len });
+        t.fromTo(live, { strokeDashoffset: len }, { strokeDashoffset: 0, ease: 'none' }, 0);
+      }
+      /* Progress is shown by lifting the active phase, never by dimming the
+         others: text must stay fully legible whatever the scroll position. */
+      steps.forEach(function (step, i) {
+        var num = step.querySelector('.step__num');
+        t.to(step, { y: -14, duration: 0.5 }, i * 0.55)
+         .to(step, { y: 0, duration: 0.4 }, i * 0.55 + 0.5);
+        if (num) {
+          t.to(num, { scale: 1.14, duration: 0.5 }, i * 0.55)
+           .to(num, { scale: 1, duration: 0.4 }, i * 0.55 + 0.5);
+        }
+      });
+    }());
 
     /* --- FAQ -------------------------------------------------------------- */
     document.querySelectorAll('.faq').forEach(function (faq) {
@@ -513,6 +613,293 @@
     startCounters();
     document.querySelectorAll('[data-hero]').forEach(function (el) { el.style.opacity = 1; });
   }
+
+  /* ----- Live neural field -----------------------------------------------
+     A canvas of drifting nodes that link to their neighbours and energise
+     around the pointer. It replaces the static SVG constellation only once
+     it is actually running, so the SVG remains the fallback. Paused when
+     off-screen or when the tab is hidden. */
+  (function neural() {
+    var hero = document.querySelector('.hero');
+    if (!hero || reduceMotion) return;
+
+    var canvas = document.createElement('canvas');
+    canvas.className = 'neural-canvas';
+    canvas.setAttribute('aria-hidden', 'true');
+    var ctx = canvas.getContext && canvas.getContext('2d');
+    if (!ctx) return;
+    hero.insertBefore(canvas, hero.firstChild);
+    hero.classList.add('has-neural');
+
+    var w = 0, h = 0, dpr = 1, nodes = [], raf = null, running = false;
+    var pointer = { x: -9999, y: -9999, on: false };
+    var ink = { node: '14,191,67', link: '14,191,67' };
+
+    function readInk() {
+      var cs = getComputedStyle(document.documentElement);
+      var b = (cs.getPropertyValue('--brand') || '#0ebf43').trim();
+      var m = b.match(/^#([0-9a-f]{6})$/i);
+      if (m) {
+        var n = parseInt(m[1], 16);
+        ink.node = ink.link = [(n >> 16) & 255, (n >> 8) & 255, n & 255].join(',');
+      }
+    }
+
+    function resize() {
+      var r = hero.getBoundingClientRect();
+      w = Math.max(1, Math.round(r.width));
+      h = Math.max(1, Math.round(r.height));
+      dpr = Math.min(window.devicePixelRatio || 1, 2);
+      canvas.width = w * dpr;
+      canvas.height = h * dpr;
+      canvas.style.width = w + 'px';
+      canvas.style.height = h + 'px';
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+      var count = Math.min(90, Math.round((w * h) / 16000));
+      nodes = [];
+      for (var i = 0; i < count; i++) {
+        nodes.push({
+          x: Math.random() * w, y: Math.random() * h,
+          vx: (Math.random() - 0.5) * 0.22,
+          vy: (Math.random() - 0.5) * 0.22,
+          r: 1.3 + Math.random() * 1.9
+        });
+      }
+    }
+
+    var LINK = 132, PULL = 170;
+
+    function frame() {
+      ctx.clearRect(0, 0, w, h);
+      var i, j, a, b2, dx, dy, d;
+
+      for (i = 0; i < nodes.length; i++) {
+        a = nodes[i];
+        a.x += a.vx; a.y += a.vy;
+        if (a.x < -20) a.x = w + 20; else if (a.x > w + 20) a.x = -20;
+        if (a.y < -20) a.y = h + 20; else if (a.y > h + 20) a.y = -20;
+
+        if (pointer.on) {
+          dx = pointer.x - a.x; dy = pointer.y - a.y;
+          d = Math.sqrt(dx * dx + dy * dy);
+          if (d < PULL && d > 0.1) {
+            a.x += (dx / d) * (1 - d / PULL) * 0.7;
+            a.y += (dy / d) * (1 - d / PULL) * 0.7;
+          }
+        }
+      }
+
+      for (i = 0; i < nodes.length; i++) {
+        a = nodes[i];
+        for (j = i + 1; j < nodes.length; j++) {
+          b2 = nodes[j];
+          dx = a.x - b2.x; dy = a.y - b2.y;
+          d = Math.sqrt(dx * dx + dy * dy);
+          if (d > LINK) continue;
+          ctx.strokeStyle = 'rgba(' + ink.link + ',' + (0.2 * (1 - d / LINK)).toFixed(3) + ')';
+          ctx.lineWidth = 1;
+          ctx.beginPath();
+          ctx.moveTo(a.x, a.y);
+          ctx.lineTo(b2.x, b2.y);
+          ctx.stroke();
+        }
+
+        var near = 0;
+        if (pointer.on) {
+          dx = pointer.x - a.x; dy = pointer.y - a.y;
+          d = Math.sqrt(dx * dx + dy * dy);
+          if (d < PULL) {
+            near = 1 - d / PULL;
+            ctx.strokeStyle = 'rgba(' + ink.link + ',' + (0.3 * near).toFixed(3) + ')';
+            ctx.beginPath();
+            ctx.moveTo(a.x, a.y);
+            ctx.lineTo(pointer.x, pointer.y);
+            ctx.stroke();
+          }
+        }
+        ctx.fillStyle = 'rgba(' + ink.node + ',' + (0.3 + near * 0.55).toFixed(3) + ')';
+        ctx.beginPath();
+        ctx.arc(a.x, a.y, a.r + near * 1.6, 0, 6.2832);
+        ctx.fill();
+      }
+      raf = requestAnimationFrame(frame);
+    }
+
+    function start() { if (!running) { running = true; raf = requestAnimationFrame(frame); } }
+    function stop() { running = false; if (raf) cancelAnimationFrame(raf); raf = null; }
+
+    readInk();
+    resize();
+    start();
+
+    window.addEventListener('resize', function () {
+      clearTimeout(resize._t);
+      resize._t = setTimeout(function () { resize(); }, 180);
+    });
+    window.addEventListener('mousemove', function (e) {
+      var r = hero.getBoundingClientRect();
+      pointer.x = e.clientX - r.left;
+      pointer.y = e.clientY - r.top;
+      pointer.on = pointer.x > -60 && pointer.x < w + 60 && pointer.y > -60 && pointer.y < h + 60;
+    }, { passive: true });
+    hero.addEventListener('mouseleave', function () { pointer.on = false; });
+    document.addEventListener('visibilitychange', function () {
+      document.hidden ? stop() : start();
+    });
+    if ('IntersectionObserver' in window) {
+      new IntersectionObserver(function (es) {
+        es.forEach(function (e) { e.isIntersecting ? start() : stop(); });
+      }, { threshold: 0 }).observe(hero);
+    }
+    new MutationObserver(readInk).observe(document.documentElement,
+      { attributes: true, attributeFilter: ['data-theme'] });
+  }());
+
+  /* ----- Load sequence + page transitions --------------------------------
+     First visit in a session gets the full sequence; later navigations get a
+     fast curtain lift, so moving around the site never feels gated. Every
+     exit path is covered: window.load, a hard timeout, and a CSS failsafe
+     that clears the overlay even if this script dies. */
+  (function sequence() {
+    var loader = document.getElementById('loader');
+    var curtain = document.getElementById('curtain');
+    var panels = curtain ? curtain.querySelectorAll('i') : [];
+
+    function startHero() {
+      if (window.__novixHero) window.__novixHero.play();
+    }
+
+    function finish() {
+      if (loader) loader.classList.add('is-done');
+      if (curtain) curtain.classList.add('is-idle');
+      startHero();
+    }
+
+    if (!loader || reduceMotion || !hasGSAP) {
+      if (loader) loader.classList.add('is-done');
+      if (curtain) curtain.classList.add('is-idle');
+      startHero();
+      return;
+    }
+
+    var SEEN = 'novix-seen';
+    var seen = false;
+    try { seen = sessionStorage.getItem(SEEN) === '1'; } catch (e) {}
+    try { sessionStorage.setItem(SEEN, '1'); } catch (e) {}
+
+    /* Lift the curtain, then hand over to the hero. */
+    function lift(delay) {
+      gsap.set(panels, { scaleY: 1, transformOrigin: '50% 100%' });
+      gsap.to(panels, {
+        scaleY: 0, duration: 0.75, ease: 'power4.inOut', stagger: 0.06,
+        delay: delay || 0,
+        onStart: function () {
+          if (loader) gsap.to(loader, { opacity: 0, duration: 0.4,
+            onComplete: function () { loader.classList.add('is-done'); } });
+        },
+        onComplete: function () {
+          curtain.classList.add('is-idle');
+          startHero();
+        }
+      });
+    }
+
+    if (seen) {
+      /* Returning within the session: skip the counter entirely. */
+      loader.classList.add('is-done');
+      lift(0);
+    } else {
+      var mark = loader.querySelector('.loader__mark');
+      var ring = loader.querySelector('.loader__ring');
+      var bar = loader.querySelector('.loader__bar i');
+      var pct = loader.querySelector('.loader__pct');
+      var counter = { v: 0 };
+      var done = false;
+
+      gsap.from(mark, { scale: 0.7, opacity: 0, duration: 0.7, ease: 'power3.out' });
+      gsap.to(ring, { rotation: 360, duration: 6, repeat: -1, ease: 'none' });
+
+      var progress = gsap.to(counter, {
+        v: 92, duration: 1.5, ease: 'power1.out',
+        onUpdate: function () {
+          var n = Math.round(counter.v);
+          if (pct) pct.textContent = n;
+          if (bar) gsap.set(bar, { scaleX: n / 100 });
+        }
+      });
+
+      var complete = function () {
+        if (done) return;
+        done = true;
+        progress.kill();
+        gsap.to(counter, {
+          v: 100, duration: 0.4, ease: 'power2.out',
+          onUpdate: function () {
+            var n = Math.round(counter.v);
+            if (pct) pct.textContent = n;
+            if (bar) gsap.set(bar, { scaleX: n / 100 });
+          },
+          onComplete: function () {
+            gsap.to(loader.querySelector('.loader__box'),
+              { scale: 1.06, opacity: 0, duration: 0.45, ease: 'power2.in' });
+            lift(0.2);
+          }
+        });
+      };
+
+      if (document.readyState === 'complete') setTimeout(complete, 900);
+      else window.addEventListener('load', function () { setTimeout(complete, 500); });
+      /* Hard stop: never wait on a slow third-party script. */
+      setTimeout(complete, 3200);
+    }
+
+    /* --- Page transitions ------------------------------------------------
+       Links keep working normally: the click is only intercepted for plain
+       same-origin navigations, and the browser follows through even if the
+       animation never completes. */
+    document.addEventListener('click', function (e) {
+      if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey ||
+          e.shiftKey || e.altKey) return;
+      var a = e.target.closest ? e.target.closest('a') : null;
+      if (!a) return;
+      var href = a.getAttribute('href');
+      if (!href || href.charAt(0) === '#' || a.target === '_blank' ||
+          a.hasAttribute('download') || /^(mailto|tel):/.test(href)) return;
+      var url;
+      try { url = new URL(a.href); } catch (err) { return; }
+      if (url.origin !== location.origin) return;
+      if (url.pathname === location.pathname && url.hash) return;
+
+      e.preventDefault();
+      var navigated = false;
+      var go = function () {
+        if (navigated) return;
+        navigated = true;
+        location.href = a.href;
+      };
+      curtain.classList.remove('is-idle');
+      gsap.set(panels, { scaleY: 0, transformOrigin: '50% 0%' });
+      gsap.to(panels, {
+        scaleY: 1, duration: 0.5, ease: 'power3.inOut', stagger: 0.05,
+        onComplete: go
+      });
+      /* If the tween is interrupted, still navigate. */
+      setTimeout(go, 1200);
+    });
+
+    /* Absolute failsafe: the hero is hidden until its timeline plays, so it
+       must never depend on the sequence completing. */
+    setTimeout(startHero, 5000);
+
+    /* Coming back via bfcache must not leave the curtain down. */
+    window.addEventListener('pageshow', function (ev) {
+      if (!ev.persisted) return;
+      gsap.set(panels, { scaleY: 0 });
+      curtain.classList.add('is-idle');
+      if (loader) loader.classList.add('is-done');
+    });
+  }());
 
   /* ----- Custom cursor ---------------------------------------------------
      A tracking reticle with a trailing spark field. Built only for a fine

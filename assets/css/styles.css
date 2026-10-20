@@ -960,6 +960,20 @@ body.is-locked { overflow: hidden; }
 }
 .work-card__kpi div span { font-size: .74rem; color: var(--muted); text-transform: uppercase; letter-spacing: .08em; }
 
+/* Horizontal work rail — applied by script only when it can run. */
+.section.is-rail { overflow: hidden; }
+.section.is-rail .grid--3 {
+  display: flex;
+  width: max-content;
+  gap: clamp(20px, 2.4vw, 32px);
+  will-change: transform;
+}
+.section.is-rail .work-card {
+  width: clamp(330px, 30vw, 430px);
+  flex: 0 0 auto;
+}
+.section.is-rail .section-head { margin-bottom: clamp(28px, 3vw, 44px); }
+
 /* --------------------------------------------------------------------------
    13. Testimonials
    -------------------------------------------------------------------------- */
@@ -1531,6 +1545,16 @@ body.is-locked { overflow: hidden; }
 .sbg--stream    { opacity: .38; }
 .sbg--orbit     { opacity: .5; }
 
+/* Live canvas replaces the static SVG field once it is actually running. */
+.neural-canvas {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: .9;
+}
+.hero.has-neural .sbg--constellation { display: none; }
+
 /* The hero field spans the whole hero, unmasked at the top. */
 .sbg--constellation {
   opacity: .5;
@@ -1574,7 +1598,7 @@ body.is-locked { overflow: hidden; }
 .cursor-layer {
   position: fixed;
   inset: 0;
-  z-index: 200;
+  z-index: 400;
   pointer-events: none;
   contain: layout style paint;
 }
@@ -1668,6 +1692,86 @@ body.is-locked { overflow: hidden; }
   .cursor-layer { display: none; }
   .has-cursor, .has-cursor a, .has-cursor button,
   .has-cursor summary, .has-cursor [role="button"] { cursor: auto; }
+}
+
+
+/* --------------------------------------------------------------------------
+   30. Load sequence + page transitions
+   The overlay only exists once the head script has set `.js`, and a CSS
+   failsafe clears it even if the dismissing script never runs — a preloader
+   that cannot be removed hides the whole site.
+   -------------------------------------------------------------------------- */
+.loader, .curtain { display: none; }
+
+.js .loader {
+  position: fixed;
+  inset: 0;
+  z-index: 320;
+  display: grid;
+  place-items: center;
+  background: var(--bg);
+  animation: loaderFailsafe 7s linear forwards;
+}
+@keyframes loaderFailsafe {
+  0%, 96% { opacity: 1; }
+  100%    { opacity: 0; visibility: hidden; pointer-events: none; }
+}
+.loader.is-done { animation: none; opacity: 0; visibility: hidden; pointer-events: none; }
+
+.loader__box { display: grid; justify-items: center; gap: 22px; }
+.loader__mark { width: 86px; height: auto; display: block; }
+
+/* Centred on the mark itself, not the whole box, so the progress bar
+   below it is never crossed by the ring. */
+.loader__ring {
+  position: absolute;
+  top: 50%; left: 50%;
+  width: 112px; height: 112px;
+  margin: -56px 0 0 -56px;
+  border-radius: 50%;
+  border: 1.5px dashed color-mix(in srgb, var(--brand) 55%, transparent);
+}
+.loader__head { position: relative; display: grid; place-items: center; height: 112px; }
+
+.loader__bar {
+  width: 190px; height: 2px;
+  border-radius: 2px;
+  background: var(--border-strong);
+  overflow: hidden;
+}
+.loader__bar i {
+  display: block; height: 100%; width: 100%;
+  background: var(--brand);
+  transform: scaleX(0);
+  transform-origin: 0 50%;
+}
+.loader__pct {
+  font-family: var(--font-mono);
+  font-size: .76rem;
+  letter-spacing: .18em;
+  color: var(--muted);
+}
+.loader__pct::after { content: "%"; }
+
+/* Curtain panels wipe the page in and out. */
+.js .curtain {
+  position: fixed;
+  inset: 0;
+  z-index: 310;
+  display: flex;
+  pointer-events: none;
+}
+.curtain i {
+  flex: 1;
+  background: var(--bg-2);
+  transform: scaleY(0);
+  transform-origin: 50% 100%;
+  will-change: transform;
+}
+.curtain.is-idle { visibility: hidden; }
+
+@media (prefers-reduced-motion: reduce) {
+  .js .loader, .js .curtain { display: none !important; }
 }
 
 /* --------------------------------------------------------------------------
