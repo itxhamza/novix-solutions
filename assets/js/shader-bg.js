@@ -156,7 +156,7 @@
   resize();
 
   var mouse = [0.5, 0.5], mouseOn = 0, scroll = 0, raf = null, running = false;
-  var started = 0, frames = 0, slow = 0, dead = false;
+  var started = 0, frames = 0, slow = 0, dead = false, painted = 0;
 
   function stop() { running = false; if (raf) cancelAnimationFrame(raf); raf = null; }
 
@@ -185,6 +185,11 @@
       }
     }
     last = now;
+
+    /* ~30fps. The field drifts slowly enough that this is invisible, and it
+       halves the cost of the one effect that is on screen at all times. */
+    if (now - painted < 32) { raf = requestAnimationFrame(frame); return; }
+    painted = now;
 
     gl.uniform1f(U.uTime, (now - started) / 1000);
     gl.uniform1f(U.uScroll, scroll);

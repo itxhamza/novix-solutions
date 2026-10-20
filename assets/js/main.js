@@ -415,7 +415,7 @@
         if (dist() < 320) { section.classList.remove('is-rail'); continue; }
 
         var endStr = (function (dist) {
-          return function () { return '+=' + (dist() + window.innerHeight * 0.6); };
+          return function () { return '+=' + Math.round(dist() * 0.7); };
         }(dist));
 
         gsap.to(grid, {
@@ -445,7 +445,7 @@
       var t = gsap.timeline({
         scrollTrigger: {
           trigger: section, start: 'top top',
-          end: '+=' + (steps.length * 260), pin: true, scrub: 0.5,
+          end: '+=' + (steps.length * 130), pin: true, scrub: 0.5,
           anticipatePin: 1, invalidateOnRefresh: true,
           refreshPriority: 1
         }
@@ -696,7 +696,11 @@
 
     var LINK = 132, PULL = 170;
 
-    function frame() {
+    var painted = 0;
+    function frame(now) {
+      /* The link pass is O(n^2) per frame; 30fps is plenty for drift. */
+      if (now - painted < 32) { raf = requestAnimationFrame(frame); return; }
+      painted = now;
       ctx.clearRect(0, 0, w, h);
       var i, j, a, b2, dx, dy, d;
 
@@ -818,10 +822,10 @@
     function lift(delay) {
       gsap.set(panels, { scaleY: 1, transformOrigin: '50% 100%' });
       gsap.to(panels, {
-        scaleY: 0, duration: 0.75, ease: 'power4.inOut', stagger: 0.06,
+        scaleY: 0, duration: 0.5, ease: 'power4.inOut', stagger: 0.035,
         delay: delay || 0,
         onStart: function () {
-          if (loader) gsap.to(loader, { opacity: 0, duration: 0.4,
+          if (loader) gsap.to(loader, { opacity: 0, duration: 0.28,
             onComplete: function () { loader.classList.add('is-done'); } });
         },
         onComplete: function () {
@@ -847,7 +851,7 @@
       gsap.to(ring, { rotation: 360, duration: 6, repeat: -1, ease: 'none' });
 
       var progress = gsap.to(counter, {
-        v: 92, duration: 1.5, ease: 'power1.out',
+        v: 92, duration: 0.85, ease: 'power1.out',
         onUpdate: function () {
           var n = Math.round(counter.v);
           if (pct) pct.textContent = n;
@@ -860,7 +864,7 @@
         done = true;
         progress.kill();
         gsap.to(counter, {
-          v: 100, duration: 0.4, ease: 'power2.out',
+          v: 100, duration: 0.25, ease: 'power2.out',
           onUpdate: function () {
             var n = Math.round(counter.v);
             if (pct) pct.textContent = n;
@@ -868,16 +872,17 @@
           },
           onComplete: function () {
             gsap.to(loader.querySelector('.loader__box'),
-              { scale: 1.06, opacity: 0, duration: 0.45, ease: 'power2.in' });
-            lift(0.2);
+              { scale: 1.06, opacity: 0, duration: 0.3, ease: 'power2.in' });
+            lift(0.08);
           }
         });
       };
 
-      if (document.readyState === 'complete') setTimeout(complete, 900);
-      else window.addEventListener('load', function () { setTimeout(complete, 500); });
-      /* Hard stop: never wait on a slow third-party script. */
-      setTimeout(complete, 3200);
+      /* Don't gate on `load`: it waits for the ad script and CDN fonts,
+         which has nothing to do with the page being ready to look at. */
+      if (document.readyState === 'complete') setTimeout(complete, 250);
+      else window.addEventListener('DOMContentLoaded', function () { setTimeout(complete, 250); });
+      setTimeout(complete, 900);
     }
 
     /* --- Page transitions ------------------------------------------------
@@ -907,11 +912,11 @@
       curtain.classList.remove('is-idle');
       gsap.set(panels, { scaleY: 0, transformOrigin: '50% 0%' });
       gsap.to(panels, {
-        scaleY: 1, duration: 0.5, ease: 'power3.inOut', stagger: 0.05,
+        scaleY: 1, duration: 0.32, ease: 'power3.inOut', stagger: 0.025,
         onComplete: go
       });
       /* If the tween is interrupted, still navigate. */
-      setTimeout(go, 1200);
+      setTimeout(go, 700);
     });
 
     /* Absolute failsafe: the hero is hidden until its timeline plays, so it
