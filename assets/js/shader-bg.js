@@ -42,7 +42,7 @@
 
     'float fbm(vec2 p){',
     '  float v = 0.0, a = 0.5;',
-    '  for (int i = 0; i < 5; i++) { v += a * noise(p); p *= 2.03; a *= 0.5; }',
+    '  for (int i = 0; i < 4; i++) { v += a * noise(p); p *= 2.03; a *= 0.5; }',
     '  return v;',
     '}',
 
@@ -144,7 +144,7 @@
   new MutationObserver(readTheme).observe(root, { attributes: true, attributeFilter: ['data-theme'] });
 
   /* ---- sizing: rendered below device resolution, it is a soft backdrop --- */
-  var scale = window.innerWidth < 900 ? 0.5 : 0.62;
+  var scale = window.innerWidth < 900 ? 0.42 : 0.52;
   function resize() {
     var w = Math.max(1, Math.round(window.innerWidth * scale));
     var h = Math.max(1, Math.round(window.innerHeight * scale));
@@ -173,12 +173,15 @@
     if (!started) started = now;
 
     /* Budget guard: if the field cannot hold a reasonable frame rate on this
-       device, drop it and let the CSS gradient take over. */
+       device, drop it and let the CSS gradient take over. The first second
+       is skipped — page load, the entrance timeline and the loader all
+       compete for frames, and judging the shader on those would drop it on
+       machines that handle it fine. */
     if (last) {
       frames++;
-      if (now - last > 34) slow++;
-      if (frames === 90) {
-        if (slow > 45) { teardown(); return; }
+      if (frames > 60) {
+        if (now - last > 34) slow++;
+        if (frames === 180 && slow > 84) { teardown(); return; }
       }
     }
     last = now;

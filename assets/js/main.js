@@ -368,6 +368,30 @@
       });
     });
 
+    /* --- Scroll drives the 3D assembly ----------------------------------
+       The globe module owns the rendering; this only feeds it progress.
+       If WebGL never came up there is nothing to drive, and the section
+       still reads as a normal split layout. */
+    (function globeScroll() {
+      var stage = document.querySelector('[data-globe]');
+      var globe = window.__novixGlobe;
+      if (!stage || !globe || !globe.alive()) return;
+
+      var state = { p: 0 };
+      gsap.to(state, {
+        p: 1, ease: 'none',
+        onUpdate: function () { globe.set(state.p); },
+        scrollTrigger: {
+          /* A long runway: the convergence is the point, so it has to span
+             enough scroll to actually be watched rather than arrive done. */
+          trigger: stage,
+          start: 'top bottom',
+          end: 'bottom 55%',
+          scrub: 0.8
+        }
+      });
+    }());
+
     /* --- Work: pin and run the cards sideways ---------------------------
        Only where there are enough cards to make the travel worth a pin, and
        only above 1040px. The markup is a plain grid, so everywhere else it
@@ -399,7 +423,8 @@
           ease: 'none',
           scrollTrigger: {
             trigger: section, start: 'top top', end: endStr,
-            pin: true, scrub: 0.6, anticipatePin: 1, invalidateOnRefresh: true
+            pin: true, scrub: 0.6, anticipatePin: 1, invalidateOnRefresh: true,
+            refreshPriority: 1
           }
         });
         gsap.fromTo(cards, { rotate: 1.2, y: 14 }, {
@@ -421,7 +446,8 @@
         scrollTrigger: {
           trigger: section, start: 'top top',
           end: '+=' + (steps.length * 260), pin: true, scrub: 0.5,
-          anticipatePin: 1, invalidateOnRefresh: true
+          anticipatePin: 1, invalidateOnRefresh: true,
+          refreshPriority: 1
         }
       });
 

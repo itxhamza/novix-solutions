@@ -1696,6 +1696,45 @@ body.is-locked { overflow: hidden; }
 
 
 /* --------------------------------------------------------------------------
+   29a. Scroll-driven 3D
+   The section reads as a normal split layout; the canvas is added by script
+   only when WebGL is available and removes itself on any failure.
+   -------------------------------------------------------------------------- */
+.system {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: clamp(32px, 5vw, 66px);
+  align-items: center;
+}
+.system__stage {
+  position: relative;
+  min-height: clamp(320px, 42vw, 520px);
+  border-radius: var(--r-lg);
+}
+.globe-canvas {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+/* A quiet placeholder so the column is never an empty hole without WebGL. */
+.system__stage::before {
+  content: "";
+  position: absolute;
+  inset: 12%;
+  border-radius: 50%;
+  border: 1px dashed var(--border-strong);
+  opacity: .5;
+}
+.system__stage.has-globe::before { opacity: 0; transition: opacity .6s var(--ease); }
+
+@media (max-width: 880px) {
+  .system { grid-template-columns: 1fr; }
+  .system__stage { min-height: 300px; order: -1; }
+}
+
+/* --------------------------------------------------------------------------
    29b. WebGL backdrop
    Sits beneath the CSS ambient layer, which stays in place as the fallback
    and is simply made transparent once the shader is confirmed running.

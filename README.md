@@ -86,6 +86,16 @@ large type is what made the first pass read as neon rather than professional.
   never runs still reads correctly. Counters use IntersectionObserver for the same
   reason. A CSS `animation` also outranks inline styles, so the pre-GSAP keyframes
   are disabled under `.gsap`.
+- **Scroll-driven 3D** (`assets/js/globe-3d.js`): a node globe that converges out of
+  a scattered shell as its section is scrolled through, then turns under its own
+  momentum. Raw WebGL again — a perspective camera, two buffers and a shader that
+  interpolates each node between its scattered and spherical position. GSAP only
+  feeds it scroll progress; the module owns the rendering, and the section reads as
+  a normal split layout if WebGL is unavailable.
+- **Pins change the position of everything below them**, so the pinned process and
+  work rail carry `refreshPriority: 1`. Without it, triggers further down the page
+  keep start/end values computed before the pin spacers existed — the globe's
+  assembly was firing ~1040px early and was always finished before it came on screen.
 - **WebGL backdrop** (`assets/js/shader-bg.js`): a domain-warped noise field in the
   brand greens, drifting slowly, brightening around the pointer and shifting with
   scroll. Raw WebGL — one fullscreen triangle and a fragment shader — because a 3D
