@@ -416,8 +416,12 @@
         }(grid));
         if (dist() < 320) { section.classList.remove('is-rail'); continue; }
 
+        /* The pinned stretch is capped, not proportional: the rail's travel
+           grows with every project added, and without a ceiling the page
+           would get stickier each time one lands. Past the cap the rail just
+           moves faster per pixel of scroll. */
         var endStr = (function (dist) {
-          return function () { return '+=' + Math.round(dist() * 0.7); };
+          return function () { return '+=' + Math.round(Math.min(dist() * 0.7, 1400)); };
         }(dist));
 
         gsap.to(grid, {
