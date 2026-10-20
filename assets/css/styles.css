@@ -1696,6 +1696,26 @@ body.is-locked { overflow: hidden; }
 
 
 /* --------------------------------------------------------------------------
+   29b. WebGL backdrop
+   Sits beneath the CSS ambient layer, which stays in place as the fallback
+   and is simply made transparent once the shader is confirmed running.
+   -------------------------------------------------------------------------- */
+.shader-bg {
+  position: fixed;
+  inset: 0;
+  z-index: -3;
+  width: 100%;
+  height: 100%;
+  display: block;
+  pointer-events: none;
+}
+/* `:root[data-theme="light"] .ambient` also sets a background, so these need
+   matching specificity to win rather than relying on source order alone. */
+:root.has-shader .ambient { background: none; }
+:root.has-shader .orb { display: none; }
+:root.has-shader .ambient::after { opacity: .18; }
+
+/* --------------------------------------------------------------------------
    30. Load sequence + page transitions
    The overlay only exists once the head script has set `.js`, and a CSS
    failsafe clears it even if the dismissing script never runs — a preloader

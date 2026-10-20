@@ -86,6 +86,16 @@ large type is what made the first pass read as neon rather than professional.
   never runs still reads correctly. Counters use IntersectionObserver for the same
   reason. A CSS `animation` also outranks inline styles, so the pre-GSAP keyframes
   are disabled under `.gsap`.
+- **WebGL backdrop** (`assets/js/shader-bg.js`): a domain-warped noise field in the
+  brand greens, drifting slowly, brightening around the pointer and shifting with
+  scroll. Raw WebGL — one fullscreen triangle and a fragment shader — because a 3D
+  library would outweigh the entire site. Amplitudes are deliberately low: it is
+  atmosphere behind text, measured at 6.6:1 (light) and 8.4:1 (dark) for body copy.
+  It only ever enhances: the CSS ambient gradient stays underneath and returns if
+  WebGL is missing, the context is lost, or the frame budget is missed (a guard
+  samples the first 90 frames and tears the canvas down if it cannot hold ~30fps).
+  Renders below device resolution, pauses when the tab is hidden, and re-reads the
+  theme colours on switch.
 - **Load sequence & page transitions**: first visit in a session runs a counter
   and curtain reveal; later navigations get a fast curtain lift, so moving around
   never feels gated. Links are only intercepted for plain same-origin clicks and
