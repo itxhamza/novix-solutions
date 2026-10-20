@@ -383,10 +383,12 @@
         onUpdate: function () { globe.set(state.p); },
         scrollTrigger: {
           /* A long runway: the convergence is the point, so it has to span
-             enough scroll to actually be watched rather than arrive done. */
+             enough scroll to actually be watched rather than arrive done.
+             Fully formed by the time the section is centred, so the final
+             shape is seen in place rather than on the way out. */
           trigger: stage,
           start: 'top bottom',
-          end: 'bottom 55%',
+          end: 'center center',
           scrub: 0.8
         }
       });

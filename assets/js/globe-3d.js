@@ -28,46 +28,99 @@
   } catch (e) { gl = null; }
   if (!gl) return;
 
-  /* ---- geometry ---------------------------------------------------------- */
+  /* ---- shape library ------------------------------------------------------
+     Every form is the same N points rearranged, so any shape can morph into
+     any other by interpolating position. */
   var N = 220;
-  var sphere = new Float32Array(N * 3);
-  var scatter = new Float32Array(N * 3);
-  var golden = Math.PI * (3 - Math.sqrt(5));
 
-  function rand(seed) { var x = Math.sin(seed) * 43758.5453123; return x - Math.floor(x); }
+  function rnd(seed) { var x = Math.sin(seed * 12.9898) * 43758.5453123; return x - Math.floor(x); }
 
-  for (var i = 0; i < N; i++) {
-    var y = 1 - (i / (N - 1)) * 2;
-    var rr = Math.sqrt(Math.max(0, 1 - y * y));
-    var th = golden * i;
-    sphere[i * 3] = Math.cos(th) * rr;
-    sphere[i * 3 + 1] = y;
-    sphere[i * 3 + 2] = Math.sin(th) * rr;
+  var SHAPES = {
+    /* A wide shell the points converge in from. */
+    scatter: function (i, out) {
+      var a = rnd(i * 1.7) * Math.PI * 2;
+      var b = Math.acos(2 * rnd(i * 3.1) - 1);
+      var d = 2.6 + rnd(i * 5.3) * 3.4;
+      out[0] = Math.sin(b) * Math.cos(a) * d;
+      out[1] = Math.cos(b) * d * 0.75;
+      out[2] = Math.sin(b) * Math.sin(a) * d;
+    },
+    sphere: function (i, out) {
+      var g = Math.PI * (3 - Math.sqrt(5));
+      var y = 1 - (i / (N - 1)) * 2;
+      var r = Math.sqrt(Math.max(0, 1 - y * y));
+      var t = g * i;
+      out[0] = Math.cos(t) * r; out[1] = y; out[2] = Math.sin(t) * r;
+    },
+    torus: function (i, out) {
+      var u = (i / N) * Math.PI * 2 * 7;
+      var v = (i / N) * Math.PI * 2 * 17;
+      var R = 0.98, r = 0.38;
+      out[0] = (R + r * Math.cos(v)) * Math.cos(u);
+      out[1] = r * Math.sin(v);
+      out[2] = (R + r * Math.cos(v)) * Math.sin(u);
+    },
+    helix: function (i, out) {
+      var t = i / (N - 1);
+      var strand = i % 2 === 0 ? 0 : Math.PI;
+      var a = t * Math.PI * 6 + strand;
+      out[0] = Math.cos(a) * 0.62;
+      out[1] = (t - 0.5) * 2.5;
+      out[2] = Math.sin(a) * 0.62;
+    },
+    lattice: function (i, out) {
+      var side = 6;                      /* 6 x 6 x 6 = 216, padded to N */
+      var k = i % (side * side * side);
+      var x = k % side, y = Math.floor(k / side) % side, z = Math.floor(k / (side * side));
+      out[0] = (x / (side - 1) - 0.5) * 2.0;
+      out[1] = (y / (side - 1) - 0.5) * 2.0;
+      out[2] = (z / (side - 1) - 0.5) * 2.0;
+    },
+    wave: function (i, out) {
+      var side = 15;
+      var x = i % side, z = Math.floor(i / side);
+      var u = x / (side - 1) - 0.5, v = z / (side - 1) - 0.5;
+      out[0] = u * 2.6;
+      out[1] = Math.sin(u * 7) * Math.cos(v * 7) * 0.42;
+      out[2] = v * 2.6;
+    }
+  };
 
-    /* Scattered start: a wide shell the nodes converge in from. */
-    var a = rand(i * 1.7) * Math.PI * 2;
-    var b = Math.acos(2 * rand(i * 3.1) - 1);
-    var d = 2.6 + rand(i * 5.3) * 3.4;
-    scatter[i * 3] = Math.sin(b) * Math.cos(a) * d;
-    scatter[i * 3 + 1] = Math.cos(b) * d * 0.75;
-    scatter[i * 3 + 2] = Math.sin(b) * Math.sin(a) * d;
+  function build(name) {
+    var fn = SHAPES[name] || SHAPES.sphere;
+    var arr = new Float32Array(N * 3);
+    var tmp = [0, 0, 0];
+    for (var i = 0; i < N; i++) {
+      fn(i, tmp);
+      arr[i * 3] = tmp[0]; arr[i * 3 + 1] = tmp[1]; arr[i * 3 + 2] = tmp[2];
+    }
+    return arr;
   }
 
-  /* Edges between near neighbours on the sphere. */
+  /* Shapes come from the host: data-globe="scatter,sphere,torus". */
+  var names = (host.getAttribute('data-globe') || '').split(',')
+    .map(function (x) { return x.trim(); }).filter(function (x) { return SHAPES[x]; });
+  if (names.length < 2) names = ['scatter', 'sphere'];
+
+  var forms = names.map(build);
+  var sphere = forms[forms.length - 1];     /* last form defines the edges */
+  var scatter = forms[0];
+
+  /* Edges between near neighbours of the final form. */
   var edges = [];
-  for (var p = 0; p < N; p++) {
+  for (var pI = 0; pI < N; pI++) {
     var best = [];
     for (var q = 0; q < N; q++) {
-      if (q === p) continue;
-      var dx = sphere[p * 3] - sphere[q * 3];
-      var dy = sphere[p * 3 + 1] - sphere[q * 3 + 1];
-      var dz = sphere[p * 3 + 2] - sphere[q * 3 + 2];
+      if (q === pI) continue;
+      var dx = sphere[pI * 3] - sphere[q * 3];
+      var dy = sphere[pI * 3 + 1] - sphere[q * 3 + 1];
+      var dz = sphere[pI * 3 + 2] - sphere[q * 3 + 2];
       best.push([dx * dx + dy * dy + dz * dz, q]);
     }
     best.sort(function (m, n) { return m[0] - n[0]; });
     for (var k = 0; k < 3; k++) {
       var j = best[k][1];
-      if (p < j) edges.push(p, j);
+      if (pI < j) edges.push(pI, j);
     }
   }
   var edgeIdx = new Uint16Array(edges);
@@ -127,9 +180,19 @@
     gl.bufferData(target, data, gl.STATIC_DRAW);
     return b;
   }
-  var bSphere = buf(sphere, gl.ARRAY_BUFFER);
-  var bScatter = buf(scatter, gl.ARRAY_BUFFER);
+  var bSphere = buf(sphere, gl.ARRAY_BUFFER);     /* "to" of the current pair */
+  var bScatter = buf(scatter, gl.ARRAY_BUFFER);   /* "from" of the current pair */
   var bEdges = buf(edgeIdx, gl.ELEMENT_ARRAY_BUFFER);
+
+  var curSeg = -1;
+  function setSegment(seg) {
+    if (seg === curSeg) return;
+    curSeg = seg;
+    gl.bindBuffer(gl.ARRAY_BUFFER, bScatter);
+    gl.bufferData(gl.ARRAY_BUFFER, forms[seg], gl.DYNAMIC_DRAW);
+    gl.bindBuffer(gl.ARRAY_BUFFER, bSphere);
+    gl.bufferData(gl.ARRAY_BUFFER, forms[Math.min(seg + 1, forms.length - 1)], gl.DYNAMIC_DRAW);
+  }
 
   var aSphere = gl.getAttribLocation(prog, 'aSphere');
   var aScatter = gl.getAttribLocation(prog, 'aScatter');
@@ -183,7 +246,7 @@
   host.classList.add('has-globe');
 
   var W = 1, H = 1, proj = null, dead = false, raf = null, running = false;
-  var progress = reduce ? 1 : 0, spin = 0, last = 0, frames = 0, slow = 0;
+  var progress = reduce ? 1 : 0, spin = 0, last = 0, frames = 0, sampled = 0, slow = 0;
 
   function resize() {
     var r = host.getBoundingClientRect();
@@ -206,10 +269,17 @@
 
   function draw(now) {
     if (dead) return;
+    /* Give the page time to settle before judging the frame rate: the first
+       seconds are load, layout and the entrance animations, which are not
+       what this canvas costs. Then sample a window and only bail if most of
+       it was genuinely slow. */
     if (last) {
       frames++;
-      if (now - last > 34) slow++;
-      if (frames === 90 && slow > 50) { teardown(); return; }
+      if (frames > 120) {
+        sampled++;
+        if (now - last > 34) slow++;
+        if (sampled === 120 && slow > 90) { teardown(); return; }
+      }
     }
     last = now;
 
@@ -220,9 +290,18 @@
     gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
     gl.disable(gl.DEPTH_TEST);
 
-    var eased = progress * progress * (3 - 2 * progress);
+    /* Walk the chain of forms: pick the pair progress currently sits
+       between, and ease within that segment. */
+    var segs = Math.max(1, forms.length - 1);
+    var sp = Math.min(progress, 0.99999) * segs;
+    var seg = Math.floor(sp);
+    var localT = sp - seg;
+    setSegment(seg);
+
+    var eased = localT * localT * (3 - 2 * localT);
+    var assembled = progress * progress * (3 - 2 * progress);
     gl.uniformMatrix4fv(U.uProj, false, proj);
-    gl.uniformMatrix4fv(U.uView, false, view(-0.33 + eased * 0.12, spin, 4.6));
+    gl.uniformMatrix4fv(U.uView, false, view(-0.33 + assembled * 0.12, spin, 4.6));
     gl.uniform1f(U.uProg, eased);
     gl.uniform3fv(U.uColor, color);
 
@@ -233,14 +312,14 @@
 
     /* Edges only once the shell has formed enough to read as structure. */
     gl.uniform1f(U.uRound, 0);
-    gl.uniform1f(U.uAlpha, Math.max(0, eased - 0.2) / 0.8 * 0.75);
+    gl.uniform1f(U.uAlpha, Math.max(0, assembled - 0.2) / 0.8 * 0.75);
     gl.uniform1f(U.uSize, 1);
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, bEdges);
     gl.drawElements(gl.LINES, edgeIdx.length, gl.UNSIGNED_SHORT, 0);
 
     gl.uniform1f(U.uRound, 1);
-    gl.uniform1f(U.uAlpha, 0.65 + eased * 0.35);
-    gl.uniform1f(U.uSize, (6.5 + eased * 3.0) * Math.min(window.devicePixelRatio || 1, 2));
+    gl.uniform1f(U.uAlpha, 0.65 + assembled * 0.35);
+    gl.uniform1f(U.uSize, (6.5 + assembled * 3.0) * Math.min(window.devicePixelRatio || 1, 2));
     gl.drawArrays(gl.POINTS, 0, N);
 
     raf = requestAnimationFrame(draw);

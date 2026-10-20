@@ -1711,6 +1711,29 @@ body.is-locked { overflow: hidden; }
   min-height: clamp(320px, 42vw, 520px);
   border-radius: var(--r-lg);
 }
+/* Stage on the left, so consecutive bands across the site do not all lean
+   the same way. */
+.system--flip .system__stage { order: -1; }
+/* A full-width stage sits behind a section's content. */
+.section--stage { position: relative; }
+.section--stage > .container { position: relative; z-index: 1; }
+/* Anchored to the edge and allowed to bleed off it. Centred behind a
+   section it ends up hidden under the content; out here it has room to
+   read as an object. */
+.stage-wide {
+  position: absolute;
+  right: -10%;
+  top: 50%;
+  transform: translateY(-50%);
+  width: min(620px, 52%);
+  height: min(620px, 94%);
+  z-index: 0;
+  pointer-events: none;
+  opacity: .6;
+}
+:root[data-theme="dark"] .stage-wide { opacity: .75; }
+@media (max-width: 1040px) { .stage-wide { display: none; } }
+
 .globe-canvas {
   position: absolute;
   inset: 0;
