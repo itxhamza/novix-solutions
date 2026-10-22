@@ -1131,6 +1131,108 @@
     });
   }());
 
+  /* ----- Scrub-lit sentences ---------------------------------------------
+     A [data-scrub] sentence is split into words that come up from dim to
+     full as the line is scrolled through. The dim start is applied from
+     script, never from the stylesheet, so a reader without GSAP gets the
+     sentence fully lit rather than a paragraph at 22% opacity. */
+  (function scrubText() {
+    if (!hasGSAP || !window.ScrollTrigger) return;
+    var blocks = document.querySelectorAll('[data-scrub]');
+    if (!blocks.length) return;
+
+    blocks.forEach(function (el) {
+      if (el.querySelector('.scrub-w')) return;
+      /* Rebuild the text as words without touching any inline markup: these
+         sentences are plain text by contract. */
+      var words = el.textContent.trim().split(/\s+/);
+      el.textContent = '';
+      var spans = words.map(function (w, i) {
+        var sp = document.createElement('span');
+        sp.className = 'scrub-w';
+        sp.textContent = w;
+        el.appendChild(sp);
+        if (i < words.length - 1) el.appendChild(document.createTextNode(' '));
+        return sp;
+      });
+
+      if (reduceMotion) return;
+      gsap.set(spans, { opacity: 0.2 });
+      gsap.to(spans, {
+        opacity: 1,
+        ease: 'none',
+        stagger: { amount: 0.9 },
+        scrollTrigger: {
+          /* Driven by the block the line sits in, not the line itself: a
+             three-line sentence is too short to give the lighting a runway,
+             and it finished before the section was even centred. */
+          trigger: el.closest('.statement, .section, .page-hero') || el,
+          start: 'top 72%',
+          end: 'bottom 52%',
+          scrub: 0.6
+        }
+      });
+    });
+  }());
+
+  /* ----- Statement band: opens to full bleed ------------------------------
+     The padding that insets the panel and the radius that rounds it are
+     scrubbed to zero together, so the panel appears to widen into the
+     window rather than slide. Both rest at their open values in CSS, so
+     without GSAP the band is simply a rounded panel. */
+  (function statementBleed() {
+    if (!hasGSAP || !window.ScrollTrigger || reduceMotion) return;
+    var wrap = document.querySelector('.statement-wrap');
+    var panel = wrap && wrap.querySelector('.statement');
+    if (!panel || window.innerWidth <= 640) return;
+
+    gsap.to(wrap, {
+      paddingInline: 0, ease: 'none',
+      scrollTrigger: { trigger: wrap, start: 'top bottom', end: 'center 58%', scrub: 0.7 }
+    });
+    gsap.to(panel, {
+      borderRadius: 0, ease: 'none',
+      scrollTrigger: { trigger: wrap, start: 'top bottom', end: 'center 58%', scrub: 0.7 }
+    });
+  }());
+
+  /* ----- Header takes the dark palette over a dark band ------------------- */
+  (function headerOverDark() {
+    if (!hasGSAP || !window.ScrollTrigger) return;
+    var header = document.querySelector('.header');
+    var bands = document.querySelectorAll('.statement-sec');
+    if (!header || !bands.length) return;
+    var over = 0;
+    bands.forEach(function (band) {
+      ScrollTrigger.create({
+        trigger: band,
+        start: 'top 76px',
+        end: 'bottom 76px',
+        onToggle: function (self) {
+          over += self.isActive ? 1 : -1;
+          if (over < 0) over = 0;
+          header.classList.toggle('is-on-dark', over > 0);
+        }
+      });
+    });
+  }());
+
+  /* ----- Section artwork drifts behind its content ------------------------
+     Each section's background sits on its own, slower track, which gives the
+     page depth without moving anything anyone is reading. */
+  (function backgroundParallax() {
+    if (!hasGSAP || !window.ScrollTrigger || reduceMotion) return;
+    if (window.matchMedia('(max-width: 760px)').matches) return;
+    document.querySelectorAll('.sbg__svg').forEach(function (art) {
+      var sec = art.closest('.section, .page-hero, .hero, .statement-sec');
+      if (!sec) return;
+      gsap.fromTo(art, { yPercent: -7 }, {
+        yPercent: 7, ease: 'none', immediateRender: false,
+        scrollTrigger: { trigger: sec, start: 'top bottom', end: 'bottom top', scrub: 0.9 }
+      });
+    });
+  }());
+
   /* ----- FAQ: one open at a time ---------------------------------------- */
   var faqItems = document.querySelectorAll('.faq__item');
   faqItems.forEach(function (item) {

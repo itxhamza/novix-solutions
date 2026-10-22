@@ -307,6 +307,20 @@ p { text-wrap: pretty; }
   box-shadow: 0 10px 40px -28px rgba(0, 0, 0, .9);
 }
 
+/* While a dark band is passing beneath it, the header borrows the dark
+   palette by redefining the tokens its own rules already read — the lockup
+   is fixed artwork that reads on either ground, so nothing else changes. */
+.header.is-on-dark {
+  --bg: #0b1016;
+  --text: #f2f5f8;
+  --text-dim: #c3ccd5;
+  --muted: #94a0ac;
+  --border: rgba(255, 255, 255, .11);
+  --border-strong: rgba(255, 255, 255, .2);
+  --surface: rgba(255, 255, 255, .06);
+  --surface-2: rgba(255, 255, 255, .09);
+}
+
 .header__inner {
   display: flex;
   align-items: center;
@@ -1429,6 +1443,126 @@ body.is-locked { overflow: hidden; }
   gap: clamp(20px, 2.4vw, 32px);
 }
 .team-row > .member { flex: 0 1 clamp(280px, 30vw, 360px); }
+
+/* --------------------------------------------------------------------------
+   19a. Stacking cards
+   Each card stops under the one before it, a little lower each time, so the
+   set collects into a deck as you scroll. Done with position: sticky rather
+   than a pinned timeline: the cards keep their normal flow height, so the
+   effect costs no extra scrolling at all.
+   -------------------------------------------------------------------------- */
+.stack { display: grid; gap: clamp(16px, 2vw, 26px); }
+.stack-card {
+  position: sticky;
+  /* Clears the sticky header, then steps down so the card beneath still
+     shows an edge once it is covered. */
+  top: calc(96px + var(--i) * 20px);
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: clamp(20px, 3.4vw, 52px);
+  min-height: clamp(210px, 29vh, 300px);
+  padding: clamp(26px, 3.6vw, 52px);
+  border-radius: var(--r-lg);
+  border: 1px solid var(--border);
+  /* Opaque on purpose: --surface is translucent in dark mode and the cards
+     would read through one another once stacked. */
+  background: var(--surface-solid);
+  box-shadow: var(--shadow);
+}
+.stack-card__num {
+  font-family: var(--font-display);
+  font-size: clamp(2.6rem, 6vw, 5rem);
+  font-weight: 800;
+  line-height: 1;
+  /* It was a 22%-opacity watermark, which measured 1.24:1 on a white card —
+     a number nobody could read. Each theme takes the green that has contrast
+     against its own card instead. */
+  color: var(--brand-soft);
+  opacity: .78;
+}
+:root[data-theme="light"] .stack-card__num { color: var(--brand-cta); opacity: .85; }
+.stack-card__title { margin-bottom: 10px; font-size: clamp(1.15rem, 2vw, 1.6rem); }
+.stack-card__text { color: var(--muted); max-width: 62ch; }
+
+@media (max-width: 720px) {
+  .stack-card { top: calc(78px + var(--i) * 11px); grid-template-columns: 1fr; gap: 14px; }
+  .stack-card__num { font-size: 2.4rem; }
+}
+
+/* --------------------------------------------------------------------------
+   19b. Statement band
+   A dark panel that opens out to the full width of the window as it is
+   scrolled through. It carries its own palette rather than inverting the
+   page's: dark is the base theme here and light is the override, so a token
+   flip would mean duplicating the whole block.
+   -------------------------------------------------------------------------- */
+.statement-sec { padding-block: var(--section-y); position: relative; }
+.statement-wrap {
+  /* Scrubbed to 0 on scroll, which is what opens the panel to full bleed. */
+  padding-inline: clamp(16px, 7vw, 120px);
+}
+.statement {
+  position: relative;
+  overflow: hidden;
+  border-radius: 36px;          /* scrubbed to 0 alongside the padding */
+  background:
+    radial-gradient(900px 420px at 18% 0%, rgba(14, 191, 67, .20), transparent 68%),
+    radial-gradient(700px 380px at 92% 100%, rgba(10, 127, 47, .22), transparent 70%),
+    #0b1016;
+  padding: clamp(46px, 7vw, 108px) clamp(22px, 5vw, 76px);
+}
+/* A faint rule grid, so the panel has texture rather than being a flat fill. */
+.statement::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(to right, rgba(255, 255, 255, .055) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, .055) 1px, transparent 1px);
+  background-size: 62px 62px;
+  mask-image: radial-gradient(120% 100% at 50% 50%, #000 30%, transparent 80%);
+  -webkit-mask-image: radial-gradient(120% 100% at 50% 50%, #000 30%, transparent 80%);
+  pointer-events: none;
+}
+.statement__inner {
+  position: relative;
+  z-index: 1;
+  max-width: 1020px;
+  margin-inline: auto;
+}
+.eyebrow--on-dark { color: var(--brand-soft); }
+.statement__text {
+  margin-top: 22px;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(1.6rem, 3.5vw, 3.1rem);
+  line-height: 1.22;
+  letter-spacing: -.02em;
+  color: #ffffff;
+  text-wrap: balance;
+}
+.statement__meta {
+  display: flex;
+  align-items: center;
+  gap: clamp(18px, 3vw, 34px);
+  flex-wrap: wrap;
+  margin-top: clamp(30px, 4vw, 46px);
+}
+.statement__meta > span {
+  font-size: .85rem;
+  color: rgba(255, 255, 255, .72);
+}
+
+/* Scrub-lit text: each word starts dimmed and comes up as the line is
+   scrolled through. The dimming is applied from script, so without GSAP the
+   sentence is simply fully lit. */
+.scrub-w { display: inline-block; will-change: opacity; }
+
+@media (max-width: 640px) {
+  .statement-wrap { padding-inline: 0; }
+  .statement { border-radius: 0; }
+}
 
 /* --------------------------------------------------------------------------
    20. Footer
