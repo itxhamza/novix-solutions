@@ -1013,17 +1013,41 @@
     /* Luminance of the nearest painted background, so the reticle can
        invert over dark fills (the brand button, dark surfaces) instead of
        disappearing into them. */
+    /* getComputedStyle hands back two different shapes, and they do not share
+       a scale: rgb()/rgba() give 0-255 channels, while anything built with
+       color-mix() comes back as color(srgb r g b / a) with 0-1 channels.
+       The footer's background is a color-mix, so reading it as 0-255 made
+       white (1 1 1) look like near-black and turned the cursor white on a
+       white footer. */
+    function channels(bg) {
+      var open = bg.indexOf('(');
+      if (open < 0) return null;
+      var inner = bg.slice(open + 1, bg.lastIndexOf(')'));
+      var isColorFn = bg.lastIndexOf('color(', 0) === 0;
+      if (isColorFn) inner = inner.replace(/^\s*[a-z0-9-]+\s+/i, '');
+      var parts = inner.split('/');
+      var nums = (parts[0].match(/[\d.]+/g) || []).map(parseFloat);
+      if (nums.length < 3) return null;
+      var a = 1;
+      if (parts.length > 1) {
+        a = parseFloat(parts[1]);
+        if (parts[1].indexOf('%') !== -1) a /= 100;
+      } else if (nums.length > 3) {
+        a = nums[3];
+      }
+      var k = isColorFn ? 1 : 1 / 255;
+      return { r: nums[0] * k, g: nums[1] * k, b: nums[2] * k, a: isNaN(a) ? 1 : a };
+    }
+
     function onDark(el) {
       for (var n = el; n && n !== document.documentElement; n = n.parentElement) {
-        var bg = getComputedStyle(n).backgroundColor;
-        var m = bg.match(/[\d.]+/g);
-        if (!m || m.length < 3) continue;
-        if (m.length > 3 && parseFloat(m[3]) < 0.5) continue;
-        var c = m.slice(0, 3).map(function (v) {
-          v = v / 255;
+        var c = channels(getComputedStyle(n).backgroundColor);
+        if (!c) continue;
+        if (c.a < 0.5) continue;
+        var lin = [c.r, c.g, c.b].map(function (v) {
           return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4);
         });
-        return 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2] < 0.3;
+        return 0.2126 * lin[0] + 0.7152 * lin[1] + 0.0722 * lin[2] < 0.3;
       }
       return false;
     }

@@ -1420,6 +1420,16 @@ body.is-locked { overflow: hidden; }
 .member__role { color: var(--brand); font-size: .87rem; font-weight: 700; margin-bottom: 12px; }
 .member p { color: var(--muted); font-size: .92rem; }
 
+/* One card in a four-across grid looks like three people failed to load, so
+   the row centres on whoever is in it and caps its own width instead. */
+.team-row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: clamp(20px, 2.4vw, 32px);
+}
+.team-row > .member { flex: 0 1 clamp(280px, 30vw, 360px); }
+
 /* --------------------------------------------------------------------------
    20. Footer
    -------------------------------------------------------------------------- */
