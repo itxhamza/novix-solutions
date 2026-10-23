@@ -80,7 +80,10 @@
 
   --text:         #0b1117;
   --text-dim:     #44505c;
-  --muted:        #6a7682;
+  /* Was #6a7682, which clears AA on a white card (4.64:1) but not on the
+     page background (4.23:1) — and most muted copy sits on the page, not on
+     a card. This clears both: 5.7:1 and 5.3:1. */
+  --muted:        #5d6874;
 
   /* Two-layer shadows: a tight contact edge plus a soft ambient spread. */
   --shadow-sm:    0 1px 2px rgba(15, 23, 32, .06);
@@ -1448,6 +1451,45 @@ body.is-locked { overflow: hidden; }
   gap: clamp(20px, 2.4vw, 32px);
 }
 .team-row > .member { flex: 0 1 clamp(280px, 30vw, 360px); }
+
+/* --------------------------------------------------------------------------
+   18c. Architecture diagram
+   One picture of a typical system. Everything is a CSS variable so it reads
+   in either theme, and each connector is a single path so it can be drawn
+   on scroll.
+   -------------------------------------------------------------------------- */
+.diagram { margin: 0; }
+/* Below the width where the labels stay legible it scrolls sideways rather
+   than shrinking into an unreadable thumbnail. */
+.diagram__scroll {
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 6px;
+}
+.dg { width: 100%; min-width: 860px; height: auto; display: block; }
+.dg-link {
+  stroke: var(--border-strong);
+  stroke-width: 1.6;
+  fill: none;
+  stroke-linecap: round;
+}
+.dg-node rect {
+  fill: var(--surface-solid);
+  stroke: var(--border-strong);
+  stroke-width: 1.2;
+}
+.dg-node--core rect { stroke: var(--brand); stroke-width: 1.8; }
+.dg-node--ai   rect { stroke: var(--brand-3); }
+.dg-node--store rect { fill: var(--surface-2); }
+.dg-label { fill: var(--text); font-family: var(--font-display); font-size: 17px; font-weight: 700; }
+.dg-sub   { fill: var(--muted); font-size: 13px; }
+.diagram figcaption {
+  margin-top: 18px;
+  text-align: center;
+  color: var(--muted);
+  font-size: .88rem;
+}
 
 /* --------------------------------------------------------------------------
    19a. Stacking cards

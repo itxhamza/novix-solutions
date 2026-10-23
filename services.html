@@ -256,6 +256,97 @@
     </div>
   </section>
 
+  <section class="section">
+    <div class="container">
+      <div class="section-head section-head--center" data-reveal>
+        <span class="eyebrow">How it fits together</span>
+        <h2 data-split>One diagram beats three paragraphs</h2>
+        <p>A typical build. Not every project needs all of it, but this is the shape:
+           clients at the top, one way in, and everything underneath it replaceable.</p>
+      </div>
+      <figure class="diagram" data-draw>
+        <div class="diagram__scroll">
+          <svg class="dg" viewBox="0 0 1200 600" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="How a typical Novix system fits together: web and mobile clients and a CDN talk to an API gateway, which fans out to core services, background jobs and an AI pipeline, each backed by Postgres, object storage and a warehouse, with observability across the whole.">
+              <path class="dg-link" d="M185.0 124V151.0Q185.0 165.0 199.0 165.0H531.0Q545.0 165.0 545.0 179.0V206" />
+              <path class="dg-link" d="M430.0 124V151.0Q430.0 165.0 444.0 165.0H531.0Q545.0 165.0 545.0 179.0V206" />
+              <path class="dg-link" d="M660.0 124V151.0Q660.0 165.0 646.0 165.0H559.0Q545.0 165.0 545.0 179.0V206" />
+              <path class="dg-link" d="M1015.0 124V151.0Q1015.0 165.0 1001.0 165.0H559.0Q545.0 165.0 545.0 179.0V206" />
+              <path class="dg-link" d="M545.0 298V324.0Q545.0 338.0 531.0 338.0H199.0Q185.0 338.0 185.0 352.0V378" />
+              <path class="dg-link" d="M545.0 298V324.0Q545.0 338.0 531.0 338.0H444.0Q430.0 338.0 430.0 352.0V378" />
+              <path class="dg-link" d="M545.0 298V324.0Q545.0 338.0 559.0 338.0H646.0Q660.0 338.0 660.0 352.0V378" />
+              <path class="dg-link" d="M185.0 462V471.0Q185.0 485.0 199.0 485.0H291.0Q305.0 485.0 305.0 499.0V508" />
+              <path class="dg-link" d="M430.0 462V471.0Q430.0 485.0 444.0 485.0H551.0Q565.0 485.0 565.0 499.0V508" />
+              <path class="dg-link" d="M660.0 462V471.0Q660.0 485.0 674.0 485.0H811.0Q825.0 485.0 825.0 499.0V508" />
+              <path class="dg-link" d="M545.0 298V324.0Q545.0 338.0 559.0 338.0H1001.0Q1015.0 338.0 1015.0 352.0V378" />
+              <path class="dg-link" d="M1015.0 124V378" />
+              <g class="dg-node dg-node--client">
+                <rect x="70" y="40" width="230" height="84" rx="14" />
+                <text class="dg-label" x="90" y="76">Web app</text>
+                <text class="dg-sub" x="90" y="102">Next.js</text>
+              </g>
+              <g class="dg-node dg-node--client">
+                <rect x="330" y="40" width="200" height="84" rx="14" />
+                <text class="dg-label" x="350" y="76">iOS</text>
+                <text class="dg-sub" x="350" y="102">React Native</text>
+              </g>
+              <g class="dg-node dg-node--client">
+                <rect x="560" y="40" width="200" height="84" rx="14" />
+                <text class="dg-label" x="580" y="76">Android</text>
+                <text class="dg-sub" x="580" y="102">React Native</text>
+              </g>
+              <g class="dg-node dg-node--edge">
+                <rect x="900" y="40" width="230" height="84" rx="14" />
+                <text class="dg-label" x="920" y="76">CDN &amp; edge</text>
+                <text class="dg-sub" x="920" y="102">Caching, TLS</text>
+              </g>
+              <g class="dg-node dg-node--core">
+                <rect x="330" y="206" width="430" height="92" rx="14" />
+                <text class="dg-label" x="350" y="242">API gateway</text>
+                <text class="dg-sub" x="350" y="276">Auth, rate limits, routing</text>
+              </g>
+              <g class="dg-node dg-node--svc">
+                <rect x="70" y="378" width="230" height="84" rx="14" />
+                <text class="dg-label" x="90" y="414">Core services</text>
+                <text class="dg-sub" x="90" y="440">Business logic</text>
+              </g>
+              <g class="dg-node dg-node--svc">
+                <rect x="330" y="378" width="200" height="84" rx="14" />
+                <text class="dg-label" x="350" y="414">Jobs</text>
+                <text class="dg-sub" x="350" y="440">Queues, cron</text>
+              </g>
+              <g class="dg-node dg-node--ai">
+                <rect x="560" y="378" width="200" height="84" rx="14" />
+                <text class="dg-label" x="580" y="414">AI pipeline</text>
+                <text class="dg-sub" x="580" y="440">RAG, embeddings</text>
+              </g>
+              <g class="dg-node dg-node--edge">
+                <rect x="900" y="378" width="230" height="84" rx="14" />
+                <text class="dg-label" x="920" y="414">Observability</text>
+                <text class="dg-sub" x="920" y="440">Traces, alerts</text>
+              </g>
+              <g class="dg-node dg-node--store">
+                <rect x="190" y="508" width="230" height="72" rx="14" />
+                <text class="dg-label" x="210" y="550.0">Postgres</text>
+                
+              </g>
+              <g class="dg-node dg-node--store">
+                <rect x="450" y="508" width="230" height="72" rx="14" />
+                <text class="dg-label" x="470" y="550.0">Object store</text>
+                
+              </g>
+              <g class="dg-node dg-node--store">
+                <rect x="710" y="508" width="230" height="72" rx="14" />
+                <text class="dg-label" x="730" y="550.0">Warehouse</text>
+                
+              </g>
+          </svg>
+        </div>
+        <figcaption>Swap Postgres for whatever you already run. The point is the
+          arrows, not the boxes.</figcaption>
+      </figure>
+    </div>
+  </section>
+
   <section class="section" id="stack">
       <div class="sbg sbg--neural" aria-hidden="true"><svg class="sbg__svg" viewBox="0 0 1060 400" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg"><g class="sbg-line sbg-synapse"><path d="M140 50 L400 50"/><path d="M140 50 L400 110"/><path d="M140 50 L400 170"/><path d="M140 50 L400 230"/><path d="M140 50 L400 290"/><path d="M140 50 L400 350"/><path d="M140 150 L400 50"/><path d="M140 150 L400 110"/><path d="M140 150 L400 170"/><path d="M140 150 L400 230"/><path d="M140 150 L400 290"/><path d="M140 150 L400 350"/><path d="M140 250 L400 50"/><path d="M140 250 L400 110"/><path d="M140 250 L400 170"/><path d="M140 250 L400 230"/><path d="M140 250 L400 290"/><path d="M140 250 L400 350"/><path d="M140 350 L400 50"/><path d="M140 350 L400 110"/><path d="M140 350 L400 170"/><path d="M140 350 L400 230"/><path d="M140 350 L400 290"/><path d="M140 350 L400 350"/><path d="M400 50 L660 50"/><path d="M400 50 L660 110"/><path d="M400 50 L660 170"/><path d="M400 50 L660 230"/><path d="M400 50 L660 290"/><path d="M400 50 L660 350"/><path d="M400 110 L660 50"/><path d="M400 110 L660 110"/><path d="M400 110 L660 170"/><path d="M400 110 L660 230"/><path d="M400 110 L660 290"/><path d="M400 110 L660 350"/><path d="M400 170 L660 50"/><path d="M400 170 L660 110"/><path d="M400 170 L660 170"/><path d="M400 170 L660 230"/><path d="M400 170 L660 290"/><path d="M400 170 L660 350"/><path d="M400 230 L660 50"/><path d="M400 230 L660 110"/><path d="M400 230 L660 170"/><path d="M400 230 L660 230"/><path d="M400 230 L660 290"/><path d="M400 230 L660 350"/><path d="M400 290 L660 50"/><path d="M400 290 L660 110"/><path d="M400 290 L660 170"/><path d="M400 290 L660 230"/><path d="M400 290 L660 290"/><path d="M400 290 L660 350"/><path d="M400 350 L660 50"/><path d="M400 350 L660 110"/><path d="M400 350 L660 170"/><path d="M400 350 L660 230"/><path d="M400 350 L660 290"/><path d="M400 350 L660 350"/><path d="M660 50 L920 50"/><path d="M660 50 L920 200"/><path d="M660 50 L920 350"/><path d="M660 110 L920 50"/><path d="M660 110 L920 200"/><path d="M660 110 L920 350"/><path d="M660 170 L920 50"/><path d="M660 170 L920 200"/><path d="M660 170 L920 350"/><path d="M660 230 L920 50"/><path d="M660 230 L920 200"/><path d="M660 230 L920 350"/><path d="M660 290 L920 50"/><path d="M660 290 L920 200"/><path d="M660 290 L920 350"/><path d="M660 350 L920 50"/><path d="M660 350 L920 200"/><path d="M660 350 L920 350"/></g><g class="sbg-accent sbg-neuron"><circle cx="140" cy="50" r="7"/><circle cx="140" cy="150" r="7"/><circle cx="140" cy="250" r="7"/><circle cx="140" cy="350" r="7"/><circle cx="400" cy="50" r="7"/><circle cx="400" cy="110" r="7"/><circle cx="400" cy="170" r="7"/><circle cx="400" cy="230" r="7"/><circle cx="400" cy="290" r="7"/><circle cx="400" cy="350" r="7"/><circle cx="660" cy="50" r="7"/><circle cx="660" cy="110" r="7"/><circle cx="660" cy="170" r="7"/><circle cx="660" cy="230" r="7"/><circle cx="660" cy="290" r="7"/><circle cx="660" cy="350" r="7"/><circle cx="920" cy="50" r="7"/><circle cx="920" cy="200" r="7"/><circle cx="920" cy="350" r="7"/></g></svg></div>
     <div class="container">

@@ -1259,6 +1259,32 @@
     });
   }());
 
+  /* ----- Diagrams draw themselves ----------------------------------------
+     Connectors are stroked in as the figure is scrolled through, then the
+     boxes arrive. The dash offset is set from script, so with GSAP absent
+     the diagram is simply already drawn. */
+  (function drawDiagram() {
+    if (!hasGSAP || !window.ScrollTrigger) return;
+    document.querySelectorAll('[data-draw]').forEach(function (fig) {
+      var links = fig.querySelectorAll('.dg-link');
+      var nodes = fig.querySelectorAll('.dg-node');
+      if (!links.length) return;
+      if (reduceMotion) return;
+
+      links.forEach(function (path) {
+        var len = path.getTotalLength();
+        gsap.set(path, { strokeDasharray: len, strokeDashoffset: len });
+      });
+      gsap.set(nodes, { opacity: 0, y: 14 });
+
+      var tl = gsap.timeline({
+        scrollTrigger: { trigger: fig, start: 'top 78%', end: 'bottom 62%', scrub: 0.7 }
+      });
+      tl.to(links, { strokeDashoffset: 0, ease: 'none', stagger: 0.05 }, 0)
+        .to(nodes, { opacity: 1, y: 0, ease: 'power2.out', stagger: 0.035 }, 0.1);
+    });
+  }());
+
   /* ----- Scrub-lit sentences ---------------------------------------------
      A [data-scrub] sentence is split into words that come up from dim to
      full as the line is scrolled through. The dim start is applied from
