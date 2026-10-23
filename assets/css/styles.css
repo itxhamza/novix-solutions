@@ -931,7 +931,12 @@ body.is-locked { overflow: hidden; }
   overflow: hidden;
   transition: transform var(--t) var(--ease), border-color var(--t) var(--ease), box-shadow var(--t) var(--ease);
 }
+/* The CSS lift is the no-JS fallback. Where the pointer tilt is running it
+   takes the lift over too, because GSAP writes an inline transform and an
+   inline transform beats this rule — two owners would mean the card either
+   stopped lifting or fought itself. */
 .work-card:hover { transform: translateY(-6px); border-color: var(--border-strong); box-shadow: var(--shadow); }
+.work-card.has-tilt:hover { transform: none; }
 
 /* The media box holds the chrome bar (sites only) and the well below it, so
    it carries no ratio of its own — the well does. */

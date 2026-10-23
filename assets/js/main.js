@@ -34,6 +34,68 @@
 
   applyTheme(root.getAttribute('data-theme') || 'light');
 
+  /* ----- Smooth scrolling ------------------------------------------------
+     Lenis interpolates the real scrollTop rather than transforming a
+     wrapper, which is the reason it can be used here at all: the header,
+     the cursor layer and the stacking cards are position: sticky/fixed, and
+     a transform-based smoother would break all three.
+
+     It is off for anyone who asked for reduced motion, and off on touch,
+     where the platform's own scrolling is already better than anything we
+     would put in front of it. */
+  var lenis = null;
+  (function smoothScroll() {
+    if (typeof window.Lenis !== 'function') return;
+    if (reduceMotion) return;
+    if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
+
+    lenis = new Lenis({
+      duration: 1.05,
+      easing: function (t) { return 1 - Math.pow(1 - t, 3); },
+      smoothWheel: true,
+      syncTouch: false
+    });
+    window.__novixLenis = lenis;
+
+    var gsapReady = typeof window.gsap !== 'undefined' && typeof window.ScrollTrigger !== 'undefined';
+    if (gsapReady) {
+      /* One clock. Lenis stepped from GSAP's ticker keeps scroll-driven
+         tweens and the scroll position on the same frame; two rAF loops
+         would show up as jitter in anything scrubbed. */
+      lenis.on('scroll', function () { if (window.ScrollTrigger) ScrollTrigger.update(); });
+      gsap.ticker.add(function (time) { lenis.raf(time * 1000); });
+      gsap.ticker.lagSmoothing(0);
+    } else {
+      requestAnimationFrame(function loop(t) { lenis.raf(t); requestAnimationFrame(loop); });
+    }
+  }());
+
+  /* Anything that wants to move the page goes through the scroller when one
+     is running, so it is never fighting a native smooth scroll. */
+  function scrollToTarget(target, offset) {
+    if (lenis) { lenis.scrollTo(target, { offset: offset || 0, duration: 1.1 }); return; }
+    var y = typeof target === 'number'
+      ? target
+      : target.getBoundingClientRect().top + window.scrollY + (offset || 0);
+    window.scrollTo({ top: y, behavior: reduceMotion ? 'auto' : 'smooth' });
+  }
+
+  document.addEventListener('click', function (e) {
+    var toTop = e.target.closest && e.target.closest('[data-to-top]');
+    if (toTop) { e.preventDefault(); scrollToTarget(0); return; }
+    var a = e.target.closest && e.target.closest('a[href^="#"]');
+    if (!a) return;
+    var id = a.getAttribute('href').slice(1);
+    if (!id) return;
+    var el = document.getElementById(id);
+    if (!el) return;
+    e.preventDefault();
+    scrollToTarget(el, -84);
+    /* Keyboard users must land on the target, not just see it. */
+    el.setAttribute('tabindex', '-1');
+    el.focus({ preventScroll: true });
+  });
+
   /* ----- Sticky header -------------------------------------------------- */
   var header = document.querySelector('.header');
 
@@ -281,6 +343,23 @@
       var marquee = track.closest('.marquee');
       marquee.addEventListener('mouseenter', function () { gsap.to(loop, { timeScale: 0, duration: 0.4 }); });
       marquee.addEventListener('mouseleave', function () { gsap.to(loop, { timeScale: 1, duration: 0.4 }); });
+
+      /* The strip runs faster the harder the page is being scrolled, and
+         eases back to its resting speed when the scrolling stops. */
+      if (window.ScrollTrigger && !reduceMotion) {
+        var settle = null;
+        ScrollTrigger.create({
+          trigger: marquee, start: 'top bottom', end: 'bottom top',
+          onUpdate: function (self) {
+            var boost = 1 + Math.min(Math.abs(self.getVelocity()) / 1400, 2.6);
+            gsap.to(loop, { timeScale: boost, duration: 0.25, overwrite: true });
+            clearTimeout(settle);
+            settle = setTimeout(function () {
+              gsap.to(loop, { timeScale: 1, duration: 0.7, overwrite: true });
+            }, 180);
+          }
+        });
+      }
     }
 
     /* --- Card grids: stagger in, then the icons pop ---------------------- */
@@ -1128,6 +1207,55 @@
         });
       }
       if (window.ScrollTrigger) ScrollTrigger.refresh();
+    });
+  }());
+
+  /* ----- Project cards: tilt toward the pointer, wipe in on arrival ------
+     Both are additive. The tilt only ever exists while a fine pointer is
+     over a card, and the wipe's start state is set from script, so a card
+     is fully visible and square without any of this. */
+  (function cardDepth() {
+    if (!hasGSAP || reduceMotion) return;
+    var fine = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+    var cards = document.querySelectorAll('.work-card');
+    if (!cards.length) return;
+
+    cards.forEach(function (card) {
+      var shot = card.querySelector('.shot');
+
+      /* Wipe the screenshot up from its own bottom edge as the card lands,
+         a beat behind the card's own reveal. */
+      if (shot && window.ScrollTrigger) {
+        gsap.fromTo(shot,
+          { clipPath: 'inset(0% 0% 100% 0%)' },
+          {
+            clipPath: 'inset(0% 0% 0% 0%)', duration: 1.1, ease: 'power3.out',
+            immediateRender: false,
+            scrollTrigger: { trigger: card, start: 'top 86%', once: true }
+          });
+      }
+
+      if (!fine) return;
+      card.classList.add('has-tilt');
+      /* Per-element perspective, so no ancestor needs a rule for this to
+         read as depth rather than a flat skew. */
+      gsap.set(card, { transformPerspective: 1400 });
+
+      var rx = gsap.quickTo(card, 'rotationX', { duration: 0.5, ease: 'power3' });
+      var ry = gsap.quickTo(card, 'rotationY', { duration: 0.5, ease: 'power3' });
+      var ly = gsap.quickTo(card, 'y', { duration: 0.5, ease: 'power3' });
+
+      card.addEventListener('mousemove', function (e) {
+        var r = card.getBoundingClientRect();
+        /* -1..1 from the card's centre, then a couple of degrees either way:
+           enough to catch the light, not enough to make the text swim. */
+        var nx = (e.clientX - (r.left + r.width / 2)) / (r.width / 2);
+        var ny = (e.clientY - (r.top + r.height / 2)) / (r.height / 2);
+        rx(-ny * 3.2);
+        ry(nx * 3.6);
+        ly(-6);
+      });
+      card.addEventListener('mouseleave', function () { rx(0); ry(0); ly(0); });
     });
   }());
 

@@ -197,33 +197,33 @@
       <div class="grid grid--3">
         <article class="card card--hover" data-reveal data-reveal-delay="0">
           <div class="icon-tile"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.3"/></svg></div>
-          <h3 class="card__title">Say the hard thing early</h3>
-          <p class="card__text">If a deadline is unrealistic or a feature is not worth building, you hear it in week one — not in the retrospective.</p>
+          <h3 class="card__title">We say it in week one</h3>
+          <p class="card__text">If the deadline is wrong or the feature is not worth building, you hear it straight away. It is an awkward conversation. It is far cheaper than the same conversation in a retrospective.</p>
         </article>
         <article class="card card--hover" data-reveal data-reveal-delay="70">
           <div class="icon-tile"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l8 3v6c0 5-3.4 8.3-8 9.6C7.4 20.3 4 17 4 12V6z"/><path d="M9 12.5l2 2 4-4.5"/></svg></div>
-          <h3 class="card__title">Own the outcome</h3>
-          <p class="card__text">We are not finished when the ticket closes. We are finished when the thing works in production for real users.</p>
+          <h3 class="card__title">A closed ticket is not a finished feature</h3>
+          <p class="card__text">It is finished when it has been in production under real load for long enough that we have stopped checking on it.</p>
         </article>
         <article class="card card--hover" data-reveal data-reveal-delay="140">
           <div class="icon-tile"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.4"/><path d="M2.5 20a6.5 6.5 0 0113 0M17 11a3 3 0 100-6M18 20a6 6 0 00-2-4.5"/></svg></div>
-          <h3 class="card__title">Teach as we build</h3>
-          <p class="card__text">Your engineers sit in our reviews. By handover, nothing about the codebase is a mystery to your team.</p>
+          <h3 class="card__title">Your team is in the room</h3>
+          <p class="card__text">Your engineers review our pull requests from the first week. By handover nobody on your side is opening the codebase for the first time.</p>
         </article>
         <article class="card card--hover" data-reveal data-reveal-delay="0">
           <div class="icon-tile"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h4L19.5 8.5a2.8 2.8 0 10-4-4L4 16z"/></svg></div>
-          <h3 class="card__title">Craft over volume</h3>
-          <p class="card__text">We take on fewer projects than we could, so the ones we take get senior attention from start to finish.</p>
+          <h3 class="card__title">We turn work down</h3>
+          <p class="card__text">A studio this size can do a couple of things properly or five things badly. The second one is how projects end up needing rescuing, and we have been called in to enough of those.</p>
         </article>
         <article class="card card--hover" data-reveal data-reveal-delay="70">
           <div class="icon-tile"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 11A8 8 0 006 6L3 9"/><path d="M3 4v5h5"/><path d="M4 13a8 8 0 0014 5l3-3"/><path d="M21 20v-5h-5"/></svg></div>
-          <h3 class="card__title">Small, reversible steps</h3>
-          <p class="card__text">Short-lived branches, feature flags and staged rollouts. Every change has a way back.</p>
+          <h3 class="card__title">Everything has a way back</h3>
+          <p class="card__text">Short branches. Feature flags. Staged rollouts. Nothing goes live that cannot be switched off again in under a minute.</p>
         </article>
         <article class="card card--hover" data-reveal data-reveal-delay="140">
           <div class="icon-tile"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20s-7-4.4-7-9.2A4 4 0 0112 8a4 4 0 017 2.8C19 15.6 12 20 12 20z"/></svg></div>
-          <h3 class="card__title">Treat people well</h3>
-          <p class="card__text">Sustainable hours, honest invoices and no surprises. It is the only way to keep a team worth hiring.</p>
+          <h3 class="card__title">Sustainable hours, honest invoices</h3>
+          <p class="card__text">Partly because it is the right way to run a company. Mostly because the alternative is losing people halfway through your project.</p>
         </article>
       </div>
     </div>
@@ -354,10 +354,11 @@
   </div>
 </footer>
 
-<button class="to-top" type="button" aria-label="Back to top" onclick="window.scrollTo({top:0,behavior:'smooth'})"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5M5 12l7-7 7 7"/></svg></button>
+<button class="to-top" type="button" aria-label="Back to top" data-to-top><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5M5 12l7-7 7 7"/></svg></button>
 
 <script src="/assets/js/shader-bg.js" defer></script>
 <script src="/assets/js/globe-3d.js" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/lenis@1.1.18/dist/lenis.min.js" defer></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js" defer></script>
 <script src="/assets/js/main.js" defer></script>
