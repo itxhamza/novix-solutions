@@ -34,46 +34,11 @@
 
   applyTheme(root.getAttribute('data-theme') || 'light');
 
-  /* ----- Smooth scrolling ------------------------------------------------
-     Lenis interpolates the real scrollTop rather than transforming a
-     wrapper, which is the reason it can be used here at all: the header,
-     the cursor layer and the stacking cards are position: sticky/fixed, and
-     a transform-based smoother would break all three.
-
-     It is off for anyone who asked for reduced motion, and off on touch,
-     where the platform's own scrolling is already better than anything we
-     would put in front of it. */
-  var lenis = null;
-  (function smoothScroll() {
-    if (typeof window.Lenis !== 'function') return;
-    if (reduceMotion) return;
-    if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
-
-    lenis = new Lenis({
-      duration: 1.05,
-      easing: function (t) { return 1 - Math.pow(1 - t, 3); },
-      smoothWheel: true,
-      syncTouch: false
-    });
-    window.__novixLenis = lenis;
-
-    var gsapReady = typeof window.gsap !== 'undefined' && typeof window.ScrollTrigger !== 'undefined';
-    if (gsapReady) {
-      /* One clock. Lenis stepped from GSAP's ticker keeps scroll-driven
-         tweens and the scroll position on the same frame; two rAF loops
-         would show up as jitter in anything scrubbed. */
-      lenis.on('scroll', function () { if (window.ScrollTrigger) ScrollTrigger.update(); });
-      gsap.ticker.add(function (time) { lenis.raf(time * 1000); });
-      gsap.ticker.lagSmoothing(0);
-    } else {
-      requestAnimationFrame(function loop(t) { lenis.raf(t); requestAnimationFrame(loop); });
-    }
-  }());
-
-  /* Anything that wants to move the page goes through the scroller when one
-     is running, so it is never fighting a native smooth scroll. */
+  /* ----- Anchor scrolling ------------------------------------------------
+     The page scrolls natively, exactly like an ordinary website — no wheel
+     hijacking, no momentum layer. In-page anchor jumps are eased with the
+     platform's own smooth scroll (and jump instantly under reduced motion). */
   function scrollToTarget(target, offset) {
-    if (lenis) { lenis.scrollTo(target, { offset: offset || 0, duration: 1.1 }); return; }
     var y = typeof target === 'number'
       ? target
       : target.getBoundingClientRect().top + window.scrollY + (offset || 0);
@@ -473,87 +438,8 @@
       });
     }());
 
-    /* --- Work: pin and run the cards sideways ---------------------------
-       Only where there are enough cards to make the travel worth a pin, and
-       only above 1040px. The markup is a plain grid, so everywhere else it
-       stays a normal stacked section. */
-    (function horizontalWork() {
-      if (window.innerWidth <= 1040) return;
-      var grids = document.querySelectorAll('.grid');
-      for (var g = 0; g < grids.length; g++) {
-        var grid = grids[g];
-        if (grid.hasAttribute('data-no-rail')) continue;
-        var cards = grid.querySelectorAll('.work-card');
-        if (cards.length < 4) continue;
-        var section = grid.closest('.section');
-        if (!section) continue;
-
-        section.classList.add('is-rail');
-        var dist = (function (grid) {
-          return function () {
-            return Math.max(0, grid.scrollWidth - grid.parentElement.clientWidth);
-          };
-        }(grid));
-        if (dist() < 320) { section.classList.remove('is-rail'); continue; }
-
-        /* The pinned stretch is capped, not proportional: the rail's travel
-           grows with every project added, and without a ceiling the page
-           would get stickier each time one lands. Past the cap the rail just
-           moves faster per pixel of scroll. */
-        var endStr = (function (dist) {
-          return function () { return '+=' + Math.round(Math.min(dist() * 0.7, 1400)); };
-        }(dist));
-
-        gsap.to(grid, {
-          x: function () { return -dist(); },
-          ease: 'none',
-          scrollTrigger: {
-            trigger: section, start: 'top top', end: endStr,
-            pin: true, scrub: 0.6, anticipatePin: 1, invalidateOnRefresh: true,
-            refreshPriority: 1
-          }
-        });
-        gsap.fromTo(cards, { rotate: 1.2, y: 14 }, {
-          rotate: -1.2, y: -14, ease: 'none',
-          scrollTrigger: { trigger: section, start: 'top top', end: endStr, scrub: 0.8 }
-        });
-      }
-    }());
-
-    /* --- Process: pin, then light each phase in turn --------------------- */
-    (function pinnedProcess() {
-      var section = document.getElementById('process');
-      if (!section || window.innerWidth <= 1040 || !window.ScrollTrigger) return;
-      var steps = section.querySelectorAll('.step');
-      var live = section.querySelector('.pipeline__live');
-      if (steps.length < 2) return;
-
-      var t = gsap.timeline({
-        scrollTrigger: {
-          trigger: section, start: 'top top',
-          end: '+=' + (steps.length * 130), pin: true, scrub: 0.5,
-          anticipatePin: 1, invalidateOnRefresh: true,
-          refreshPriority: 1
-        }
-      });
-
-      if (live) {
-        var len = live.getTotalLength();
-        gsap.set(live, { strokeDasharray: len });
-        t.fromTo(live, { strokeDashoffset: len }, { strokeDashoffset: 0, ease: 'none' }, 0);
-      }
-      /* Progress is shown by lifting the active phase, never by dimming the
-         others: text must stay fully legible whatever the scroll position. */
-      steps.forEach(function (step, i) {
-        var num = step.querySelector('.step__num');
-        t.to(step, { y: -14, duration: 0.5 }, i * 0.55)
-         .to(step, { y: 0, duration: 0.4 }, i * 0.55 + 0.5);
-        if (num) {
-          t.to(num, { scale: 1.14, duration: 0.5 }, i * 0.55)
-           .to(num, { scale: 1, duration: 0.4 }, i * 0.55 + 0.5);
-        }
-      });
-    }());
+    /* The Work and Process sections scroll normally — no pinning, no
+       sideways scroll-jacking. Their scroll-in reveals are handled above. */
 
     /* --- FAQ -------------------------------------------------------------- */
     document.querySelectorAll('.faq').forEach(function (faq) {
@@ -1166,6 +1052,22 @@
       });
       el.addEventListener('mouseleave', function () { mx(0); my(0); });
     });
+  }());
+
+  /* ----- Card spotlight --------------------------------------------------
+     A soft brand glow tracks the pointer across hoverable cards. One
+     delegated listener, fine pointer only, purely additive: the CSS keeps
+     the glow invisible until a pointer is actually over a card. */
+  (function cardSpotlight() {
+    if (reduceMotion) return;
+    if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
+    document.addEventListener('pointermove', function (e) {
+      var card = e.target.closest && e.target.closest('.card--hover');
+      if (!card) return;
+      var r = card.getBoundingClientRect();
+      card.style.setProperty('--mx', (e.clientX - r.left) + 'px');
+      card.style.setProperty('--my', (e.clientY - r.top) + 'px');
+    }, { passive: true });
   }());
 
   /* ----- Project filter --------------------------------------------------
