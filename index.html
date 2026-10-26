@@ -157,21 +157,26 @@
       </div>
 
       <div class="hero__visual" style="position:relative">
-        <div class="console" role="img" aria-label="Illustration of a Novix analytics console showing deployment metrics">
+        <div class="console" role="img" aria-label="Illustration of the Novix code editor: an async build() function that takes an idea from design through engineering to launch, with a passing build, 214 tests and a Lighthouse score of 98">
           <div class="console__bar">
             <span class="console__dots" aria-hidden="true"><i></i><i></i><i></i></span>
-            <span>novix — platform overview</span>
+            <span class="console__file">build.ts</span>
+            <span class="console__badge" aria-hidden="true"><i class="dot"></i> live</span>
           </div>
           <div class="console__body">
-            <div class="metric-row">
-              <div class="metric"><small>Deploys</small><b data-count="248">248</b><em>&uarr; 18%</em></div>
-              <div class="metric"><small>Uptime</small><b data-count="99.98" data-count-suffix="%">99.98%</b><em>&uarr; stable</em></div>
-              <div class="metric"><small>Latency</small><b data-count="84" data-count-suffix="ms">84ms</b><em>&darr; 32%</em></div>
+            <div class="code" aria-hidden="true">
+<span class="ln"><i class="k">import</i> <i class="p">{</i> <i class="f">ship</i> <i class="p">}</i> <i class="k">from</i> <i class="s">"@novix/core"</i><i class="p">;</i></span>
+<span class="ln"></span>
+<span class="ln"><i class="k">export async function</i> <i class="f">build</i><i class="p">(</i>idea<i class="p">:</i> <i class="t">Idea</i><i class="p">) {</i></span>
+<span class="ln">  <i class="k">const</i> design  <i class="p">=</i> <i class="k">await</i> studio<i class="p">.</i><i class="f">craft</i><i class="p">(</i>idea<i class="p">);</i></span>
+<span class="ln">  <i class="k">const</i> product <i class="p">=</i> <i class="k">await</i> studio<i class="p">.</i><i class="f">engineer</i><i class="p">(</i>design<i class="p">);</i></span>
+<span class="ln"></span>
+<span class="ln">  <i class="k">return</i> <i class="f">ship</i><i class="p">(</i>product<i class="p">);</i> <i class="c">// discovery → launch</i></span>
+<span class="ln"><i class="p">}</i><i class="caret"></i></span>
             </div>
-            <div class="chart" aria-hidden="true"><i data-h="38"></i><i data-h="52"></i><i data-h="44"></i><i data-h="66"></i><i data-h="58"></i><i data-h="78"></i><i data-h="70"></i><i data-h="92"></i><i data-h="84"></i><i data-h="100"></i></div>
             <div class="console__rows">
               <div class="console__row"><i></i><b>Build passed</b><span>2m 14s</span></div>
-              <div class="console__row"><i></i><b>Staging deployed</b><span>just now</span></div>
+              <div class="console__row"><i></i><b>214 tests passed</b><span>0 failed</span></div>
               <div class="console__row"><i></i><b>Lighthouse 98</b><span>+6</span></div>
             </div>
           </div>
