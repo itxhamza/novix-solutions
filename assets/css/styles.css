@@ -1974,6 +1974,49 @@ body.is-locked { overflow: hidden; }
 }
 
 /* --------------------------------------------------------------------------
+   Tech stack grid
+   -------------------------------------------------------------------------- */
+.tech-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 14px;
+  margin-top: clamp(30px, 4vw, 48px);
+}
+.tech {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 20px 16px;
+  border-radius: var(--r);
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text-dim);
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: .98rem;
+  letter-spacing: -.01em;
+  transition: transform var(--t) var(--ease), border-color var(--t) var(--ease),
+              color var(--t) var(--ease), background var(--t) var(--ease);
+}
+.tech::before {
+  content: "";
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+  background: var(--brand);
+  opacity: .75;
+  transition: transform var(--t) var(--ease);
+}
+.tech:hover {
+  transform: translateY(-4px);
+  border-color: color-mix(in srgb, var(--brand) 55%, var(--border));
+  color: var(--text);
+  background: var(--surface-2);
+}
+.tech:hover::before { transform: scale(1.3) rotate(45deg); }
+
+/* --------------------------------------------------------------------------
    22. Responsive
    -------------------------------------------------------------------------- */
 @media (max-width: 1040px) {
