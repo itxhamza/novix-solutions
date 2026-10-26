@@ -717,80 +717,170 @@ body.is-locked { overflow: hidden; }
 :root[data-theme="light"] .work-card:hover,
 :root[data-theme="light"] .price-card:hover { box-shadow: var(--shadow); }
 
-/* Hero artwork — an abstract, non-technical brand piece: a slowly shifting
-   field of brand-green gradients with orbiting rings and a luminous core.
-   The outer .console supplies the rounded card, shadow and mouse-tilt. */
+/* Hero artwork — translucent 3D objects floating in deep space: a glossy
+   brand sphere ringed by halos, a tumbling glass cube, a satellite orb and
+   drifting sparks. Real CSS 3D (preserve-3d). The outer .console supplies the
+   card, shadow and pointer-tilt. */
 .showpiece {
   aspect-ratio: 5 / 5.2;
-  background: radial-gradient(130% 120% at 18% 6%, #0f3320 0%, #061710 56%, #04110b 100%);
+  background:
+    radial-gradient(62% 56% at 50% 44%, #0b2615 0%, transparent 72%),
+    radial-gradient(135% 120% at 50% 6%, #0a1a10 0%, #060d08 58%, #030705 100%);
   isolation: isolate;
 }
 :root[data-theme="light"] .showpiece {
-  background: radial-gradient(130% 120% at 18% 6%, #0f3320 0%, #061710 56%, #04110b 100%);
-}
-.showpiece > span { position: absolute; display: block; pointer-events: none; }
-
-/* The drifting colour field. */
-.sp-mesh {
-  inset: -25%;
   background:
-    radial-gradient(28% 30% at 26% 28%, rgba(14, 191, 67, .95), transparent 60%),
-    radial-gradient(26% 28% at 74% 34%, rgba(52, 208, 108, .72), transparent 62%),
-    radial-gradient(32% 34% at 60% 76%, rgba(10, 143, 51, .92), transparent 60%),
-    radial-gradient(22% 24% at 32% 80%, rgba(130, 235, 170, .5), transparent 62%),
-    radial-gradient(20% 22% at 86% 84%, rgba(246, 97, 53, .3), transparent 60%);
-  filter: blur(16px) saturate(1.1);
-  opacity: .92;
-  animation: meshDrift 22s var(--ease) infinite alternate;
+    radial-gradient(62% 56% at 50% 44%, #0b2615 0%, transparent 72%),
+    radial-gradient(135% 120% at 50% 6%, #0a1a10 0%, #060d08 58%, #030705 100%);
 }
-@keyframes meshDrift {
-  from { transform: translate3d(-3%, -2%, 0) scale(1.05) rotate(0deg); }
-  to   { transform: translate3d(4%, 3%, 0)  scale(1.2)  rotate(9deg); }
-}
-
-/* Luminous core. */
-.sp-orb {
-  width: 56%;
-  aspect-ratio: 1;
+.sp-glowbg {
+  position: absolute;
   inset: 0;
-  margin: auto;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(198, 255, 219, .85), rgba(52, 208, 108, .32) 44%, transparent 70%);
-  filter: blur(4px);
-  mix-blend-mode: screen;
-  animation: coreBreathe 7s var(--ease) infinite alternate;
-}
-@keyframes coreBreathe {
-  from { transform: scale(.9);  opacity: .72; }
-  to   { transform: scale(1.1); opacity: 1; }
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 50% 47%, rgba(14, 191, 67, .42), transparent 40%),
+    radial-gradient(circle at 22% 28%, rgba(52, 208, 108, .14), transparent 42%),
+    radial-gradient(circle at 82% 72%, rgba(14, 191, 67, .12), transparent 46%);
 }
 
-/* Orbiting rings. */
-.sp-ring {
-  width: 76%;
-  aspect-ratio: 1;
+.stage3d {
+  position: absolute;
   inset: 0;
-  margin: auto;
-  border-radius: 50%;
-  border: 1px dashed rgba(255, 255, 255, .16);
-  animation: spin 30s linear infinite;
+  display: grid;
+  place-items: center;
+  perspective: 880px;
+  perspective-origin: 50% 42%;
 }
-.sp-ring--2 {
-  width: 50%;
-  border-style: solid;
-  border-color: rgba(255, 255, 255, .1);
-  animation: spin 22s linear infinite reverse;
+.scene {
+  position: relative;
+  width: 64%;
+  aspect-ratio: 1;
+  transform-style: preserve-3d;
+  animation: sceneFloat 15s ease-in-out infinite alternate;
 }
-@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes sceneFloat {
+  from { transform: rotateY(-17deg) rotateX(7deg); }
+  to   { transform: rotateY(17deg)  rotateX(-5deg); }
+}
+.scene > span,
+.scene > .cube-pos { position: absolute; inset: 0; margin: auto; }
 
-/* A soft light sweep. */
-.sp-sheen {
-  inset: -30%;
-  background: conic-gradient(from 210deg, transparent 0deg, rgba(255, 255, 255, .12) 36deg, transparent 92deg, transparent 360deg);
-  mix-blend-mode: soft-light;
-  opacity: .85;
-  animation: spin 26s linear infinite;
+/* Glossy brand sphere — the focal object. */
+.o-sphere {
+  width: 52%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 34% 27%, #ecffee 0%, #7bf0a6 14%, #19cc55 40%, #0a9a3a 64%, #064a20 100%);
+  box-shadow:
+    inset -16px -20px 46px rgba(1, 22, 8, .82),
+    inset 13px 15px 32px rgba(226, 255, 235, .42);
+  animation: bob3d 6s ease-in-out infinite alternate;
 }
+.o-sphere::after {
+  content: "";
+  position: absolute;
+  left: 23%;
+  top: 16%;
+  width: 26%;
+  height: 20%;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 255, 255, .9), transparent 70%);
+  filter: blur(2px);
+}
+@keyframes bob3d {
+  from { transform: translateY(4%); }
+  to   { transform: translateY(-4%); }
+}
+
+/* Satellite orb. */
+.o-mini {
+  width: 15%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(circle at 34% 30%, #d6ffe3, #2bd068 42%, #0c7f33 100%);
+  box-shadow: inset -4px -5px 10px rgba(0, 25, 8, .6);
+  transform: translate3d(-168%, 150%, 90px);
+  animation: bobMini 5s ease-in-out infinite alternate;
+}
+@keyframes bobMini {
+  from { transform: translate3d(-168%, 150%, 90px); }
+  to   { transform: translate3d(-168%, 118%, 90px); }
+}
+
+/* Halo rings, set behind the sphere. */
+.o-ring {
+  width: 88%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  border: 1px solid rgba(123, 240, 166, .45);
+}
+.o-ring--1 {
+  transform: translateZ(-34px) rotateX(74deg);
+  animation: ring1 17s linear infinite;
+}
+.o-ring--2 {
+  width: 106%;
+  border-color: rgba(123, 240, 166, .24);
+  transform: translateZ(-34px) rotateX(64deg) rotateY(16deg);
+  animation: ring2 26s linear infinite;
+}
+@keyframes ring1 {
+  from { transform: translateZ(-34px) rotateX(74deg) rotateZ(0deg); }
+  to   { transform: translateZ(-34px) rotateX(74deg) rotateZ(360deg); }
+}
+@keyframes ring2 {
+  from { transform: translateZ(-34px) rotateX(64deg) rotateY(16deg) rotateZ(0deg); }
+  to   { transform: translateZ(-34px) rotateX(64deg) rotateY(16deg) rotateZ(-360deg); }
+}
+
+/* Tumbling glass cube (fixed size so the 3D depth stays correct). */
+.cube-pos {
+  width: 84px;
+  height: 84px;
+  transform: translate3d(140%, -150%, 120px);
+  transform-style: preserve-3d;
+}
+.o-cube {
+  position: absolute;
+  inset: 0;
+  transform-style: preserve-3d;
+  transform: rotateX(-20deg) rotateY(-28deg);
+  animation: cubeSpin 18s linear infinite;
+}
+@keyframes cubeSpin {
+  from { transform: rotateX(-20deg) rotateY(-28deg); }
+  to   { transform: rotateX(-20deg) rotateY(332deg); }
+}
+.cf {
+  position: absolute;
+  inset: 0;
+  border: 1px solid rgba(170, 255, 200, .5);
+  background: linear-gradient(135deg, rgba(25, 204, 85, .5), rgba(10, 120, 45, .14));
+  box-shadow: inset 0 0 22px rgba(123, 240, 166, .28);
+}
+.cf-f { transform: translateZ(42px); }
+.cf-b { transform: rotateY(180deg) translateZ(42px); }
+.cf-r { transform: rotateY(90deg) translateZ(42px); }
+.cf-l { transform: rotateY(-90deg) translateZ(42px); }
+.cf-t { transform: rotateX(90deg) translateZ(42px); }
+.cf-d { transform: rotateX(-90deg) translateZ(42px); }
+
+/* Drifting sparks. */
+.spark {
+  position: absolute;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #aefcc6;
+  box-shadow: 0 0 10px 2px rgba(123, 240, 166, .85);
+  animation: twinkle 4s ease-in-out infinite;
+}
+.spark--1 { top: 16%; left: 18%; transform: translateZ(70px); animation-delay: -.5s; }
+.spark--2 { top: 72%; left: 24%; transform: translateZ(40px); animation-delay: -1.6s; }
+.spark--3 { top: 26%; right: 16%; transform: translateZ(100px); animation-delay: -2.4s; }
+.spark--4 { top: 82%; right: 26%; transform: translateZ(55px); animation-delay: -3.1s; }
+@keyframes twinkle { 0%, 100% { opacity: 1; } 50% { opacity: .28; } }
 
 .float-card {
   position: absolute;
