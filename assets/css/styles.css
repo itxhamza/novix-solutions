@@ -69,32 +69,6 @@
   color-scheme: dark;
 }
 
-:root[data-theme="light"] {
-  --bg:           #f6f8fb;
-  --bg-2:         #ffffff;
-  --surface:      #ffffff;
-  --surface-2:    #f1f4f8;   /* nested fills — white-on-white has no edge */
-  --surface-solid:#ffffff;
-  --border:       rgba(15, 23, 32, .09);
-  --border-strong:rgba(15, 23, 32, .16);
-
-  --text:         #0b1117;
-  --text-dim:     #44505c;
-  /* Was #6a7682, which clears AA on a white card (4.64:1) but not on the
-     page background (4.23:1) — and most muted copy sits on the page, not on
-     a card. This clears both: 5.7:1 and 5.3:1. */
-  --muted:        #5d6874;
-
-  /* Two-layer shadows: a tight contact edge plus a soft ambient spread. */
-  --shadow-sm:    0 1px 2px rgba(15, 23, 32, .06);
-  --shadow:       0 14px 34px -18px rgba(15, 23, 32, .24), 0 2px 8px -3px rgba(15, 23, 32, .07);
-  --shadow-lg:    0 34px 70px -30px rgba(15, 23, 32, .26), 0 5px 16px -6px rgba(15, 23, 32, .08);
-  --glow:         0 0 0 1px rgba(14, 191, 67, .3), 0 18px 46px -24px rgba(14, 191, 67, .34);
-  --ring:         0 0 0 3px rgba(14, 191, 67, .32);
-
-  color-scheme: light;
-}
-
 /* --------------------------------------------------------------------------
    2. Reset & base
    -------------------------------------------------------------------------- */
@@ -181,13 +155,6 @@ p { text-wrap: pretty; }
     radial-gradient(900px 520px at 18% -10%, rgba(14, 191, 67, .07), transparent 60%),
     radial-gradient(760px 480px at 88% 2%,  rgba(255, 255, 255, .035), transparent 58%),
     linear-gradient(180deg, var(--bg) 0%, var(--bg-2) 50%, var(--bg) 100%);
-}
-
-:root[data-theme="light"] .ambient {
-  background:
-    radial-gradient(880px 500px at 14% -12%, rgba(14, 191, 67, .085), transparent 62%),
-    radial-gradient(720px 460px at 88% -2%,  rgba(15, 23, 32, .035), transparent 60%),
-    linear-gradient(180deg, var(--bg) 0%, #ffffff 46%, var(--bg) 100%);
 }
 
 .ambient::after {
@@ -410,10 +377,6 @@ p { text-wrap: pretty; }
   transform: translateY(-1px);
 }
 .icon-btn svg { width: 19px; height: 19px; }
-
-.theme-toggle .icon-sun { display: none; }
-:root[data-theme="light"] .theme-toggle .icon-sun  { display: block; }
-:root[data-theme="light"] .theme-toggle .icon-moon { display: none; }
 
 .nav-toggle { display: none; }
 
@@ -703,19 +666,6 @@ body.is-locked { overflow: hidden; }
   overflow: hidden;
   animation: rise 1s var(--ease-out) both;
 }
-:root[data-theme="light"] .console { background: #fff; }
-:root[data-theme="light"] .card,
-:root[data-theme="light"] .step,
-:root[data-theme="light"] .quote,
-:root[data-theme="light"] .price-card,
-:root[data-theme="light"] .work-card,
-:root[data-theme="light"] .faq__item,
-:root[data-theme="light"] .contact-item { box-shadow: var(--shadow-sm); }
-:root[data-theme="light"] .card--hover:hover,
-:root[data-theme="light"] .step:hover,
-:root[data-theme="light"] .quote:hover,
-:root[data-theme="light"] .work-card:hover,
-:root[data-theme="light"] .price-card:hover { box-shadow: var(--shadow); }
 
 /* Hero artwork — translucent 3D objects floating in deep space: a glossy
    brand sphere ringed by halos, a tumbling glass cube, a satellite orb and
@@ -727,11 +677,6 @@ body.is-locked { overflow: hidden; }
     radial-gradient(62% 56% at 50% 44%, #0b2615 0%, transparent 72%),
     radial-gradient(135% 120% at 50% 6%, #0a1a10 0%, #060d08 58%, #030705 100%);
   isolation: isolate;
-}
-:root[data-theme="light"] .showpiece {
-  background:
-    radial-gradient(62% 56% at 50% 44%, #0b2615 0%, transparent 72%),
-    radial-gradient(135% 120% at 50% 6%, #0a1a10 0%, #060d08 58%, #030705 100%);
 }
 .sp-glowbg {
   position: absolute;
@@ -899,7 +844,6 @@ body.is-locked { overflow: hidden; }
   animation: bob 5.5s var(--ease) infinite alternate;
   z-index: 2;
 }
-:root[data-theme="light"] .float-card { background: #fff; }
 .float-card svg { width: 19px; height: 19px; color: var(--brand-2); }
 .float-card small { display: block; font-weight: 500; color: var(--muted); font-size: .74rem; }
 .float-card--a { bottom: -54px; left: -18px; }
@@ -982,7 +926,6 @@ body.is-locked { overflow: hidden; }
   text-align: center;
   transition: background var(--t) var(--ease);
 }
-:root[data-theme="light"] .stat { background: #fff; }
 .stat:hover { background: var(--surface-2); }
 .stat b {
   display: block;
@@ -1334,9 +1277,6 @@ body.is-locked { overflow: hidden; }
     color-mix(in srgb, var(--surface-solid) 86%, transparent);
   backdrop-filter: blur(18px);
 }
-:root[data-theme="light"] .cta { background:
-    radial-gradient(620px 320px at 20% 0%, rgba(14, 191, 67, .09), transparent 70%),
-    #fff; }
 .cta h2 { max-width: 20ch; margin-inline: auto; }
 .cta p { max-width: 54ch; margin: 18px auto 32px; color: var(--text-dim); }
 .cta .btn-row { justify-content: center; }
@@ -1626,7 +1566,6 @@ body.is-locked { overflow: hidden; }
   color: var(--brand-soft);
   opacity: .78;
 }
-:root[data-theme="light"] .stack-card__num { color: var(--brand-cta); opacity: .85; }
 .stack-card__title { margin-bottom: 10px; font-size: clamp(1.15rem, 2vw, 1.6rem); }
 .stack-card__text { color: var(--muted); max-width: 62ch; }
 
@@ -2166,8 +2105,7 @@ body.is-locked { overflow: hidden; }
   display: block;
   pointer-events: none;
 }
-/* `:root[data-theme="light"] .ambient` also sets a background, so these need
-   matching specificity to win rather than relying on source order alone. */
+/* The shader replaces the CSS ambient background once it is confirmed running. */
 :root.has-shader .ambient { background: none; }
 :root.has-shader .orb { display: none; }
 :root.has-shader .ambient::after { opacity: .18; }
