@@ -150,7 +150,7 @@ large type is what made the first pass read as neon rather than professional.
 
 ## Placeholders to replace
 
-- `hello@novixsolutions.com` — used in the footer, contact page and form handler.
+- `info@novixsolutions.com` — used in the footer, contact page and form handler.
 - Portfolio entries, client names, testimonials and team members are illustrative.
 - Pricing in `services.html` is indicative.
 

@@ -1389,7 +1389,7 @@
         get('message')
       ];
 
-      var mailto = 'mailto:hello@novixsolutions.com'
+      var mailto = 'mailto:info@novixsolutions.com'
         + '?subject=' + encodeURIComponent('New project enquiry — ' + (get('name') || 'Website'))
         + '&body=' + encodeURIComponent(lines.join('\n'));
 
