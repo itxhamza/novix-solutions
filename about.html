@@ -26,6 +26,7 @@
   // Dark theme only; flag JS so the loader and curtain can run.
   try {
     document.documentElement.classList.add('js');
+    if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
   } catch (e) {}
 </script>
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7067611061240760" crossorigin="anonymous"></script>

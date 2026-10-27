@@ -11,6 +11,17 @@
   /* ----- Theme: dark only ----------------------------------------------- */
   root.setAttribute('data-theme', 'dark');
 
+  /* ----- Always open at the top -----------------------------------------
+     A refresh must start from the top and then play the intro, never restore
+     the previous scroll position — unless the URL points at an anchor. */
+  if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+  if (!location.hash) {
+    window.scrollTo(0, 0);
+    window.addEventListener('load', function () {
+      if (!location.hash) window.scrollTo(0, 0);
+    });
+  }
+
   /* ----- Anchor scrolling ------------------------------------------------
      The page scrolls natively, exactly like an ordinary website — no wheel
      hijacking, no momentum layer. In-page anchor jumps are eased with the
