@@ -1612,9 +1612,9 @@ body.is-locked { overflow: hidden; }
   display: inline-block;
   overflow: hidden;
   vertical-align: top;
-  /* room for descenders, removed again so line-height is unchanged */
-  padding-bottom: .14em;
-  margin-bottom: -.14em;
+  /* room for descenders (g, y, p…), removed again so line-height is unchanged */
+  padding-bottom: .26em;
+  margin-bottom: -.26em;
 }
 .word > i { display: inline-block; font-style: inherit; will-change: transform; }
 
