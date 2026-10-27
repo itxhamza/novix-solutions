@@ -96,6 +96,10 @@
 :root[data-theme="light"] .theme-toggle .icon-sun  { display: block; }
 :root[data-theme="light"] .theme-toggle .icon-moon { display: none; }
 
+/* Logo wordmark adapts to the theme: white "ovix" on dark, dark on light.
+   (The default src is the white-wordmark SVG; light theme swaps the image.) */
+:root[data-theme="light"] .brand__lockup { content: url("/assets/img/novix-lockup-light.svg"); }
+
 /* Light-theme component overrides. */
 :root[data-theme="light"] .ambient {
   background:
