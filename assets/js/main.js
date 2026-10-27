@@ -8,8 +8,31 @@
   var root = document.documentElement;
   var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  /* ----- Theme: dark only ----------------------------------------------- */
-  root.setAttribute('data-theme', 'dark');
+  /* ----- Theme ---------------------------------------------------------- */
+  var THEME_KEY = 'novix-theme';
+
+  function store(key, value) {
+    try { localStorage.setItem(key, value); } catch (e) { /* private mode */ }
+  }
+
+  function applyTheme(theme) {
+    root.setAttribute('data-theme', theme);
+    var label = theme === 'light' ? 'Switch to dark theme' : 'Switch to light theme';
+    document.querySelectorAll('.theme-toggle').forEach(function (btn) {
+      btn.setAttribute('aria-label', label);
+      btn.setAttribute('title', label);
+    });
+  }
+
+  document.querySelectorAll('.theme-toggle').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var next = root.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+      applyTheme(next);
+      store(THEME_KEY, next);
+    });
+  });
+
+  applyTheme(root.getAttribute('data-theme') || 'light');
 
   /* ----- Always open at the top -----------------------------------------
      A refresh must start from the top and then play the intro, never restore
