@@ -5,7 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Services — Novix Solutions</title>
 <meta name="description" content="Web platforms, mobile apps, cloud and DevOps, AI automation, product design and data analytics — delivered by one senior team.">
-<meta name="theme-color" content="#ffffff">
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+<meta name="theme-color" media="(prefers-color-scheme: light)" content="#ffffff">
+<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0a0c0f">
 <link rel="canonical" href="https://novixsolutions.com/services">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Novix Solutions">
@@ -25,6 +27,7 @@
 <meta name="twitter:description" content="Web platforms, mobile apps, cloud and DevOps, AI automation, product design and data analytics — delivered by one senior team.">
 <link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" sizes="180x180" href="/assets/img/apple-touch-icon.png">
+<link rel="manifest" href="/site.webmanifest">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800;900&display=swap">
@@ -38,12 +41,28 @@
     document.documentElement.setAttribute("data-theme", t === "dark" ? "dark" : "light");
   } catch (e) {}
 </script>
-<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7067611061240760" crossorigin="anonymous"></script>
 <script type="application/ld+json">
 { "@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [
   { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://novixsolutions.com/" },
   { "@type": "ListItem", "position": 2, "name": "Services", "item": "https://novixsolutions.com/services" }
 ] }
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "OfferCatalog",
+  "name": "Novix Solutions services",
+  "url": "https://novixsolutions.com/services",
+  "provider": { "@id": "https://novixsolutions.com/#organization" },
+  "itemListElement": [
+    { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Web Platforms", "serviceType": "Web development", "description": "Dashboards, portals and web apps built in Next.js and React with headless CMS and design systems." } },
+    { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Mobile Apps", "serviceType": "Mobile app development", "description": "iOS and Android apps from one codebase in React Native or Flutter, taken through App Store and Play review." } },
+    { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Cloud & DevOps", "serviceType": "Cloud and DevOps", "description": "Infrastructure as code, CI/CD pipelines and monitoring on AWS, Azure and Kubernetes." } },
+    { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "AI & Automation", "serviceType": "AI automation", "description": "LLM integration, RAG pipelines and workflow automation wired into the systems you already run." } },
+    { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Product Design", "serviceType": "Product design", "description": "UX research, UI design and prototyping, with the prototype built before the rewrite." } },
+    { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Data & Analytics", "serviceType": "Data analytics", "description": "Data warehouses, ETL pipelines, event tracking and BI dashboards." } }
+  ]
+}
 </script>
 </head>
 <body>
