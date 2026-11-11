@@ -40,21 +40,10 @@ export function Footer() {
             <h2 className="mono text-muted">Contact</h2>
             <ul className="mt-5 grid gap-3 text-sm">
               <li>
-                <a
-                  href={contact.whatsappHref}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="transition-colors hover:text-accent"
-                >
-                  {contact.whatsappDisplay}
-                </a>
-              </li>
-              <li>
                 <a href={contact.emailHref} className="transition-colors hover:text-accent">
                   {contact.email}
                 </a>
               </li>
-              <li className="text-muted">{site.location}</li>
             </ul>
 
             {/* Only channels with a real URL are listed. */}

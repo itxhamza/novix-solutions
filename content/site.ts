@@ -11,8 +11,6 @@
  * Animation timings live in lib/animations.ts.
  */
 
-const whatsappNumber = "923054668401"; // digits only, with country code
-const whatsappMessage = "Hi Novix, I'd like to book a call about my app.";
 const email = "info@novixsolutions.com";
 const booking = "https://calendly.com/itxhamzajaved-work/30min";
 
@@ -20,12 +18,11 @@ export const site = {
   name: "Novix Solutions",
   shortName: "Novix",
   url: "https://novixsolutions.com",
-  location: "Lahore, Pakistan",
 
   seo: {
     title: "Novix Solutions — We build and rescue mobile apps",
     description:
-      "Novix Solutions is a software agency in Lahore building and rescuing iOS, Android and web apps for growing businesses in the US and the Gulf. Backend, payments and launch included.",
+      "Novix Solutions is a software agency building and rescuing iOS, Android and web apps for growing businesses in the US and the Gulf. Backend, payments and launch included.",
     ogAlt: "Novix Solutions — we build and rescue mobile apps for growing businesses",
   },
 
@@ -40,9 +37,7 @@ export const site = {
   contact: {
     email,
     emailHref: `mailto:${email}`,
-    whatsappDisplay: "+92 305 4668401",
-    whatsappHref: `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(whatsappMessage)}`,
-    /** Every "Book a call" button. WhatsApp stays a contact detail, not a booking link. */
+    /** Every "Book a call" and "Schedule a call" button. */
     bookingHref: booking,
   },
 
@@ -60,7 +55,7 @@ export const site = {
   cursorHref: "/contact",
 
   hero: {
-    eyebrow: "Software agency · Lahore → US & Gulf",
+    eyebrow: "Software agency · US & Gulf",
     headline: "We build and rescue mobile apps for growing businesses.",
     // Words from the headline that get the accent colour.
     headlineAccent: ["rescue"],
@@ -74,6 +69,18 @@ export const site = {
     scrollHint: "Scroll",
   },
 
+  /**
+   * Counters on the home page and /about. A counter renders only once its
+   * value is set, and the strip hides entirely while all four are empty.
+   * FILL ME IN — no figure here is a guess.
+   */
+  stats: [
+    { value: "", label: "apps shipped" },
+    { value: "", label: "years building mobile apps" },
+    { value: "", label: "countries with clients" },
+    { value: "", label: "average first-reply time" },
+  ],
+
   /** Section copy for the work grid. The projects come from content/projects. */
   workSection: {
     eyebrow: "Work",
@@ -86,9 +93,7 @@ export const site = {
     eyebrow: "Contact",
     title: "Tell us what's broken, or what's next.",
     intro: "Send a few lines about your app. We reply within one business day.",
-    whatsappLabel: "WhatsApp",
     emailLabel: "Email",
-    locationLabel: "Based in",
     /** Secondary CTA next to the form link; opens the Calendly booking page. */
     scheduleCta: "Schedule a call",
     form: {
@@ -101,7 +106,7 @@ export const site = {
       submit: "Send message",
       sending: "Sending",
       success: "Message sent. We'll reply within one business day.",
-      error: "Couldn't send your message. Please try again, or use WhatsApp or email instead.",
+      error: "Couldn't send your message. Please try again, or email us instead.",
       invalid: "Please fill in your name, a valid email and a message.",
     },
   },

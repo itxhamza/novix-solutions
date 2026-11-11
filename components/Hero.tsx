@@ -87,7 +87,6 @@ export function Hero() {
               {hero.statusFixed}
             </span>
           </span>
-          <span className="hidden sm:inline">{site.location}</span>
           <a href="#services" className="transition-colors hover:text-accent">
             {hero.scrollHint} ↓
           </a>

@@ -1,7 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
 import { site } from "@/content/site";
-import { featuredTestimonial } from "@/content/testimonials";
 import { getFeatured } from "@/lib/content/projects";
 
 /**
@@ -69,23 +68,6 @@ export function Work() {
           </Link>
         </div>
 
-        {/* Renders only once a real quote exists in content/testimonials.ts. */}
-        {featuredTestimonial ? (
-          <figure className="mt-20 border-t border-line pt-14 md:mt-32 md:pt-20" data-reveal>
-            <span className="display block text-7xl leading-none text-accent md:text-9xl" aria-hidden="true">
-              “
-            </span>
-            <blockquote className="display -mt-4 max-w-5xl text-2xl !leading-[1.15] !tracking-[-0.03em] md:-mt-8 md:text-5xl">
-              {featuredTestimonial.text}
-            </blockquote>
-            <figcaption className="mt-8 flex items-center gap-4">
-              <span>
-                <span className="block font-semibold">{featuredTestimonial.name}</span>
-                <span className="block text-sm text-muted">{featuredTestimonial.role}</span>
-              </span>
-            </figcaption>
-          </figure>
-        ) : null}
       </div>
     </section>
   );

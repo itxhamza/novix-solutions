@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { services, servicesSection } from "@/content/services";
-import { ServiceDemo } from "./Demos";
+import { ServiceDemo, hasServiceDemo } from "./Demos";
 
 export function Services() {
   return (
@@ -20,8 +20,10 @@ export function Services() {
             </div>
           </div>
 
-          {services.map((item, i) => (
-            <article key={item.id} className="panel" data-panel>
+          {services.map((item, i) => {
+            const showDemo = hasServiceDemo(item.id);
+            return (
+            <article key={item.id} className={`panel${showDemo ? "" : " panel-solo"}`} data-panel>
               <div className="panel-copy" data-panel-copy>
                 <div className="mono flex items-center justify-between text-muted">
                   <span className="text-accent">
@@ -41,15 +43,18 @@ export function Services() {
                   </ul>
                 </div>
               </div>
-              <div className="panel-demo">
-                <ServiceDemo id={item.id} />
-                <span className="mono absolute top-5 left-5 flex items-center gap-2 text-muted">
-                  <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-accent" />
-                  {item.demoLabel}
-                </span>
-              </div>
+              {showDemo ? (
+                <div className="panel-demo">
+                  <ServiceDemo id={item.id} />
+                  <span className="mono absolute top-5 left-5 flex items-center gap-2 text-muted">
+                    <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-accent" />
+                    {item.demoLabel}
+                  </span>
+                </div>
+              ) : null}
             </article>
-          ))}
+            );
+          })}
         </div>
 
         <div className="services-progress shell mt-8" aria-hidden="true">

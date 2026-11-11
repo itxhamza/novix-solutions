@@ -20,20 +20,6 @@ export function Contact({ heading = "h2" }: { heading?: "h1" | "h2" }) {
 
           <dl className="mt-12 grid gap-8">
             <div>
-              <dt className="mono text-muted">{c.whatsappLabel}</dt>
-              <dd className="mt-2">
-                <a
-                  href={contact.whatsappHref}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="font-display text-xl font-semibold tracking-tight transition-colors hover:text-accent md:text-2xl"
-                  data-cursor="talk"
-                >
-                  {contact.whatsappDisplay}
-                </a>
-              </dd>
-            </div>
-            <div>
               <dt className="mono text-muted">{c.emailLabel}</dt>
               <dd className="mt-2">
                 <a
@@ -44,10 +30,6 @@ export function Contact({ heading = "h2" }: { heading?: "h1" | "h2" }) {
                   {contact.email}
                 </a>
               </dd>
-            </div>
-            <div>
-              <dt className="mono text-muted">{c.locationLabel}</dt>
-              <dd className="mt-2 text-lg">{site.location}</dd>
             </div>
           </dl>
         </div>

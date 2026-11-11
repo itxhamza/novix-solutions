@@ -98,7 +98,15 @@ export const processStepSchema = z.object({
   deliverables: z.array(z.string().min(1)).default([]),
 });
 
-export const testimonialSchema = quote.extend({
+export const testimonialSchema = z.object({
+  quote: z.string().min(1),
+  name: z.string().min(1),
+  role: z.string().min(1),
+  /** Hidden while empty. */
+  company: optionalText,
+  photo: optionalText,
+  /** Nothing renders until this is true — consent before publication. */
+  approved: z.boolean().default(false),
   /** Slug of the project it belongs to, when it came from one. */
   project: optionalText,
 });

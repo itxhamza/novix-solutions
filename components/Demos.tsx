@@ -191,6 +191,20 @@ export function TeamDemo({ from, to }: { from: { label: string; time: string }; 
   );
 }
 
+/**
+ * Whether a service has the content its demo needs. Used by the panel layout:
+ * a panel with no demo drops the demo column instead of leaving it empty.
+ */
+export function hasServiceDemo(id: string): boolean {
+  if (id === "build") return true;
+  if (id === "rescue") {
+    const rescue = getService("rescue");
+    return Boolean(rescue?.demoBroken && rescue.demoFixed);
+  }
+  const team = getService("team");
+  return Boolean(team?.demoFrom && team.demoTo);
+}
+
 /** Each demo needs its labels from content/services.ts; without them it is hidden. */
 export function ServiceDemo({ id }: { id: string }) {
   if (id === "build") return <BuildDemo />;

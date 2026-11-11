@@ -1,24 +1,34 @@
 /**
  * Real client quotes only.
  *
- * This list is intentionally empty: the previous placeholder testimonial was
- * removed. Every testimonial block on the site renders only when this array
- * has an entry, so adding one here makes it appear and nothing else changes.
- *
- * Shape: { text, name, role, project? } — all of text/name/role are required,
- * because an unattributed quote is not publishable. `project` is a project
- * slug when the quote came from one.
+ * `approved` is the publication gate: an entry renders nowhere on the site
+ * until it is true. Set it only once the person has agreed to be quoted.
+ * Empty optional fields (company, photo) are hidden rather than filled in.
  */
 import { parseOrThrow, testimonialSchema } from "@/lib/content/schema";
 import { z } from "zod";
 
 export const testimonials = parseOrThrow(
   z.array(testimonialSchema),
-  [],
+  [
+    {
+      quote:
+        "Hamza built both our mobile app and our web platform, end to end. He understood what we needed faster than teams I'd worked with before, communicated constantly, and delivered working software on every milestone. I'd work with him again without hesitation.",
+      name: "Anthony",
+      role: "Founder",
+      /** FILL ME IN — the company line is hidden while this is empty. */
+      company: "",
+      photo: "",
+      approved: true,
+    },
+  ],
   "content/testimonials.ts → testimonials",
 );
 
-export const hasTestimonials = testimonials.length > 0;
+/** The only list any component should read. */
+export const approvedTestimonials = testimonials.filter((t) => t.approved);
+
+export const hasTestimonials = approvedTestimonials.length > 0;
 
 /** The quote to show on the home page, or undefined to hide the block. */
-export const featuredTestimonial = testimonials[0];
+export const featuredTestimonial = approvedTestimonials[0];
