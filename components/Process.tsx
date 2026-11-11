@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { processSection, processSteps } from "@/content/process";
 
 // Stroke icons. Every path has pathLength=1 so it can draw itself.
@@ -19,9 +18,6 @@ export function Process() {
             {processSection.title}
           </h2>
           <p className="lede mt-6">{processSection.intro}</p>
-          <Link href="/process" className="btn btn-ghost btn-sm mt-8">
-            Full process <span aria-hidden="true">→</span>
-          </Link>
         </div>
 
         <ol className="relative" data-beam>
@@ -44,6 +40,23 @@ export function Process() {
                 </div>
                 <h3 className="display text-2xl md:text-4xl">{step.title}</h3>
                 <p className="mt-4 max-w-md text-muted">{step.body}</p>
+
+                {/* What the client receives at this step — hidden while empty. */}
+                {step.deliverables.length > 0 ? (
+                  <div className="mt-6">
+                    <h4 className="mono text-muted">What you receive</h4>
+                    <ul className="check-list mt-4">
+                      {step.deliverables.map((d) => (
+                        <li key={d}>
+                          <svg className="check-icon" viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="M4 12.5l5 5L20 6.5" />
+                          </svg>
+                          <span>{d}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                ) : null}
               </div>
             </li>
           ))}

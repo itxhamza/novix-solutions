@@ -1,3 +1,5 @@
+import fs from "node:fs";
+import path from "node:path";
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
@@ -12,8 +14,20 @@ const description =
 
 export const metadata: Metadata = pageMetadata({ title, description, path: "/about" });
 
+/**
+ * The portrait is referenced in content/about.ts but may not be on disk yet.
+ * Checking here means a missing file hides the photo — and the two-column
+ * founder card falls back to one column — rather than rendering a broken
+ * image. Runs once at build time.
+ */
+function photoOnDisk(src: string): boolean {
+  if (!src) return false;
+  return fs.existsSync(path.join(process.cwd(), "public", src.replace(/^\//, "")));
+}
+
 export default function AboutPage() {
   const { hero, story, whatWeDo, howWeWork, founder, cta } = about;
+  const hasPhoto = photoOnDisk(founder.photo);
 
   /**
    * Only facts that appear in the copy above; empty fields are left out.
@@ -39,7 +53,7 @@ export default function AboutPage() {
         email: site.contact.email,
         worksFor: { "@id": `${site.url}/#organization` },
         ...(founder.linkedin ? { sameAs: [founder.linkedin] } : {}),
-        ...(founder.photo ? { image: `${site.url}${founder.photo}` } : {}),
+        ...(photoOnDisk(founder.photo) ? { image: `${site.url}${founder.photo}` } : {}),
       },
     ],
   };
@@ -130,11 +144,11 @@ export default function AboutPage() {
 
           <div className="founder-card mt-12" data-reveal>
             {/* Hidden until a real photo is in place. */}
-            {founder.photo ? (
+            {hasPhoto ? (
               <Image
                 src={founder.photo}
                 alt={founder.photoAlt || founder.name}
-                width={520}
+                width={620}
                 height={620}
                 sizes="(min-width: 768px) 32vw, 90vw"
                 className="founder-photo"

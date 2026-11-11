@@ -1056,9 +1056,13 @@ html.anim .step:not(.is-lit) .step-num {
 }
 .founder-photo {
   width: 100%;
+  /* Square regardless of the source ratio; a wide photo centre-crops to the
+     subject rather than letterboxing. */
+  aspect-ratio: 1;
   height: auto;
   border-radius: 1.25rem;
   object-fit: cover;
+  object-position: center;
 }
 
 /* ------------------------------------------------------------------ *

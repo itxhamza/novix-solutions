@@ -73,18 +73,21 @@ export const about = {
       "You own the code. It lives in your repository from day one.",
       "We tell you when an idea is a bad one, and what we would do instead.",
     ],
-    link: { label: "See the full process", href: "/process" },
+    link: { label: "See the full process", href: "/#process" },
   },
 
   founder: {
     heading: "Who you will be talking to",
     name: "Hamza Javed",
-    role: "Founder and lead engineer",
+    role: "CEO & Founder",
     bio: "Hamza leads every project personally. He works across the whole stack: React Native apps, Node.js backends, in-app payments and subscriptions, and the servers they run on. When you message Novix, you are talking to the person responsible for your code.",
-    /** FILL ME IN — put the file in /public/team/ and set e.g. "/team/hamza.jpg". */
-    photo: "",
-    /** FILL ME IN — the photo's alt text, required once a photo is set. */
-    photoAlt: "",
+    /**
+     * Save the portrait as public/team/hamza.png and it appears automatically.
+     * The About page checks the file exists before rendering it, so a missing
+     * file hides the photo instead of showing a broken image.
+     */
+    photo: "/team/hamza.png",
+    photoAlt: "Hamza Javed, CEO and founder of Novix Solutions",
     /** FILL ME IN — full LinkedIn profile URL. Hidden while empty. */
     linkedin: "",
   },

@@ -1,6 +1,7 @@
 /**
  * The four process steps. `deliverables` ("what the client receives at this
- * step") is empty until the real list exists; /process hides empty ones.
+ * step") is empty until the real list exists; the home section hides any
+ * that are still empty.
  */
 import { parseOrThrow, processStepSchema, sectionSchema } from "@/lib/content/schema";
 import { z } from "zod";
