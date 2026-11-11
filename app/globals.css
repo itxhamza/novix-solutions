@@ -1,0 +1,675 @@
+@import "tailwindcss";
+
+/* ------------------------------------------------------------------ *
+ * Design tokens
+ * One accent (electric lime), warm off-white text, near-black ground.
+ * --color-fault is not a second brand colour: it only ever marks a
+ * "broken" state (hero glitch, rescue demo, form error).
+ * ------------------------------------------------------------------ */
+@theme {
+  --color-bg: #090a08;
+  --color-surface: #10120d;
+  --color-raised: #171a13;
+  --color-line: rgb(242 237 228 / 0.1);
+  --color-text: #f2ede4;
+  --color-muted: #a9a698;
+  --color-accent: #c9ff3b;
+  --color-accent-ink: #0d1200;
+  --color-fault: #ff5a3c;
+
+  --font-display: var(--font-syne), ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-hanken), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: ui-monospace, "SF Mono", "Cascadia Mono", Menlo, Consolas, monospace;
+
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+:root {
+  --gutter: clamp(1.25rem, 4vw, 3.5rem);
+  --dot-gap: 44px;
+  color-scheme: dark;
+}
+
+html {
+  background: var(--color-bg);
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-sans);
+  font-size: 1.0625rem;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: clip;
+}
+
+/* Static dotted grid. Shown until (and unless) the live canvas field takes
+   over — so reduced-motion, no-JS and no-canvas all still get the texture. */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image: radial-gradient(rgb(242 237 228 / 0.14) 1px, transparent 1.4px);
+  background-size: var(--dot-gap) var(--dot-gap);
+  background-position: center top;
+  mask-image: linear-gradient(to bottom, #000 0%, rgb(0 0 0 / 0.45) 90vh);
+}
+html.field-live body::before {
+  display: none;
+}
+
+::selection {
+  background: var(--color-accent);
+  color: var(--color-accent-ink);
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+section[id] {
+  scroll-margin-top: 5rem;
+}
+
+/* ------------------------------------------------------------------ *
+ * Type
+ * ------------------------------------------------------------------ */
+.display {
+  font-family: var(--font-display);
+  font-weight: 700;
+  letter-spacing: -0.045em;
+  line-height: 0.98;
+  text-wrap: balance;
+}
+.h-hero {
+  font-size: clamp(2.5rem, 7.4vw, 6.75rem);
+  font-kerning: none; /* keeps layout identical once letters are split */
+}
+.h-section {
+  font-size: clamp(2.1rem, 5.2vw, 4.5rem);
+}
+.h-panel {
+  font-size: clamp(1.75rem, 3.4vw, 3.25rem);
+}
+.eyebrow {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--color-accent);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+.eyebrow::before {
+  content: "";
+  width: 0.45rem;
+  height: 0.45rem;
+  background: currentColor;
+}
+.lede {
+  font-size: clamp(1.0625rem, 1.5vw, 1.3rem);
+  line-height: 1.55;
+  color: var(--color-muted);
+  max-width: 34rem;
+}
+.mono {
+  font-family: var(--font-mono);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-size: 0.72rem;
+}
+
+/* Header sits on a soft fade so content scrolling under it stays readable. */
+.site-header {
+  background: linear-gradient(to bottom, var(--color-bg) 35%, rgb(9 10 8 / 0));
+}
+
+.shell {
+  width: 100%;
+  max-width: 88rem;
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+
+/* ------------------------------------------------------------------ *
+ * Buttons
+ * ------------------------------------------------------------------ */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  min-height: 3.25rem;
+  padding: 0 1.5rem;
+  border-radius: 999px;
+  font-weight: 600;
+  font-size: 1rem;
+  letter-spacing: -0.01em;
+  border: 1px solid transparent;
+  transition:
+    background-color 0.25s,
+    color 0.25s,
+    border-color 0.25s,
+    transform 0.25s var(--ease-out-expo);
+}
+.btn:active {
+  transform: scale(0.97);
+}
+.btn-primary {
+  background: var(--color-accent);
+  color: var(--color-accent-ink);
+}
+.btn-primary:hover {
+  background: var(--color-text);
+}
+.btn-ghost {
+  border-color: rgb(242 237 228 / 0.28);
+  color: var(--color-text);
+}
+.btn-ghost:hover {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+}
+.btn-sm {
+  min-height: 2.6rem;
+  padding: 0 1.1rem;
+  font-size: 0.9rem;
+}
+
+/* ------------------------------------------------------------------ *
+ * Loader — the wordmark draws as one stroke, then JS dissolves it.
+ * The draw is CSS so it starts before any script has loaded.
+ * Tune with --loader-draw (keep TIMING.loader.minVisible in
+ * lib/animations.ts a little longer than this).
+ * ------------------------------------------------------------------ */
+.loader {
+  --loader-draw: 1s;
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: grid;
+  place-items: center;
+  background: var(--color-bg);
+  /* Failsafe: clears itself even if the script never runs. */
+  animation: loader-out 0.4s 4s forwards;
+}
+.loader svg {
+  width: min(58vw, 22rem);
+  overflow: visible;
+}
+.loader path {
+  fill: none;
+  stroke: var(--color-accent);
+  stroke-width: 5;
+  stroke-linecap: square;
+  stroke-linejoin: miter;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: loader-draw var(--loader-draw) cubic-bezier(0.65, 0, 0.35, 1) 0.1s forwards;
+}
+@keyframes loader-draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+@keyframes loader-out {
+  to {
+    opacity: 0;
+    visibility: hidden;
+  }
+}
+
+/* ------------------------------------------------------------------ *
+ * Live field + cursor
+ * ------------------------------------------------------------------ */
+.field {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100lvh;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0;
+}
+
+.cursor {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 90;
+  pointer-events: none;
+  opacity: 0;
+  display: none;
+}
+html.has-cursor .cursor {
+  display: block;
+}
+.cursor__ring {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 14px;
+  height: 14px;
+  border-radius: 999px;
+  border: 1.5px solid var(--color-accent);
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  white-space: nowrap;
+  color: var(--color-accent-ink);
+  font-weight: 700;
+  font-size: 0.8rem;
+  letter-spacing: -0.01em;
+}
+.cursor__label {
+  opacity: 0;
+}
+html.has-cursor,
+html.has-cursor a,
+html.has-cursor button,
+html.has-cursor [data-tilt] {
+  cursor: none;
+}
+
+/* ------------------------------------------------------------------ *
+ * Hero
+ * ------------------------------------------------------------------ */
+.hero-word {
+  display: inline-block;
+  white-space: nowrap;
+}
+.hero-char {
+  display: inline-block;
+  will-change: transform, opacity;
+}
+.hero-accent {
+  color: var(--color-accent);
+}
+.hero-scan {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0;
+  background: repeating-linear-gradient(
+    to bottom,
+    transparent 0 3px,
+    rgb(242 237 228 / 0.07) 3px 4px
+  );
+  mix-blend-mode: screen;
+}
+.hero-flash {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  height: 2px;
+  background: var(--color-accent);
+  box-shadow: 0 0 24px 2px var(--color-accent);
+  transform: scaleX(0);
+  opacity: 0;
+  pointer-events: none;
+}
+.grid-line {
+  position: absolute;
+  background: rgb(242 237 228 / 0.5);
+  opacity: 0.09;
+  pointer-events: none;
+}
+.grid-line[data-axis="h"] {
+  left: 0;
+  right: 0;
+  height: 1px;
+}
+.grid-line[data-axis="v"] {
+  top: 0;
+  bottom: 0;
+  width: 1px;
+}
+
+/* ------------------------------------------------------------------ *
+ * Services
+ * Default (mobile, reduced motion, no JS): panels stack vertically.
+ * JS adds .is-horizontal on wide screens and pins the row.
+ * ------------------------------------------------------------------ */
+.services-track {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  padding-inline: var(--gutter);
+}
+.panel {
+  position: relative;
+  background: var(--color-surface);
+  border: 1px solid var(--color-line);
+  border-radius: 1.75rem;
+  overflow: hidden;
+  display: grid;
+  grid-template-columns: 1fr;
+}
+.panel-intro {
+  background: none;
+  border: 0;
+  border-radius: 0;
+  overflow: visible;
+}
+.panel-copy {
+  padding: clamp(1.5rem, 4vw, 3.5rem);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 2rem;
+}
+.panel-demo {
+  position: relative;
+  min-height: 20rem;
+  display: grid;
+  place-items: center;
+  padding: 1.5rem;
+  background:
+    radial-gradient(60% 60% at 50% 45%, rgb(201 255 59 / 0.07), transparent 70%), var(--color-bg);
+  border-top: 1px solid var(--color-line);
+}
+.panel-demo svg {
+  width: 100%;
+  height: 100%;
+  max-height: min(58vh, 30rem);
+  overflow: visible;
+}
+@media (min-width: 900px) {
+  .panel {
+    grid-template-columns: 1fr 1.05fr;
+  }
+  .panel-demo {
+    border-top: 0;
+    border-left: 1px solid var(--color-line);
+  }
+  .services-pin.is-horizontal {
+    height: 100svh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    overflow: hidden;
+  }
+  .is-horizontal .services-track {
+    flex-direction: row;
+    flex-wrap: nowrap;
+    width: max-content;
+    gap: 2rem;
+    will-change: transform;
+  }
+  .is-horizontal .panel {
+    width: min(78vw, 72rem);
+    height: min(74svh, 40rem);
+    flex: none;
+  }
+  .is-horizontal .panel-intro {
+    width: min(42vw, 34rem);
+    align-content: center;
+  }
+}
+.services-progress {
+  display: none;
+}
+.is-horizontal .services-progress {
+  display: block;
+}
+.chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.3rem 0.75rem;
+  border: 1px solid var(--color-line);
+  border-radius: 999px;
+  font-size: 0.85rem;
+  color: var(--color-muted);
+}
+
+/* ------------------------------------------------------------------ *
+ * Process timeline
+ * Steps are fully lit by default. Once the script is driving the beam
+ * (html.anim), un-reached steps lose their glow and accent — but the text
+ * is never dimmed, so it stays readable at any scroll position.
+ * ------------------------------------------------------------------ */
+.beam-track {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 1.5rem;
+  width: 2px;
+  background: var(--color-line);
+}
+.beam-fill {
+  position: absolute;
+  inset: 0;
+  background: var(--color-accent);
+  transform-origin: top;
+}
+.beam-head {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  width: 14px;
+  height: 14px;
+  margin: -7px 0 0 -7px;
+  border-radius: 999px;
+  background: var(--color-accent);
+  box-shadow:
+    0 0 0 6px rgb(201 255 59 / 0.14),
+    0 0 36px 10px rgb(201 255 59 / 0.45);
+  display: none;
+}
+html.anim .beam-head {
+  display: block;
+}
+.step-node {
+  position: absolute;
+  left: 1.5rem;
+  top: 0.35rem;
+  width: 3rem;
+  height: 3rem;
+  margin-left: calc(-1.5rem + 1px);
+  border-radius: 999px;
+  background: var(--color-bg);
+  border: 1px solid var(--color-accent);
+  color: var(--color-accent);
+  display: grid;
+  place-items: center;
+  transition:
+    border-color 0.4s,
+    color 0.4s,
+    box-shadow 0.4s;
+  box-shadow: 0 0 28px rgb(201 255 59 / 0.22);
+}
+.step-node svg {
+  width: 1.4rem;
+  height: 1.4rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.step-node svg path {
+  stroke-dasharray: 1;
+}
+.step-num {
+  color: var(--color-accent);
+  transition: color 0.4s;
+}
+html.anim .step:not(.is-lit) .step-node {
+  border-color: var(--color-line);
+  color: var(--color-muted);
+  box-shadow: none;
+}
+html.anim .step:not(.is-lit) .step-num {
+  color: var(--color-muted);
+}
+
+/* ------------------------------------------------------------------ *
+ * Work cards — 3D tilt + diagonal wipe
+ * ------------------------------------------------------------------ */
+.wipe {
+  --wipe: 1;
+}
+.wipe.is-wiping {
+  clip-path: polygon(
+    0 0,
+    calc(var(--wipe) * 150%) 0,
+    calc(var(--wipe) * 150% - 50%) 100%,
+    0 100%
+  );
+}
+.tilt {
+  perspective: 1000px;
+}
+.tilt-inner {
+  position: relative;
+  height: 100%;
+  transform-style: preserve-3d;
+  background: var(--color-surface);
+  border: 1px solid var(--color-line);
+  border-radius: 1.5rem;
+  transition: border-color 0.3s;
+}
+.tilt:hover .tilt-inner {
+  border-color: rgb(201 255 59 / 0.45);
+}
+.tilt-pop {
+  transform: translateZ(46px);
+}
+.tilt-pop-sm {
+  transform: translateZ(22px);
+}
+.tilt-glare {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0;
+  background: radial-gradient(
+    28rem circle at var(--gx, 50%) var(--gy, 50%),
+    rgb(201 255 59 / 0.16),
+    transparent 60%
+  );
+  transition: opacity 0.3s;
+}
+.tilt:hover .tilt-glare {
+  opacity: 1;
+}
+.shot {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  border-radius: 1rem;
+  background:
+    radial-gradient(70% 70% at 50% 60%, rgb(201 255 59 / 0.1), transparent 70%), var(--color-bg);
+  display: grid;
+  place-items: center;
+}
+.shot img {
+  position: absolute;
+  inset: 8%;
+  width: 84%;
+  height: 84%;
+  object-fit: contain;
+  filter: drop-shadow(0 18px 30px rgb(0 0 0 / 0.5));
+}
+.shot-empty {
+  border: 1px dashed rgb(242 237 228 / 0.25);
+  color: var(--color-muted);
+}
+
+/* ------------------------------------------------------------------ *
+ * Contact form
+ * ------------------------------------------------------------------ */
+.field-input {
+  width: 100%;
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid rgb(242 237 228 / 0.25);
+  padding: 0.9rem 0;
+  font: inherit;
+  font-size: 1.125rem;
+  color: var(--color-text);
+  border-radius: 0;
+  transition: border-color 0.25s;
+}
+.field-input::placeholder {
+  color: rgb(169 166 152 / 0.6);
+}
+.field-input:focus {
+  outline: none;
+  border-bottom-color: var(--color-accent);
+  box-shadow: 0 1px 0 0 var(--color-accent);
+}
+.send-slot {
+  height: 3.5rem;
+  display: flex;
+  align-items: center;
+}
+.send {
+  position: relative;
+  height: 3.5rem;
+  width: 13rem;
+  border-radius: 999px;
+  background: var(--color-accent);
+  color: var(--color-accent-ink);
+  font-weight: 700;
+  overflow: hidden;
+  display: grid;
+  place-items: center;
+}
+.send:disabled {
+  cursor: default;
+}
+.send > * {
+  grid-area: 1 / 1;
+}
+.send-fill {
+  position: absolute;
+  inset: 0;
+  background: var(--color-accent);
+  transform: scaleX(0);
+  transform-origin: left;
+  opacity: 0;
+}
+.send-check {
+  width: 1.6rem;
+  height: 1.6rem;
+  fill: none;
+  stroke: var(--color-accent-ink);
+  stroke-width: 2.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  opacity: 0;
+}
+.send-check path {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+}
+
+/* ------------------------------------------------------------------ *
+ * Reduced motion: no loader, no smooth scroll, nothing hidden.
+ * ------------------------------------------------------------------ */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  .loader {
+    display: none;
+  }
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}
