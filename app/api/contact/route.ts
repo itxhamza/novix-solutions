@@ -47,16 +47,18 @@ export async function POST(req: Request) {
   }
 
   const apiKey = process.env.RESEND_API_KEY;
-  const to = process.env.CONTACT_TO_EMAIL;
+  // Defaults to the address shown on the site, so RESEND_API_KEY is the only
+  // variable that has to be set. CONTACT_TO_EMAIL overrides it.
+  const to = process.env.CONTACT_TO_EMAIL || site.contact.email;
   const from = process.env.CONTACT_FROM_EMAIL || "Novix Website <onboarding@resend.dev>";
 
-  if (!apiKey || !to) {
+  if (!apiKey) {
     if (process.env.NODE_ENV !== "production") {
-      // Local development without keys: log instead of sending.
+      // Local development without a key: log instead of sending.
       console.log("\n[contact] (email not configured — logging only)\n", { name, email, message }, "\n");
       return NextResponse.json({ ok: true, dev: true });
     }
-    console.error("[contact] RESEND_API_KEY or CONTACT_TO_EMAIL is not set.");
+    console.error("[contact] RESEND_API_KEY is not set.");
     return NextResponse.json({ error: "Email is not configured." }, { status: 500 });
   }
 

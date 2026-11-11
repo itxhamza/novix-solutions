@@ -62,7 +62,7 @@ export function Hero() {
           </p>
           <div className="flex flex-wrap gap-3" data-hero-fade>
             <a
-              href={contact.whatsappHref}
+              href={contact.bookingHref}
               target="_blank"
               rel="noopener noreferrer"
               className="btn btn-primary"

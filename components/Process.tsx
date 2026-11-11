@@ -1,4 +1,5 @@
-import { site } from "@/content/site";
+import Link from "next/link";
+import { processSection, processSteps } from "@/content/process";
 
 // Stroke icons. Every path has pathLength=1 so it can draw itself.
 const ICONS: Record<string, string[]> = {
@@ -9,16 +10,18 @@ const ICONS: Record<string, string[]> = {
 };
 
 export function Process() {
-  const { process } = site;
   return (
     <section id="process" data-process className="relative py-28 md:py-44" aria-labelledby="process-title">
       <div className="shell grid gap-16 lg:grid-cols-[0.9fr_1.1fr] lg:gap-24">
         <div className="lg:sticky lg:top-32 lg:self-start" data-reveal>
-          <p className="eyebrow mb-6">{process.eyebrow}</p>
+          <p className="eyebrow mb-6">{processSection.eyebrow}</p>
           <h2 id="process-title" className="display h-section">
-            {process.title}
+            {processSection.title}
           </h2>
-          <p className="lede mt-6">{process.intro}</p>
+          <p className="lede mt-6">{processSection.intro}</p>
+          <Link href="/process" className="btn btn-ghost btn-sm mt-8">
+            Full process <span aria-hidden="true">→</span>
+          </Link>
         </div>
 
         <ol className="relative" data-beam>
@@ -26,7 +29,7 @@ export function Process() {
             <div className="beam-fill" data-beam-fill />
             <div className="beam-head" data-beam-head />
           </div>
-          {process.steps.map((step, i) => (
+          {processSteps.map((step, i) => (
             <li key={step.title} className="step relative pb-20 pl-20 last:pb-0 md:pb-28 md:pl-28" data-step>
               <div className="step-node" aria-hidden="true">
                 <svg viewBox="0 0 24 24">

@@ -302,8 +302,8 @@ function createField(canvas: HTMLCanvasElement, animated: boolean): Field | null
   const ctx = canvas.getContext("2d");
   if (!ctx) return null;
   const F = TIMING.field;
-  const text = cssVar("--color-text") || "#f2ede4";
-  const accent = cssVar("--color-accent") || "#c9ff3b";
+  const text = cssVar("--color-text") || "#f4f6f8";
+  const accent = cssVar("--color-accent") || "#3df57a";
 
   // Per node: x, y, homeX, homeY, vx, vy
   const STRIDE = 6;
@@ -559,7 +559,7 @@ function initCursor() {
         width: size,
         height: size,
         y: 0,
-        backgroundColor: "rgba(201,255,59,0)",
+        backgroundColor: "rgba(61,245,122,0)",
         opacity: next === "hidden" ? 0 : 1,
       });
     }
@@ -905,9 +905,20 @@ function initWork() {
     );
   }
 
-  // True 3D tilt (perspective + rotateX/Y), pointer devices only.
+  return bindTilt();
+}
+
+/**
+ * True 3D tilt (perspective + rotateX/Y) on every [data-tilt] inside `root`,
+ * pointer devices only. Returns a cleanup.
+ *
+ * Exported because the work grid re-renders its cards when a filter changes
+ * and has to re-bind them; initWork() binds the whole document once.
+ */
+export function bindTilt(root: ParentNode = document): () => void {
+  const W = TIMING.work;
   if (!hasFinePointer()) return () => {};
-  const offs = $$("[data-tilt]").map((card) => {
+  const offs = $$("[data-tilt]", root).map((card) => {
     const inner = $("[data-tilt-inner]", card);
     if (!inner) return () => {};
     const rx = gsap.quickTo(inner, "rotationX", { duration: W.tiltEase, ease: "power3" });
@@ -978,7 +989,7 @@ export function createSendButton(button: HTMLButtonElement) {
   const check = $("[data-send-check]", button);
   const tick = check?.querySelector("path") ?? null;
   const instant = prefersReducedMotion();
-  const track = "rgba(242,237,228,0.16)";
+  const track = "rgba(244,246,248,0.16)";
   let progress: gsap.core.Tween | null = null;
 
   return {

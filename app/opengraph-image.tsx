@@ -17,14 +17,14 @@ export default function OpengraphImage() {
           flexDirection: "column",
           justifyContent: "space-between",
           padding: 72,
-          background: "#090a08",
-          backgroundImage: "radial-gradient(rgba(242,237,228,0.16) 2px, transparent 2px)",
+          background: "#0b0f14",
+          backgroundImage: "radial-gradient(rgba(244,246,248,0.16) 2px, transparent 2px)",
           backgroundSize: "44px 44px",
-          color: "#f2ede4",
+          color: "#f4f6f8",
         }}
       >
         <div style={{ display: "flex", alignItems: "center", fontSize: 30, letterSpacing: 6 }}>
-          <div style={{ width: 18, height: 18, background: "#c9ff3b", marginRight: 18 }} />
+          <div style={{ width: 18, height: 18, background: "#3df57a", marginRight: 18 }} />
           {site.name.toUpperCase()}
         </div>
         <div
@@ -39,7 +39,7 @@ export default function OpengraphImage() {
         >
           {site.hero.headline}
         </div>
-        <div style={{ display: "flex", fontSize: 28, color: "#c9ff3b" }}>
+        <div style={{ display: "flex", fontSize: 28, color: "#3df57a" }}>
           {site.url.replace("https://", "")}
         </div>
       </div>
