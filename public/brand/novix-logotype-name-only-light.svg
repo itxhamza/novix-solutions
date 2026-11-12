@@ -1,0 +1,11 @@
+<svg width="829" height="198" viewBox="0 0 829 198" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="novix-logotype" transform="translate(37.12 24) skewX(-5) translate(0 -25)">
+<g transform="translate(0 25) scale(1.0000) translate(0 -25)"><path d="M22 153V47" stroke="#111111" stroke-width="44" stroke-linecap="round" stroke-linejoin="round"/><path d="M134 47V153" stroke="#1FB85A" stroke-width="44" stroke-linecap="round" stroke-linejoin="round"/><path d="M22 47L134 153" stroke="#111111" stroke-width="44" stroke-linecap="round" stroke-linejoin="round"/></g>
+<circle cx="261" cy="100" r="53" stroke="#111111" stroke-width="44"/>
+<path d="M388 47L443 153L498 47" stroke="#111111" stroke-width="44" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M572 47V153" stroke="#111111" stroke-width="44" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M646 153L746 47" stroke="#1FB85A" stroke-width="44" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M646 47L746 153" stroke="#111111" stroke-width="44" stroke-linecap="round" stroke-linejoin="round"/>
+
+</g>
+</svg>

@@ -2,7 +2,7 @@
  * Micro-demos for the three service panels. Each SVG is drawn in its finished
  * state; lib/animations.ts loops it (and leaves it as-is for reduced motion).
  */
-import { site } from "@/content/site";
+import { getService } from "@/content/services";
 
 const PHONE = { x: 100, y: 20, w: 200, h: 400, r: 30 };
 
@@ -191,9 +191,31 @@ export function TeamDemo({ from, to }: { from: { label: string; time: string }; 
   );
 }
 
+/**
+ * Whether a service has the content its demo needs. Used by the panel layout:
+ * a panel with no demo drops the demo column instead of leaving it empty.
+ */
+export function hasServiceDemo(id: string): boolean {
+  if (id === "build") return true;
+  if (id === "rescue") {
+    const rescue = getService("rescue");
+    return Boolean(rescue?.demoBroken && rescue.demoFixed);
+  }
+  const team = getService("team");
+  return Boolean(team?.demoFrom && team.demoTo);
+}
+
+/** Each demo needs its labels from content/services.ts; without them it is hidden. */
 export function ServiceDemo({ id }: { id: string }) {
-  const items = site.services.items;
   if (id === "build") return <BuildDemo />;
-  if (id === "rescue") return <RescueDemo broken={items[1].demoBroken} fixed={items[1].demoFixed} />;
-  return <TeamDemo from={items[2].demoFrom} to={items[2].demoTo} />;
+
+  if (id === "rescue") {
+    const rescue = getService("rescue");
+    if (!rescue?.demoBroken || !rescue.demoFixed) return null;
+    return <RescueDemo broken={rescue.demoBroken} fixed={rescue.demoFixed} />;
+  }
+
+  const team = getService("team");
+  if (!team?.demoFrom || !team.demoTo) return null;
+  return <TeamDemo from={team.demoFrom} to={team.demoTo} />;
 }

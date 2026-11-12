@@ -39,7 +39,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#090a08",
+  themeColor: "#0b0f14",
   colorScheme: "dark",
 };
 
@@ -52,7 +52,6 @@ const jsonLd = {
   logo: `${site.url}/brand/novix-mark.svg`,
   description: site.seo.description,
   email: site.contact.email,
-  address: { "@type": "PostalAddress", addressLocality: "Lahore", addressCountry: "PK" },
   areaServed: ["US", "AE", "SA", "QA", "KW", "BH", "OM"],
   sameAs: site.footer.social.map((s) => s.href),
 };

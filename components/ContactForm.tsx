@@ -5,6 +5,19 @@ import { site } from "@/content/site";
 
 type Status = "idle" | "sending" | "sent" | "error" | "invalid";
 
+type Animations = ReturnType<
+  typeof import("@/lib/animations").createSendButton
+>;
+
+/** Resolve when `promise` settles, or after `ms`, whichever comes first. */
+function settleWithin(promise: Promise<void> | undefined, ms: number) {
+  if (!promise) return Promise.resolve();
+  return Promise.race([
+    promise.catch(() => undefined),
+    new Promise<void>((resolve) => setTimeout(resolve, ms)),
+  ]);
+}
+
 export function ContactForm() {
   const t = site.contactSection.form;
   const [status, setStatus] = useState<Status>("idle");
@@ -23,10 +36,22 @@ export function ContactForm() {
     }
 
     setStatus("sending");
+
     // The button → progress bar → check mark morph lives in lib/animations.ts.
-    const { createSendButton, pulseField } = await import("@/lib/animations");
-    const button = createSendButton(buttonRef.current!);
-    button.start();
+    // It is decorative: if the chunk fails to load the message must still send,
+    // so this never escapes into the submit path.
+    let button: Animations | undefined;
+    let pulse: (() => void) | undefined;
+    try {
+      const anim = await import("@/lib/animations");
+      pulse = anim.pulseField;
+      if (buttonRef.current) {
+        button = anim.createSendButton(buttonRef.current);
+        button.start();
+      }
+    } catch {
+      /* no animation — the states below still render */
+    }
 
     try {
       const res = await fetch("/api/contact", {
@@ -35,16 +60,19 @@ export function ContactForm() {
         body: JSON.stringify(data),
       });
       if (!res.ok) throw new Error(String(res.status));
-      await button.success();
-      pulseField();
+
+      // Never let a stalled animation hold the success state hostage.
+      await settleWithin(button?.success(), 2000);
+      pulse?.();
+
       setStatus("sent");
       form.reset();
       window.setTimeout(() => {
-        button.reset();
+        button?.reset();
         setStatus((s) => (s === "sent" ? "idle" : s));
       }, 6000);
     } catch {
-      button.reset();
+      button?.reset();
       setStatus("error");
     }
   }

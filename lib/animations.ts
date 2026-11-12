@@ -296,14 +296,15 @@ function prepareHero() {
 /* -------------------------------------------------------------------------- */
 
 type Field = { pulse: (x?: number, y?: number) => void; destroy: () => void };
-let field: Field | null = null;
+/** One per [data-field] canvas. The first is the hero's. */
+let fields: Field[] = [];
 
 function createField(canvas: HTMLCanvasElement, animated: boolean): Field | null {
   const ctx = canvas.getContext("2d");
   if (!ctx) return null;
   const F = TIMING.field;
-  const text = cssVar("--color-text") || "#f2ede4";
-  const accent = cssVar("--color-accent") || "#c9ff3b";
+  const text = cssVar("--color-text") || "#f4f6f8";
+  const accent = cssVar("--color-accent") || "#3df57a";
 
   // Per node: x, y, homeX, homeY, vx, vy
   const STRIDE = 6;
@@ -514,6 +515,7 @@ function createField(canvas: HTMLCanvasElement, animated: boolean): Field | null
 
 /** Sends a shockwave through the dot field. Called on contact-form success. */
 export function pulseField() {
+  const field = fields[0];
   if (!field) return;
   field.pulse();
   // Lift the canvas to full strength for the moment of the pulse.
@@ -559,7 +561,7 @@ function initCursor() {
         width: size,
         height: size,
         y: 0,
-        backgroundColor: "rgba(201,255,59,0)",
+        backgroundColor: "rgba(61,245,122,0)",
         opacity: next === "hidden" ? 0 : 1,
       });
     }
@@ -905,9 +907,20 @@ function initWork() {
     );
   }
 
-  // True 3D tilt (perspective + rotateX/Y), pointer devices only.
+  return bindTilt();
+}
+
+/**
+ * True 3D tilt (perspective + rotateX/Y) on every [data-tilt] inside `root`,
+ * pointer devices only. Returns a cleanup.
+ *
+ * Exported because the work grid re-renders its cards when a filter changes
+ * and has to re-bind them; initWork() binds the whole document once.
+ */
+export function bindTilt(root: ParentNode = document): () => void {
+  const W = TIMING.work;
   if (!hasFinePointer()) return () => {};
-  const offs = $$("[data-tilt]").map((card) => {
+  const offs = $$("[data-tilt]", root).map((card) => {
     const inner = $("[data-tilt-inner]", card);
     if (!inner) return () => {};
     const rx = gsap.quickTo(inner, "rotationX", { duration: W.tiltEase, ease: "power3" });
@@ -968,6 +981,106 @@ function initReveals() {
 }
 
 /* -------------------------------------------------------------------------- */
+/* 9b. Home sections — counters, weekly beam, parallax                        */
+/* -------------------------------------------------------------------------- */
+
+/**
+ * Counters count up once, when scrolled into view.
+ *
+ * The finished value is already in the HTML, so a non-numeric figure (say
+ * "< 1 day") is left alone and no-JS still shows the real value.
+ */
+function initStats() {
+  $$("[data-stat-value]").forEach((el) => {
+    const final = (el as HTMLElement).dataset.statValue ?? el.textContent ?? "";
+    const match = final.match(/^(\D*)(\d+(?:\.\d+)?)(.*)$/s);
+    if (!match) return;
+
+    const [, prefix, digits, suffix] = match;
+    const target = Number(digits);
+    const decimals = digits.includes(".") ? digits.split(".")[1].length : 0;
+    const counter = { v: 0 };
+
+    ScrollTrigger.create({
+      trigger: el,
+      start: "top 85%",
+      once: true,
+      onEnter: () =>
+        gsap.to(counter, {
+          v: target,
+          duration: 1.2,
+          ease: "power1.out",
+          onUpdate: () => {
+            el.textContent = `${prefix}${counter.v.toFixed(decimals)}${suffix}`;
+          },
+        }),
+    });
+  });
+}
+
+/** A light travelling along the week line, lighting each stop as it passes. */
+function initWeek() {
+  const list = $("[data-week]");
+  if (!list) return;
+  const fill = $("[data-week-fill]", list);
+
+  gsap.fromTo(
+    fill,
+    { scaleX: 0 },
+    {
+      scaleX: 1,
+      ease: "none",
+      scrollTrigger: { trigger: list, start: "top 75%", end: "bottom 70%", scrub: 0.5 },
+    },
+  );
+
+  $$("[data-week-stop]", list).forEach((stop) => {
+    ScrollTrigger.create({
+      trigger: stop,
+      start: "top 80%",
+      onEnter: () => stop.classList.add("is-lit"),
+      onLeaveBack: () => stop.classList.remove("is-lit"),
+    });
+  });
+}
+
+/**
+ * Gentle 3D parallax on [data-parallax], pointer devices only. Separate from
+ * bindTilt: this tracks the pointer across the whole section rather than the
+ * card, so the frame drifts instead of snapping.
+ */
+function initParallax() {
+  if (!hasFinePointer()) return () => {};
+
+  const offs = $$("[data-parallax]").map((root) => {
+    const inner = $("[data-parallax-inner]", root);
+    if (!inner) return () => {};
+
+    const rx = gsap.quickTo(inner, "rotationX", { duration: 0.9, ease: "power3" });
+    const ry = gsap.quickTo(inner, "rotationY", { duration: 0.9, ease: "power3" });
+
+    const move = (e: PointerEvent) => {
+      const r = root.getBoundingClientRect();
+      ry(((e.clientX - r.left) / r.width - 0.5) * 12);
+      rx(-((e.clientY - r.top) / r.height - 0.5) * 10);
+    };
+    const leave = () => {
+      rx(0);
+      ry(0);
+    };
+
+    root.addEventListener("pointermove", move);
+    root.addEventListener("pointerleave", leave);
+    return () => {
+      root.removeEventListener("pointermove", move);
+      root.removeEventListener("pointerleave", leave);
+    };
+  });
+
+  return () => offs.forEach((off) => off());
+}
+
+/* -------------------------------------------------------------------------- */
 /* 10. Send button — button → progress bar → check mark                       */
 /* -------------------------------------------------------------------------- */
 
@@ -978,7 +1091,7 @@ export function createSendButton(button: HTMLButtonElement) {
   const check = $("[data-send-check]", button);
   const tick = check?.querySelector("path") ?? null;
   const instant = prefersReducedMotion();
-  const track = "rgba(242,237,228,0.16)";
+  const track = "rgba(244,246,248,0.16)";
   let progress: gsap.core.Tween | null = null;
 
   return {
@@ -1030,22 +1143,22 @@ export function createSendButton(button: HTMLButtonElement) {
 export function initAnimations(): () => void {
   gsap.registerPlugin(ScrollTrigger);
   const cleanups: Array<() => void> = [];
-  const canvas = $<HTMLCanvasElement>("[data-field]");
+  const canvases = $$<HTMLCanvasElement>("[data-field]");
 
   // Reduced motion: draw the dot field once, and leave everything else as the
   // finished, static page it already is.
   if (prefersReducedMotion()) {
     $("[data-loader]")?.remove();
-    if (canvas) field = createField(canvas, false);
+    fields = canvases.map((c) => createField(c, false)).filter((f): f is Field => Boolean(f));
     return () => {
-      field?.destroy();
-      field = null;
+      fields.forEach((f) => f.destroy());
+      fields = [];
     };
   }
 
   document.documentElement.classList.add("anim");
   const hero = prepareHero();
-  if (canvas) field = createField(canvas, true);
+  fields = canvases.map((c) => createField(c, true)).filter((f): f is Field => Boolean(f));
   cleanups.push(initCursor());
 
   const mm = gsap.matchMedia();
@@ -1053,7 +1166,10 @@ export function initAnimations(): () => void {
     initServicesScroll(mm);
     initProcess();
     initReveals();
+    initStats();
+    initWeek();
     cleanups.push(initWork());
+    cleanups.push(initParallax());
   });
   cleanups.push(initDemos());
 
@@ -1067,8 +1183,8 @@ export function initAnimations(): () => void {
     mm.revert();
     ctx.revert();
     hero?.restore();
-    field?.destroy();
-    field = null;
+    fields.forEach((f) => f.destroy());
+    fields = [];
     document.documentElement.classList.remove("anim");
   };
 }
