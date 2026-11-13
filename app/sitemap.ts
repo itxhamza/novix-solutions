@@ -1,7 +1,7 @@
 import type { MetadataRoute } from "next";
 import { site } from "@/content/site";
 import { legal } from "@/content/legal";
-import { getProjects } from "@/lib/content/projects";
+import { getCaseStudies } from "@/lib/content/projects";
 
 /**
  * Every indexable page. Case studies come from content/projects, so adding a
@@ -21,7 +21,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${site.url}/contact`, changeFrequency: "yearly", priority: 0.7 },
   ];
 
-  const caseStudies: MetadataRoute.Sitemap = getProjects().map((p) => ({
+  const caseStudies: MetadataRoute.Sitemap = getCaseStudies().map((p) => ({
     url: `${site.url}/work/${p.slug}`,
     changeFrequency: "monthly" as const,
     priority: 0.8,

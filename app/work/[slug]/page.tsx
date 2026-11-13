@@ -61,7 +61,9 @@ function Block({
 export default async function CaseStudy({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const project = getProject(slug);
-  if (!project) notFound();
+  // No page for a project with nothing under the header — see hasCaseStudy in
+  // lib/content/projects.ts. /work links to those as plain tiles.
+  if (!project?.hasCaseStudy) notFound();
 
   const storeId = appStoreId(project);
   const rating = storeId ? await getAppStoreRating(storeId) : undefined;
@@ -158,7 +160,7 @@ export default async function CaseStudy({ params }: { params: Promise<{ slug: st
           </header>
 
           {/* 2 — The problem (MDX body) */}
-          <Block title="The problem" show={project.hasBody}>
+          <Block title="Overview" show={project.hasBody}>
             <div className="prose-case">
               <MDXRemote source={project.body} />
             </div>

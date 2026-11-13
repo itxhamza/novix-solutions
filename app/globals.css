@@ -401,6 +401,13 @@ html.has-cursor [data-tilt] {
   .panel-solo {
     grid-template-columns: 1fr;
   }
+  /* With no demo beside it nothing fills the card's height, so the copy sits in
+     the middle of the space under the counter instead of on the card's floor. */
+  .panel-solo .panel-copy {
+    display: grid;
+    grid-template-rows: auto 1fr;
+    align-items: center;
+  }
   .panel-demo {
     border-top: 0;
     border-left: 1px solid var(--color-line);
