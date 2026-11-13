@@ -58,9 +58,11 @@ export function FeaturedCase() {
               </ul>
             ) : null}
 
-            <Link href={`/work/${project.slug}`} className="btn btn-ghost mt-10">
-              View the case study <span aria-hidden="true">→</span>
-            </Link>
+            {project.hasCaseStudy ? (
+              <Link href={`/work/${project.slug}`} className="btn btn-ghost mt-10">
+                View the case study <span aria-hidden="true">→</span>
+              </Link>
+            ) : null}
           </div>
 
           <div className="parallax" data-parallax data-reveal>
