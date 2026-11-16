@@ -122,72 +122,85 @@ export function RescueDemo({ broken, fixed }: { broken: string; fixed: string })
   );
 }
 
-// Dot-matrix world, North America → South Asia (generated from Natural Earth land data).
-const WORLD = [
-  "#####..#...##.#.#.##....######...............########.#.#######.######",
-  "#############.#.####....####.....###........###.###.##################",
-  "###########.....##.......##...............####.#######################",
-  "###########.....###.#.....................#.##..######################",
-  "###############.######.................#...#...#######################",
-  ".##############.#######..............#.##.############################",
-  ".###################..##...............###############################",
-  "..####################..................##########..###..#############",
-  "..################....................###...#.###....###.#############",
-  "..###############.....................##...#.#.#.#######.#############",
-  "...##############........................###........##################",
-  "....############......................#######......###################",
-  "....#######.#.#......................#################################",
-  ".....#####..........................###############.####..############",
-  ".......###.........................#################.######...########",
-  "........##..#...#..................#################.######....####...",
-  ".........####......................##################.###......###....",
-  "............##.....................####################.........##....",
-  ".................####...............####################........#.....",
-  "................######...............###################.........#....",
-];
-const DOTS = WORLD.flatMap((row, r) =>
-  [...row].flatMap((c, i) => (c === "#" ? [`M${i * 10 + 5} ${r * 10 + 5}h.01`] : [])),
-).join("");
+/** 3 — what the app already knows feeds a model, which answers with something made for that person. */
+export function AiDemo() {
+  const rows = [72, 108, 144];
+  const wires = [
+    "M150 98C150 150 200 150 200 200",
+    "M200 134V200",
+    "M250 170C250 186 200 182 200 200",
+  ];
 
-const US = { x: 174, y: 90 };
-const PK = { x: 637, y: 119 };
-
-function Avatar({ x, y, id }: { x: number; y: number; id: string }) {
   return (
-    <g data-team-avatar={id}>
-      <circle data-team-ring cx={x} cy={y} r="20" fill="none" stroke="var(--color-accent)" strokeWidth="1.5" opacity="0.5" />
-      <circle cx={x} cy={y} r="15" fill="var(--color-accent)" />
-      <circle cx={x} cy={y - 4} r="4.6" fill="var(--color-accent-ink)" />
-      <path
-        d={`M${x - 8.5} ${y + 10}a8.5 7.5 0 0 1 17 0`}
-        fill="var(--color-accent-ink)"
+    <svg viewBox="0 0 400 440" data-demo="ai" aria-hidden="true">
+      <rect
+        x={PHONE.x}
+        y={PHONE.y}
+        width={PHONE.w}
+        height={PHONE.h}
+        rx={PHONE.r}
+        fill="none"
+        stroke="var(--color-text)"
+        strokeWidth="2"
       />
-    </g>
-  );
-}
+      <rect x="170" y="34" width="60" height="12" rx="6" fill="var(--color-text)" />
 
-/** 3 — two people connected by a glowing line across a US ↔ Pakistan map. */
-export function TeamDemo({ from, to }: { from: { label: string; time: string }; to: { label: string; time: string } }) {
-  const arc = `M${US.x} ${US.y}Q405 -70 ${PK.x} ${PK.y}`;
-  return (
-    <div className="flex w-full flex-col gap-5" data-demo="team" aria-hidden="true">
-      <svg viewBox="0 -30 700 240" className="!h-auto !max-h-none">
-        <path d={DOTS} stroke="var(--color-muted)" strokeOpacity="0.55" strokeWidth="3.4" strokeLinecap="round" />
-        <path d={arc} data-team-glow fill="none" stroke="var(--color-accent)" strokeOpacity="0.22" strokeWidth="9" strokeLinecap="round" pathLength={1} strokeDasharray="1" />
-        <path d={arc} data-team-arc fill="none" stroke="var(--color-accent)" strokeWidth="2.2" strokeLinecap="round" pathLength={1} strokeDasharray="1" />
-        <circle data-team-packet r="5" cx={PK.x} cy={PK.y} fill="var(--color-text)" opacity="0" />
-        <Avatar {...US} id="from" />
-        <Avatar {...PK} id="to" />
-      </svg>
-      <div className="flex items-start justify-between gap-4 text-sm">
-        {[from, to].map((p, i) => (
-          <div key={p.label} data-team-label className={i === 1 ? "text-right" : ""}>
-            <div className="font-semibold text-text">{p.label}</div>
-            <div className="mono text-muted">{p.time}</div>
-          </div>
-        ))}
-      </div>
-    </div>
+      {/* what the product already knows about this person */}
+      {rows.map((y, i) => (
+        <g key={y} data-ai-signal>
+          <rect x="120" y={y} width="160" height="26" rx="9" fill="var(--color-raised)" stroke="var(--color-line)" />
+          <circle cx="136" cy={y + 13} r="4" fill="var(--color-accent)" />
+          <rect x="150" y={y + 9} width={104 - i * 24} height="8" rx="4" fill="var(--color-muted)" />
+        </g>
+      ))}
+
+      {/* …travelling into the model */}
+      {wires.map((d) => (
+        <path
+          key={d}
+          data-ai-wire
+          d={d}
+          fill="none"
+          stroke="var(--color-accent)"
+          strokeWidth="1.6"
+          strokeLinecap="round"
+          pathLength={1}
+          strokeDasharray="1"
+          strokeDashoffset="1"
+        />
+      ))}
+
+      <circle data-ai-halo cx="200" cy="226" r="30" fill="none" stroke="var(--color-accent)" strokeWidth="2" opacity="0" />
+      <circle
+        data-ai-ring
+        cx="200"
+        cy="226"
+        r="38"
+        fill="none"
+        stroke="var(--color-accent)"
+        strokeOpacity="0.4"
+        strokeWidth="1.5"
+        strokeDasharray="5 9"
+      />
+      <g data-ai-core>
+        <circle cx="200" cy="226" r="22" fill="var(--color-accent)" />
+        <path
+          d="M200 214l3.6 8.4 8.4 3.6-8.4 3.6-3.6 8.4-3.6-8.4-8.4-3.6 8.4-3.6z"
+          fill="var(--color-accent-ink)"
+        />
+      </g>
+
+      {/* …and coming back out as the next thing to do */}
+      <g data-ai-card>
+        <rect x="120" y="288" width="160" height="92" rx="14" fill="var(--color-raised)" stroke="var(--color-line)" />
+        <rect data-ai-bit x="136" y="304" width="44" height="8" rx="4" fill="var(--color-accent)" />
+        <rect data-ai-bit x="136" y="324" width="128" height="8" rx="4" fill="var(--color-muted)" />
+        <rect data-ai-bit x="136" y="342" width="96" height="8" rx="4" fill="var(--color-line)" />
+        <rect data-ai-bit x="136" y="360" width="64" height="4" rx="2" fill="var(--color-line)" />
+      </g>
+
+      <rect x="165" y="396" width="70" height="5" rx="2.5" fill="var(--color-muted)" />
+    </svg>
   );
 }
 
@@ -196,26 +209,19 @@ export function TeamDemo({ from, to }: { from: { label: string; time: string }; 
  * a panel with no demo drops the demo column instead of leaving it empty.
  */
 export function hasServiceDemo(id: string): boolean {
-  if (id === "build") return true;
-  if (id === "rescue") {
-    const rescue = getService("rescue");
-    return Boolean(rescue?.demoBroken && rescue.demoFixed);
-  }
-  const team = getService("team");
-  return Boolean(team?.demoFrom && team.demoTo);
+  if (id === "build" || id === "ai") return true;
+  if (id !== "rescue") return false;
+  const rescue = getService("rescue");
+  return Boolean(rescue?.demoBroken && rescue.demoFixed);
 }
 
-/** Each demo needs its labels from content/services.ts; without them it is hidden. */
+/** The rescue demo needs its labels from content/services.ts; without them it is hidden. */
 export function ServiceDemo({ id }: { id: string }) {
   if (id === "build") return <BuildDemo />;
+  if (id === "ai") return <AiDemo />;
+  if (id !== "rescue") return null;
 
-  if (id === "rescue") {
-    const rescue = getService("rescue");
-    if (!rescue?.demoBroken || !rescue.demoFixed) return null;
-    return <RescueDemo broken={rescue.demoBroken} fixed={rescue.demoFixed} />;
-  }
-
-  const team = getService("team");
-  if (!team?.demoFrom || !team.demoTo) return null;
-  return <TeamDemo from={team.demoFrom} to={team.demoTo} />;
+  const rescue = getService("rescue");
+  if (!rescue?.demoBroken || !rescue.demoFixed) return null;
+  return <RescueDemo broken={rescue.demoBroken} fixed={rescue.demoFixed} />;
 }

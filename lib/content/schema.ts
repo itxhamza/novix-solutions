@@ -86,8 +86,6 @@ export const serviceSchema = z.object({
   demoLabel: optionalText,
   demoBroken: optionalText,
   demoFixed: optionalText,
-  demoFrom: z.object({ label: z.string(), time: z.string() }).optional(),
-  demoTo: z.object({ label: z.string(), time: z.string() }).optional(),
 });
 
 export const processStepSchema = z.object({
@@ -122,6 +120,11 @@ export type Project = z.infer<typeof projectSchema> & {
   body: string;
   /** False when the MDX body is empty or only comments. */
   hasBody: boolean;
+  /**
+   * False when the case study page would be its header and nothing else. Such
+   * a project still appears on /work, but as a plain tile: no link, no page.
+   */
+  hasCaseStudy: boolean;
 };
 export type Service = z.infer<typeof serviceSchema>;
 export type ProcessStep = z.infer<typeof processStepSchema>;

@@ -32,7 +32,17 @@ function read(): Project[] {
     // A body that is only comments has nothing to show, so the page hides the
     // "problem" section rather than rendering an empty heading.
     const hasBody = body.replace(/<!--[\s\S]*?-->/g, "").trim().length > 0;
-    return { ...frontmatter, slug, body, hasBody };
+    // A case study needs something under the header to be worth opening. With
+    // none of these the page would repeat the card, so the project gets no
+    // page, no link and no sitemap entry until one of them is filled in.
+    const hasCaseStudy =
+      hasBody ||
+      frontmatter.features.length > 0 ||
+      frontmatter.gallery.length > 0 ||
+      frontmatter.results.length > 0 ||
+      frontmatter.stack.length > 0 ||
+      Boolean(frontmatter.quote);
+    return { ...frontmatter, slug, body, hasBody, hasCaseStudy };
   });
 
   const slugs = new Set<string>();
@@ -63,7 +73,10 @@ export const getProject = (slug: string) => getProjects().find((p) => p.slug ===
 export const getFeatured = (limit = 3) =>
   getProjects().filter((p) => p.featured).slice(0, limit);
 
-export const getProjectSlugs = () => getProjects().map((p) => p.slug);
+/** Only the projects with a page: what generateStaticParams and the sitemap use. */
+export const getCaseStudies = () => getProjects().filter((p) => p.hasCaseStudy);
+
+export const getProjectSlugs = () => getCaseStudies().map((p) => p.slug);
 
 /** Only the platforms and types actually used, so filters never show a dead option. */
 export const usedPlatforms = (): Platform[] =>
@@ -78,9 +91,13 @@ export function appStoreId(project: Project): string | undefined {
   return project.links.appStore?.match(/\/id(\d+)/)?.[1];
 }
 
-/** The project after this one, wrapping around, for the "next project" link. */
+/**
+ * The project after this one, wrapping around, for the "next project" link.
+ * Only projects with a page of their own are in the chain — the link would
+ * otherwise lead to a 404.
+ */
 export function nextProject(slug: string): Project | undefined {
-  const all = getProjects();
+  const all = getCaseStudies();
   if (all.length < 2) return undefined;
   const i = all.findIndex((p) => p.slug === slug);
   return i === -1 ? undefined : all[(i + 1) % all.length];

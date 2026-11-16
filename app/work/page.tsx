@@ -21,6 +21,7 @@ export default function WorkPage() {
     platforms: p.platforms,
     type: p.type,
     thumbnail: p.thumbnail,
+    hasCaseStudy: p.hasCaseStudy,
   }));
 
   return (

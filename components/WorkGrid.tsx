@@ -14,6 +14,8 @@ export type WorkCard = {
   platforms: Platform[];
   type?: ProjectType;
   thumbnail: { src: string; alt: string; width: number; height: number };
+  /** False while the project has no page: the tile shows, but nothing links. */
+  hasCaseStudy: boolean;
 };
 
 const ALL = "All";
@@ -122,16 +124,22 @@ export function WorkGrid({
                   <div className="tilt-pop-sm flex flex-1 flex-col">
                     <span className="mono text-accent">{p.platforms.join(" & ")}</span>
                     <h2 className="display mt-3 text-2xl md:text-3xl">
-                      {/* Whole card is clickable; the link keeps the accessible name. */}
-                      <Link href={`/work/${p.slug}`} className="card-link">
-                        {p.title}
-                      </Link>
+                      {/* With a page, the link makes the whole card the hit area. */}
+                      {p.hasCaseStudy ? (
+                        <Link href={`/work/${p.slug}`} className="card-link">
+                          {p.title}
+                        </Link>
+                      ) : (
+                        p.title
+                      )}
                     </h2>
                     {/* `result` is the one-line outcome; falls back to the summary. */}
                     <p className="mt-3 text-muted">{p.result ?? p.summary}</p>
-                    <span className="mono mt-auto inline-flex items-center gap-2 pt-6 text-text">
-                      Case study <span aria-hidden="true">→</span>
-                    </span>
+                    {p.hasCaseStudy ? (
+                      <span className="mono mt-auto inline-flex items-center gap-2 pt-6 text-text">
+                        Case study <span aria-hidden="true">→</span>
+                      </span>
+                    ) : null}
                   </div>
                   <span className="tilt-glare" data-tilt-glare aria-hidden="true" />
                 </div>

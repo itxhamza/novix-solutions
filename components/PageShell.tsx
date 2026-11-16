@@ -2,6 +2,7 @@ import { Loader } from "./Loader";
 import { Header } from "./Header";
 import { Footer } from "./Footer";
 import { Motion } from "./Motion";
+import { ScrollManager } from "./ScrollManager";
 import { site } from "@/content/site";
 
 /**
@@ -38,6 +39,7 @@ export function PageShell({
       <main className="relative z-10">{children}</main>
       <Footer />
       <Motion />
+      <ScrollManager />
     </>
   );
 }

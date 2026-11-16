@@ -70,7 +70,7 @@ export const TIMING = {
     panelSlide: 90, // px each panel's copy travels as it enters
     build: { assemble: 0.9, stagger: 0.07, hold: 1.6, scatter: 0.5 },
     rescue: { perRow: 0.55, hold: 1.5, breakAgain: 0.35 },
-    team: { draw: 1.1, packet: 0.9, hold: 1.2, fade: 0.5 },
+    ai: { stagger: 0.12, draw: 0.75, hold: 1.5, fade: 0.45 },
   },
   process: {
     beamScrub: 0.5,
@@ -126,6 +126,16 @@ function playWhenVisible(el: Element, tl: gsap.core.Timeline) {
 /* -------------------------------------------------------------------------- */
 
 /** Resolves when the loader has started dissolving (or immediately if absent). */
+/**
+ * The loader markup is rendered by React (components/Loader.tsx), so taking the
+ * node out of the DOM here would leave React holding a stale child: the next
+ * route change throws "removeChild ... not a child of this node". Hiding it is
+ * equivalent on screen and leaves the node for React to unmount normally.
+ */
+function hideLoader(loader: HTMLElement | null) {
+  if (loader) loader.style.display = "none";
+}
+
 function runLoader(): Promise<void> {
   const loader = $("[data-loader]");
   if (!loader || getComputedStyle(loader).visibility === "hidden") return Promise.resolve();
@@ -137,7 +147,7 @@ function runLoader(): Promise<void> {
   return new Promise((resolve) => {
     Promise.all([fonts, new Promise((r) => setTimeout(r, wait * 1000))]).then(() => {
       gsap
-        .timeline({ onComplete: () => loader.remove() })
+        .timeline({ onComplete: () => hideLoader(loader) })
         .to("[data-loader-path]", {
           scale: 1.12,
           opacity: 0,
@@ -752,52 +762,48 @@ function rescueDemo(svg: Element) {
   return tl;
 }
 
-/** Demo 3 — a line draws from the US to Pakistan and messages travel along it. */
-function teamDemo(root: Element) {
-  const M = TIMING.services.team;
-  const arc = $<SVGPathElement>("[data-team-arc]", root);
-  const glow = $<SVGPathElement>("[data-team-glow]", root);
-  const packet = $<SVGElement>("[data-team-packet]", root);
-  const avatars = $$<SVGElement>("[data-team-avatar]", root);
-  const rings = $$<SVGElement>("[data-team-ring]", root);
-  const labels = $$("[data-team-label]", root);
-  if (!arc || !packet) return gsap.timeline({ paused: true });
+/** Demo 3 — what the app knows feeds a model, which answers with a card made for that person. */
+function aiDemo(svg: Element) {
+  const A = TIMING.services.ai;
+  const signals = $$<SVGElement>("[data-ai-signal]", svg);
+  const wires = $$<SVGElement>("[data-ai-wire]", svg);
+  const ring = $<SVGElement>("[data-ai-ring]", svg);
+  const halo = $<SVGElement>("[data-ai-halo]", svg);
+  const core = $<SVGElement>("[data-ai-core]", svg);
+  const card = $<SVGElement>("[data-ai-card]", svg);
+  const bits = $$<SVGElement>("[data-ai-bit]", svg);
+  if (!core || !card) return gsap.timeline({ paused: true });
 
-  const length = arc.getTotalLength();
-  const travel = { t: 0 };
-  const place = () => {
-    const p = arc.getPointAtLength(travel.t * length);
-    gsap.set(packet, { attr: { cx: p.x, cy: p.y } });
-  };
-  gsap.set([...rings, ...avatars], { transformOrigin: "50% 50%" });
+  // The model's three pieces all turn and pulse around their own centre; the
+  // card's bars wipe in from their left edge. (svgOrigin is wrong here — it
+  // offsets each element by its own radius.)
+  gsap.set([core, halo, ring], { transformOrigin: "50% 50%" });
+  gsap.set(bits, { transformOrigin: "0% 50%" });
 
   return gsap
     .timeline({ repeat: -1, paused: true, defaults: { ease: EASE.out } })
-    .set([arc, glow], { strokeDashoffset: 1, opacity: 1 })
-    .set(packet, { opacity: 0 })
-    .fromTo(avatars, { scale: 0 }, { scale: 1, duration: 0.5, ease: EASE.snap, stagger: 0.25 })
-    .fromTo(labels, { opacity: 0, y: 8 }, { opacity: 1, y: 0, duration: 0.4, stagger: 0.25 }, "<")
-    .to([arc, glow], { strokeDashoffset: 0, duration: M.draw, ease: EASE.inOut }, ">-0.1")
-    .fromTo(rings, { scale: 1, opacity: 0.6 }, { scale: 1.9, opacity: 0, duration: 0.9, stagger: 0.15 }, ">-0.2")
-    // message there…
-    .set(packet, { opacity: 1 })
-    .fromTo(travel, { t: 0 }, { t: 1, duration: M.packet, ease: EASE.inOut, onUpdate: place })
-    .fromTo(rings[1], { scale: 1, opacity: 0.6 }, { scale: 1.9, opacity: 0, duration: 0.7 })
-    // …and back
-    .to(travel, { t: 0, duration: M.packet, ease: EASE.inOut, onUpdate: place }, "<0.15")
-    .fromTo(rings[0], { scale: 1, opacity: 0.6 }, { scale: 1.9, opacity: 0, duration: 0.7 })
-    .set(packet, { opacity: 0 }, "<")
-    .to({}, { duration: M.hold })
-    .to([arc, glow], { opacity: 0, duration: M.fade })
-    .to(avatars, { scale: 0, duration: 0.3, ease: "power2.in" }, "<")
-    .to(labels, { opacity: 0, duration: 0.3 }, "<");
+    .set(wires, { strokeDashoffset: 1, opacity: 1 })
+    .set(halo, { opacity: 0 })
+    .fromTo(signals, { opacity: 0, x: -16 }, { opacity: 1, x: 0, duration: 0.45, stagger: A.stagger })
+    .fromTo(core, { scale: 0 }, { scale: 1, duration: 0.5, ease: EASE.snap }, "<0.15")
+    // what it knows travels in while the model turns it over
+    .to(wires, { strokeDashoffset: 0, duration: A.draw, stagger: A.stagger }, ">-0.1")
+    .to(ring, { rotation: 300, duration: A.draw + 0.8, ease: "none" }, "<")
+    .fromTo(halo, { scale: 0.75, opacity: 0.6 }, { scale: 1.8, opacity: 0, duration: 0.9 }, ">-0.25")
+    // …and comes back out as the next thing to do
+    .fromTo(card, { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.5, ease: EASE.snap }, "<0.1")
+    .fromTo(bits, { scaleX: 0 }, { scaleX: 1, duration: 0.35, stagger: 0.07 }, "<0.12")
+    .to({}, { duration: A.hold })
+    .to([card, ...signals], { opacity: 0, duration: A.fade, stagger: 0.05 })
+    .to(core, { scale: 0, duration: 0.3, ease: "power2.in" }, "<")
+    .to(wires, { opacity: 0, duration: 0.3 }, "<");
 }
 
 function initDemos() {
   const builders: Record<string, (el: Element) => gsap.core.Timeline> = {
     build: buildDemo,
     rescue: rescueDemo,
-    team: teamDemo,
+    ai: aiDemo,
   };
   const stops = $$("[data-demo]").map((el) => {
     const make = builders[(el as HTMLElement).dataset.demo ?? ""];
@@ -1148,7 +1154,7 @@ export function initAnimations(): () => void {
   // Reduced motion: draw the dot field once, and leave everything else as the
   // finished, static page it already is.
   if (prefersReducedMotion()) {
-    $("[data-loader]")?.remove();
+    hideLoader($("[data-loader]"));
     fields = canvases.map((c) => createField(c, false)).filter((f): f is Field => Boolean(f));
     return () => {
       fields.forEach((f) => f.destroy());

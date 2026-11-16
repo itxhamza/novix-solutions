@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { site } from "@/content/site";
+import { scrollToSection } from "./ScrollManager";
 
 /** /work also owns /work/<slug>, so a case study keeps "Work" highlighted. */
 function isCurrent(pathname: string, href: string) {
@@ -15,7 +16,10 @@ export function Header() {
   const pathname = usePathname() ?? "/";
   const [open, setOpen] = useState(false);
 
-  // Close the menu on navigation, and never leave the page locked.
+  // Safety net: close the menu if the route changes any other way. Links close
+  // it themselves, because "/#process" from the home page never changes the
+  // pathname — this effect would not fire, and the open menu would sit over the
+  // section the tap just scrolled to.
   useEffect(() => setOpen(false), [pathname]);
 
   useEffect(() => {
@@ -105,6 +109,17 @@ export function Header() {
                   href={item.href}
                   aria-current={current ? "page" : undefined}
                   className={`mobile-link${current ? " is-current" : ""}`}
+                  onClick={() => {
+                    setOpen(false);
+                    // A same-page section link never changes the route, so
+                    // nothing else scrolls for it. The menu also locks the
+                    // body, and React lifts that lock a beat later — lift it
+                    // here so the scroll below is not swallowed.
+                    if (!item.href.includes("#") || pathname !== "/") return;
+                    const hash = item.href.slice(item.href.indexOf("#"));
+                    document.body.style.overflow = "";
+                    requestAnimationFrame(() => scrollToSection(hash));
+                  }}
                 >
                   {item.label}
                 </Link>
@@ -115,6 +130,7 @@ export function Header() {
               target="_blank"
               rel="noopener noreferrer"
               className="btn btn-primary mt-5"
+              onClick={() => setOpen(false)}
             >
               {site.hero.primaryCta}
             </a>

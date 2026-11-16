@@ -1,35 +1,73 @@
 ---
 title: Bynaus.ai
-summary: "AI-agent workspace for operations teams: people, projects, timesheets and boards in one place."
+summary: "AI workspace for contractors: an assistant that answers with its sources, alongside projects, timesheets and change orders."
 platforms: [Web]
 thumbnail:
   src: /work/bynaus-ai/cover.webp
-  alt: The Bynaus.ai workspace showing projects and boards
-  width: 2000
-  height: 1159
+  alt: The Bynaus.ai dashboard, with shortcuts for projects, people, timesheets and clock-ins
+  width: 1600
+  height: 896
 featured: true
 order: 1
 
 # --- Fill these in. Empty fields stay hidden on the site. ---
 type: ""
 year: ""
-role: ""
+role: Built end to end
 client: ""
 result: ""
 links:
-  website: https://app.bynaus.ai/login
+  website: https://bynaus.ai
   appStore: ""
   googlePlay: ""
-# Taken from the existing site copy; add or correct as needed.
+# Every one of these is visible in the screens below.
 features:
-  - People
-  - Projects
-  - Timesheets
-  - Boards
+  - BynausAI assistant
+  - Answers with cited sources
+  - Prevailing wage determinations
+  - Audit trail with evidence hashing
+  - Project setup with cost codes
+  - Timesheet kiosk and clock-ins
+  - Change orders
+  - People, HR and safety
 stack: []
-gallery: []
+gallery:
+  - src: /work/bynaus-ai/dashboard.webp
+    alt: The Bynaus.ai dashboard, with shortcuts for projects, people, timesheets and clock-ins
+    width: 1600
+    height: 896
+    frame: browser
+  - src: /work/bynaus-ai/agent.webp
+    alt: BynausAI answering a prevailing wage question with the rate, compliance notes and the sources it cited
+    width: 1600
+    height: 896
+    frame: browser
+  - src: /work/bynaus-ai/create-project.webp
+    alt: Creating a project in Bynaus.ai, on the details step of a six-step setup
+    width: 1600
+    height: 1287
+    frame: browser
 results: []
 ---
 
-<!-- The problem the client had. Replace this paragraph; it is the only prose
-     on the case study page and is currently a stub. -->
+Bynaus is an AI workspace for construction operations, made for general
+contractors, specialty subcontractors and the suppliers around them. It takes
+the place of the usual stack — a project management tool, a timesheet app and a
+folder of compliance PDFs — with one workspace the office and the field both
+work in.
+
+What makes it more than a tracker is BynausAI. Ask it the prevailing wage on a
+job and it does not answer from memory: it retrieves the official determination,
+archives a screenshot of the source, hashes that evidence with SHA-256, and
+returns the rate with the compliance notes and every link it used. The answer is
+built to survive an audit rather than to sound right. Ask it for a board and it
+builds one against the project you pick.
+
+Around the assistant sits the operational surface. Projects are created through a
+six-step setup covering cost codes, alerts, contacts and time settings. Hours
+come in through daily and weekly timesheets and a kiosk the crew clocks in and
+out of. Change orders, people, and HR and safety issues are tracked in the same
+place, and a Teams meeting is one click from the dashboard.
+
+Novix built all of it: the workspace, the assistant, and the backend they both
+run on.

@@ -43,16 +43,22 @@ export function Work() {
                     <div className="tilt-pop-sm flex flex-1 flex-col">
                       <span className="mono text-accent">{p.platforms.join(" & ")}</span>
                       <h3 className="display mt-3 text-2xl md:text-3xl">
-                        {/* Whole card is the hit area; the link keeps the accessible name. */}
-                        <Link href={`/work/${p.slug}`} className="card-link">
-                          {p.title}
-                        </Link>
+                        {/* With a page, the link makes the whole card the hit area. */}
+                        {p.hasCaseStudy ? (
+                          <Link href={`/work/${p.slug}`} className="card-link">
+                            {p.title}
+                          </Link>
+                        ) : (
+                          p.title
+                        )}
                       </h3>
                       {/* `result` is the one-line outcome; until one exists we show the summary. */}
                       <p className="mt-3 text-muted">{p.result ?? p.summary}</p>
-                      <span className="mono mt-auto inline-flex items-center gap-2 pt-6 text-text">
-                        {workSection.visitLabel} <span aria-hidden="true">→</span>
-                      </span>
+                      {p.hasCaseStudy ? (
+                        <span className="mono mt-auto inline-flex items-center gap-2 pt-6 text-text">
+                          {workSection.visitLabel} <span aria-hidden="true">→</span>
+                        </span>
+                      ) : null}
                     </div>
                     <span className="tilt-glare" data-tilt-glare aria-hidden="true" />
                   </div>
