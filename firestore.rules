@@ -1,0 +1,17 @@
+rules_version = '2';
+
+// Nothing in this database is reachable from a browser.
+//
+// The site writes enquiries on the server with the Firebase Admin SDK
+// (lib/enquiries.ts), and the Admin SDK bypasses these rules entirely. No
+// visitor ever authenticates, reads or writes, so the correct rule is the
+// closed one — any rule looser than this opens a door with nothing behind it.
+//
+// Deploy with: npm run firebase:rules
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

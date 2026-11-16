@@ -1,9 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { getProject } from "@/lib/content/projects";
-
-/** Slug of the project shown in full on the home page. */
-const FEATURED_SLUG = "bynaus-ai";
+import { site } from "@/content/site";
 
 /**
  * One project, full width. Everything is pulled from its MDX file, and each
@@ -15,7 +13,7 @@ const FEATURED_SLUG = "bynaus-ai";
  * touch devices.
  */
 export function FeaturedCase() {
-  const project = getProject(FEATURED_SLUG);
+  const project = getProject(site.featuredCase);
   if (!project) return null;
 
   const results = project.results.slice(0, 3);

@@ -7,8 +7,8 @@ import { getCaseStudies } from "@/lib/content/projects";
  * Every indexable page. Case studies come from content/projects, so adding a
  * project adds its URL here with no edit.
  *
- * /privacy is left out while its body is empty — that page is noindex until
- * the policy is written, and a sitemap should not contradict that.
+ * An unwritten legal page is left out: it is noindex until its body exists,
+ * and a sitemap should not contradict that.
  */
 export default function sitemap(): MetadataRoute.Sitemap {
   const now = new Date();
@@ -27,8 +27,10 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.8,
   }));
 
-  if (legal.privacy.body.trim()) {
-    pages.push({ url: `${site.url}/privacy`, changeFrequency: "yearly", priority: 0.3 });
+  for (const [path, doc] of [["/privacy", legal.privacy], ["/terms", legal.terms]] as const) {
+    if (doc.body.trim()) {
+      pages.push({ url: `${site.url}${path}`, changeFrequency: "yearly", priority: 0.3 });
+    }
   }
 
   return [...pages, ...caseStudies].map((entry) => ({ lastModified: now, ...entry }));

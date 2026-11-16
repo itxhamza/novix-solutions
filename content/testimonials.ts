@@ -16,8 +16,7 @@ export const testimonials = parseOrThrow(
         "Hamza built both our mobile app and our web platform, end to end. He understood what we needed faster than teams I'd worked with before, communicated constantly, and delivered working software on every milestone. I'd work with him again without hesitation.",
       name: "Anthony",
       role: "Founder",
-      /** FILL ME IN — the company line is hidden while this is empty. */
-      company: "",
+      company: "Numbered",
       photo: "",
       approved: true,
     },

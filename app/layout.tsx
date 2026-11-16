@@ -43,17 +43,34 @@ export const viewport: Viewport = {
   colorScheme: "dark",
 };
 
+/**
+ * The studio and the site it publishes, declared once for every page. Other
+ * pages point at these @ids rather than describing the studio again.
+ */
 const jsonLd = {
   "@context": "https://schema.org",
-  "@type": "ProfessionalService",
-  "@id": `${site.url}/#organization`,
-  name: site.name,
-  url: site.url,
-  logo: `${site.url}/brand/novix-mark.svg`,
-  description: site.seo.description,
-  email: site.contact.email,
-  areaServed: ["US", "AE", "SA", "QA", "KW", "BH", "OM"],
-  sameAs: site.footer.social.map((s) => s.href),
+  "@graph": [
+    {
+      "@type": "ProfessionalService",
+      "@id": `${site.url}/#organization`,
+      name: site.name,
+      url: site.url,
+      logo: `${site.url}/brand/novix-mark.svg`,
+      description: site.seo.description,
+      email: site.contact.email,
+      areaServed: ["US", "AE", "SA", "QA", "KW", "BH", "OM"],
+      sameAs: site.footer.social.map((s) => s.href),
+    },
+    {
+      "@type": "WebSite",
+      "@id": `${site.url}/#website`,
+      url: site.url,
+      name: site.name,
+      description: site.seo.description,
+      inLanguage: "en",
+      publisher: { "@id": `${site.url}/#organization` },
+    },
+  ],
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

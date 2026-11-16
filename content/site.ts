@@ -20,10 +20,10 @@ export const site = {
   url: "https://novixsolutions.com",
 
   seo: {
-    title: "Novix Solutions — We build and rescue mobile apps",
+    title: "Novix Solutions — We build and rescue mobile and web apps",
     description:
       "Novix Solutions is a software agency building and rescuing iOS, Android and web apps for growing businesses in the US and the Gulf. Backend, payments and launch included.",
-    ogAlt: "Novix Solutions — we build and rescue mobile apps for growing businesses",
+    ogAlt: "Novix Solutions — we build and rescue mobile and web apps for growing businesses",
   },
 
   /** Files in /public/brand. See public/brand for the full pack. */
@@ -56,7 +56,7 @@ export const site = {
 
   hero: {
     eyebrow: "Software agency · US & Gulf",
-    headline: "We build and rescue mobile apps for growing businesses.",
+    headline: "We build and rescue mobile and web apps for growing businesses.",
     // Words from the headline that get the accent colour.
     headlineAccent: ["rescue"],
     subline:
@@ -76,10 +76,13 @@ export const site = {
    */
   stats: [
     { value: "", label: "apps shipped" },
-    { value: "", label: "years building mobile apps" },
+    { value: "", label: "years building mobile and web apps" },
     { value: "", label: "countries with clients" },
     { value: "", label: "average first-reply time" },
   ],
+
+  /** The one project shown in full on the home page; it needs a case study. */
+  featuredCase: "runout",
 
   /** Section copy for the work grid. The projects come from content/projects. */
   workSection: {
@@ -112,7 +115,7 @@ export const site = {
   },
 
   footer: {
-    line: "We build and rescue mobile apps.",
+    line: "We build and rescue mobile and web apps.",
     // Only real URLs belong here; the footer renders whatever is in this list.
     social: [
       { label: "LinkedIn", href: "https://linkedin.com/company/novixsolutions" },

@@ -30,9 +30,15 @@ npm run dev
 
 Open http://localhost:3000. Without email keys, form submissions in dev are printed to the terminal instead of sent.
 
-## Contact form email
+## Contact form
 
-The form posts to `app/api/contact/route.ts`, which sends the message through [Resend](https://resend.com). No database.
+The form posts to `app/api/contact/route.ts`, which does two things with a
+submission: writes it to Firestore and emails it through
+[Resend](https://resend.com). Either one succeeding counts as a success, so an
+enquiry is not lost when the other is down or unconfigured. It fails only when
+both do.
+
+### Email
 
 | Variable | Value |
 | --- | --- |
@@ -41,6 +47,31 @@ The form posts to `app/api/contact/route.ts`, which sends the message through [R
 | `CONTACT_FROM_EMAIL` | optional sender, e.g. `Novix Website <hello@novixsolutions.com>` once the domain is verified in Resend |
 
 Until the domain is verified in Resend, the default sender (`onboarding@resend.dev`) only delivers to the email address the Resend account was created with.
+
+### Firestore
+
+Enquiries land in the `enquiries` collection, one document per submission:
+`name`, `email`, `message`, `source` and a server `createdAt`. No IP address
+and no user agent — the privacy policy promises the IP is held in memory only,
+and storing it would make that false.
+
+| Variable | Value |
+| --- | --- |
+| `FIREBASE_PROJECT_ID` | from the service account JSON |
+| `FIREBASE_CLIENT_EMAIL` | from the service account JSON |
+| `FIREBASE_PRIVATE_KEY` | from the service account JSON, quoted; `\n` for the newlines |
+
+Setting it up, once:
+
+1. Create a project at https://console.firebase.google.com.
+2. Build → Firestore Database → Create database, in production mode.
+3. Leave the security rules denying everything. The server writes with the
+   Admin SDK, which bypasses rules; no browser ever talks to Firestore, so any
+   rule that allows client access is a hole with nothing behind it.
+4. Project settings → Service accounts → Generate new private key. The three
+   variables above are all in the downloaded JSON. Do not commit that file.
+
+Leave the variables blank and the form emails only, exactly as it did before.
 
 ## Deploy
 

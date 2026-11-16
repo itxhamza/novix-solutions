@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { site } from "@/content/site";
+import { firestoreConfigured, saveEnquiry, type Enquiry } from "@/lib/enquiries";
 
 /**
  * Contact form endpoint. No database: each submission is emailed through
@@ -46,9 +47,35 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Too many messages. Try again later." }, { status: 429 });
   }
 
+  // Two places for an enquiry to land: Firestore keeps the record, email is
+  // how we notice it. Either one succeeding means the visitor was heard, so
+  // the form only fails when both do.
+  const enquiry: Enquiry = { name, email, message };
+
+  const [saved, emailed] = await Promise.all([
+    saveEnquiry(enquiry).catch((err) => {
+      console.error("[contact] Firestore write failed", err);
+      return null;
+    }),
+    sendEmail(enquiry),
+  ]);
+
+  if (!saved && !emailed) {
+    // Both routes out are down. Say which were even set up, so the logs point
+    // at the cause rather than at the symptom.
+    console.error("[contact] enquiry neither stored nor sent", {
+      firestore: firestoreConfigured() ? "configured" : "not configured",
+      resend: process.env.RESEND_API_KEY ? "configured" : "not configured",
+    });
+    return NextResponse.json({ error: "Could not send the message." }, { status: 500 });
+  }
+  return NextResponse.json({ ok: true });
+}
+
+/** True once the enquiry is emailed — or logged, when dev has nowhere to send it. */
+async function sendEmail({ name, email, message }: Enquiry): Promise<boolean> {
   const apiKey = process.env.RESEND_API_KEY;
-  // Defaults to the address shown on the site, so RESEND_API_KEY is the only
-  // variable that has to be set. CONTACT_TO_EMAIL overrides it.
+  // Defaults to the address shown on the site; CONTACT_TO_EMAIL overrides it.
   const to = process.env.CONTACT_TO_EMAIL || site.contact.email;
   const from = process.env.CONTACT_FROM_EMAIL || "Novix Website <onboarding@resend.dev>";
 
@@ -56,10 +83,10 @@ export async function POST(req: Request) {
     if (process.env.NODE_ENV !== "production") {
       // Local development without a key: log instead of sending.
       console.log("\n[contact] (email not configured — logging only)\n", { name, email, message }, "\n");
-      return NextResponse.json({ ok: true, dev: true });
+      return true;
     }
     console.error("[contact] RESEND_API_KEY is not set.");
-    return NextResponse.json({ error: "Email is not configured." }, { status: 500 });
+    return false;
   }
 
   const res = await fetch("https://api.resend.com/emails", {
@@ -73,11 +100,14 @@ export async function POST(req: Request) {
       text: `Name: ${name}\nEmail: ${email}\n\n${message}`,
       html: `<p><strong>Name:</strong> ${escape(name)}<br><strong>Email:</strong> ${escape(email)}</p><p style="white-space:pre-wrap">${escape(message)}</p>`,
     }),
+  }).catch((err) => {
+    console.error("[contact] Resend request failed", err);
+    return null;
   });
 
-  if (!res.ok) {
-    console.error("[contact] Resend error", res.status, await res.text());
-    return NextResponse.json({ error: "Could not send the message." }, { status: 502 });
+  if (!res?.ok) {
+    if (res) console.error("[contact] Resend error", res.status, await res.text());
+    return false;
   }
-  return NextResponse.json({ ok: true });
+  return true;
 }
