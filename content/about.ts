@@ -39,7 +39,7 @@ export const about = {
     years: "",
     /** `{years}` is replaced below; the token disappears when `years` is empty. */
     paragraphs: [
-      "Novix was started by Hamza Javed, a software engineer who has spent {years}years building and shipping mobile apps end to end: the app, the backend behind it, payments, and the release to the App Store and Google Play.",
+      "Novix was started by Hamza Javed, a software engineer who has spent {years}years building and shipping mobile and web apps end to end: the app, the backend behind it, payments, and the release to the App Store and Google Play.",
       "Working with clients over those years, the same story kept coming up. A business pays for an app, the project drags on, the bugs pile up, and the team that built it goes quiet. The app is 60% done and nobody can say when it will be finished.",
       "Novix was set up to be the opposite of that. Scope is agreed in writing. You pay for milestones you have seen working. You hear from us every few days, whether the news is good or bad.",
     ],

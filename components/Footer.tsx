@@ -70,9 +70,14 @@ export function Footer() {
           <p>
             © {new Date().getFullYear()} {site.name}.
           </p>
-          <Link href="/privacy" className="transition-colors hover:text-accent">
-            Privacy policy
-          </Link>
+          <div className="flex gap-6">
+            <Link href="/privacy" className="transition-colors hover:text-accent">
+              Privacy policy
+            </Link>
+            <Link href="/terms" className="transition-colors hover:text-accent">
+              Terms
+            </Link>
+          </div>
         </div>
       </div>
     </footer>

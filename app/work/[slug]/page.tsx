@@ -24,7 +24,7 @@ export async function generateMetadata({
   const project = getProject(slug);
   if (!project) return {};
 
-  const title = `${project.title} — case study`;
+  const title = `${project.title} — case study — ${site.name}`;
   return {
     title,
     description: project.summary,
@@ -75,15 +75,32 @@ export default async function CaseStudy({ params }: { params: Promise<{ slug: st
     { label: "Live site", href: project.links.website },
   ].filter((l): l is { label: string; href: string } => Boolean(l.href));
 
+  const url = `${site.url}/work/${project.slug}`;
   const jsonLd = {
     "@context": "https://schema.org",
-    "@type": "CreativeWork",
-    name: project.title,
-    description: project.summary,
-    url: `${site.url}/work/${project.slug}`,
-    image: `${site.url}${project.thumbnail.src}`,
-    ...(project.year ? { dateCreated: project.year } : {}),
-    creator: { "@type": "Organization", name: site.name, url: site.url },
+    "@graph": [
+      {
+        "@type": "CreativeWork",
+        "@id": `${url}#project`,
+        name: project.title,
+        description: project.summary,
+        url,
+        image: `${site.url}${project.thumbnail.src}`,
+        ...(project.year ? { dateCreated: project.year } : {}),
+        // The studio is described once, site-wide, in app/layout.tsx.
+        creator: { "@id": `${site.url}/#organization` },
+      },
+      // Lets a result show Home › Work › this project instead of a bare URL.
+      {
+        "@type": "BreadcrumbList",
+        "@id": `${url}#breadcrumbs`,
+        itemListElement: [
+          { "@type": "ListItem", position: 1, name: "Home", item: site.url },
+          { "@type": "ListItem", position: 2, name: "Work", item: `${site.url}/work` },
+          { "@type": "ListItem", position: 3, name: project.title, item: url },
+        ],
+      },
+    ],
   };
 
   return (
