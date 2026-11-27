@@ -198,6 +198,10 @@ section[id] {
 
 /* Header sits on a soft fade so content scrolling under it stays readable. */
 .site-header {
+  /* Not a utility class: a utility can be dropped by the scanner if the
+     class name is ever built from a template literal, and then main's own
+     stacking context paints over the whole bar. */
+  z-index: 50;
   background: linear-gradient(to bottom, var(--color-bg) 35%, rgb(var(--bg-rgb) / 0));
 }
 
@@ -264,6 +268,10 @@ section[id] {
   position: fixed;
   inset: 0;
   z-index: 100;
+  /* Decorative. Without this, a dissolve that never completes leaves the
+     page permanently unclickable, because runLoader() has already turned
+     off the CSS failsafe that would otherwise hide it. */
+  pointer-events: none;
   display: grid;
   place-items: center;
   background: var(--color-bg);
@@ -717,6 +725,11 @@ html.anim .step:not(.is-lit) .step-num {
 }
 .tilt-inner {
   position: relative;
+  /* It is a <span>. Without this it stays inline, where height does not
+     apply, padding does not contain the block image inside it, and the frame
+     ends up sized by line-height rather than by its contents — which is what
+     left a rounded panel standing proud of the artwork. */
+  display: block;
   height: 100%;
   transform-style: preserve-3d;
   background: var(--color-surface);
@@ -1626,8 +1639,18 @@ html.anim .step:not(.is-lit) .step-num {
   display: block;
 }
 .work-media .tilt-inner {
+  /* .tilt-inner is height:100% for the card grids, where the frames have to
+     match each other. Here it stretched the frame to the grid cell while the
+     artwork kept its own aspect ratio, leaving bands of bare surface above
+     and below it. The frame should hug the artwork. */
+  height: auto;
   padding: clamp(0.9rem, 2vw, 1.75rem);
   overflow: hidden;
+}
+/* At 46px of z the perspective scales the shot up by ~5%, which ate the
+   padding and clipped it against the frame. Half that keeps the inset even. */
+.work-media .tilt-pop {
+  transform: translateZ(22px);
 }
 .work-media img {
   display: block;
@@ -1646,14 +1669,23 @@ html.anim .step:not(.is-lit) .step-num {
 /* The quote as a statement across the full measure, not a card. */
 .testimonial-band {
   position: relative;
-  padding-block: clamp(5rem, 11vw, 9rem);
+  padding-block: clamp(4rem, 8vw, 7rem);
 }
 .testimonial-statement {
-  margin-top: clamp(3rem, 6vw, 5rem);
+  /* A measure, not the whole shell. Unconstrained, the quote ran the full
+     1300px of the container at 48px type, which is where the lines became
+     too long to track and the section swallowed a screen on its own. */
+  max-width: 52rem;
+  margin-inline: auto;
+  margin-top: clamp(2.5rem, 5vw, 4rem);
+  text-align: center;
 }
 .testimonial-quote {
-  font-size: clamp(1.6rem, 3.4vw, 3rem);
-  line-height: 1.22;
+  /* Sized against the measure above, not the viewport: at 1.85rem the line
+     held only 39 characters, below the 45-75 that reads comfortably. */
+  font-size: clamp(1.2rem, 1.8vw, 1.7rem);
+  line-height: 1.38;
+  text-wrap: balance;
 }
 /* inline-block so each word can be moved on its own. */
 .quote-word {
@@ -1662,12 +1694,15 @@ html.anim .step:not(.is-lit) .step-num {
 .testimonial-by {
   display: flex;
   align-items: center;
-  gap: 1.25rem;
-  margin-top: clamp(2.5rem, 5vw, 3.5rem);
+  justify-content: center;
+  gap: 1rem;
+  margin-top: clamp(2rem, 4vw, 2.75rem);
+  /* The row is centred; the name and role inside it still read left. */
+  text-align: left;
 }
 .testimonial-photo {
-  width: 4.5rem;
-  height: 4.5rem;
+  width: 3.5rem;
+  height: 3.5rem;
   border-radius: 999px;
   object-fit: cover;
 }
@@ -1898,36 +1933,51 @@ html.anim .scroll-progress {
 /* ------------------------------------------------------------------ footer */
 .site-footer {
   border-top: 1px solid var(--color-line);
-  padding-block: clamp(4rem, 8vw, 7rem) clamp(2rem, 4vw, 3rem);
+  padding-block: clamp(3.5rem, 6vw, 5.5rem) clamp(1.75rem, 3vw, 2.5rem);
+}
+
+/* Brand block and link columns share one grid. Below 1024 the brand spans
+   the row and the lists sit under it; from 1024 the brand takes the wide
+   first track and the three lists gather to its right, so the width is used
+   instead of being left as a gap between two sparse rows. */
+.footer-top {
+  display: grid;
+  gap: 3rem 2.5rem;
+  padding-bottom: clamp(2.5rem, 5vw, 4rem);
 }
 .footer-lead {
   display: flex;
   flex-direction: column;
-  gap: 1.75rem;
+  gap: 1.5rem;
   align-items: flex-start;
-  padding-bottom: clamp(3rem, 6vw, 4.5rem);
-  border-bottom: 1px solid var(--color-line);
 }
 .footer-logo {
-  height: 3.25rem;
+  height: 2.75rem;
   width: auto;
 }
 .footer-line {
   font-family: var(--font-display);
   font-weight: 700;
   letter-spacing: -0.03em;
-  line-height: 1.1;
-  font-size: clamp(1.5rem, 3.4vw, 2.5rem);
-  max-width: 20ch;
-}
-.footer-cols {
-  display: grid;
-  gap: 2.5rem;
-  padding-block: clamp(3rem, 6vw, 4.5rem);
+  line-height: 1.12;
+  font-size: clamp(1.35rem, 2.2vw, 1.9rem);
+  max-width: 18ch;
 }
 @media (min-width: 640px) {
-  .footer-cols {
+  .footer-top {
     grid-template-columns: repeat(3, 1fr);
+  }
+  .footer-lead {
+    grid-column: 1 / -1;
+  }
+}
+@media (min-width: 1024px) {
+  .footer-top {
+    grid-template-columns: minmax(0, 1.6fr) repeat(3, minmax(0, 1fr));
+    gap: 2.5rem;
+  }
+  .footer-lead {
+    grid-column: auto;
   }
 }
 .footer-link {
@@ -2043,4 +2093,52 @@ html[data-theme] .site-header::before {
     background-color var(--dur) var(--ease-out-expo),
     border-color var(--dur) var(--ease-out-expo),
     color var(--dur) var(--ease-out-expo);
+}
+
+/* ----------------------------------------------------------- back to top */
+/* Bottom right, clear of the field badge in the opposite corner. Below the
+   header's 50 so it can never ride over the bar, above the page. */
+.back-to-top {
+  position: fixed;
+  right: var(--gutter);
+  bottom: var(--gutter);
+  z-index: 40;
+  display: grid;
+  place-items: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  border: 1px solid var(--color-line);
+  border-radius: 999px;
+  background: var(--color-surface);
+  color: var(--color-muted);
+  opacity: 0;
+  transform: translateY(0.75rem);
+  pointer-events: none;
+  transition:
+    opacity var(--dur) var(--ease-out-expo),
+    transform var(--dur) var(--ease-out-expo),
+    color var(--dur-fast) var(--ease-out-expo),
+    border-color var(--dur-fast) var(--ease-out-expo);
+}
+.back-to-top.is-shown {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+.back-to-top:hover {
+  color: var(--color-accent);
+  border-color: var(--color-accent);
+}
+.back-to-top:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 3px;
+}
+.back-to-top svg {
+  width: 1.1rem;
+  height: 1.1rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }

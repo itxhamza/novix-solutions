@@ -21,14 +21,14 @@ export function Footer() {
   return (
     <footer className="site-footer relative z-10">
       <div className="shell">
-        <div className="footer-lead">
-          <Link href="/" aria-label={`${site.name} — home`}>
-            <Logo className="footer-logo" />
-          </Link>
-          <p className="footer-line">{footer.line}</p>
-        </div>
+        <div className="footer-top">
+          <div className="footer-lead">
+            <Link href="/" aria-label={`${site.name} — home`}>
+              <Logo className="footer-logo" />
+            </Link>
+            <p className="footer-line">{footer.line}</p>
+          </div>
 
-        <div className="footer-cols">
           <nav aria-label="Footer">
             <h2 className="mono text-muted">Pages</h2>
             <ul className="mt-5 grid gap-3">

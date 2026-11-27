@@ -1,3 +1,4 @@
+import { BackToTop } from "./BackToTop";
 import { Loader } from "./Loader";
 import { Header } from "./Header";
 import { Footer } from "./Footer";
@@ -38,6 +39,7 @@ export function PageShell({
       <Header />
       <main className="relative z-10">{children}</main>
       <Footer />
+      <BackToTop />
       <Motion />
       <ScrollManager />
     </>

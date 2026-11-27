@@ -55,7 +55,7 @@ export function Header() {
 
   return (
     <header
-      className={`site-header fixed inset-x-0 top-0 z-50${condensed ? " is-condensed" : ""}`}
+      className={`site-header fixed inset-x-0 top-0 ${condensed ? "is-condensed" : ""}`}
       data-header
     >
       <div className="shell header-bar flex items-center justify-between gap-6">
