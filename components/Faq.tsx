@@ -15,11 +15,11 @@ export function Faq() {
   const [open, setOpen] = useState<number | null>(0);
 
   return (
-    <section className="relative py-28 md:py-36" aria-labelledby="faq-title">
+    <section className="band-panel relative py-28 md:py-36" aria-labelledby="faq-title">
       <div className="shell grid gap-12 lg:grid-cols-[0.8fr_1.2fr] lg:gap-20">
         <div data-reveal>
           <p className="eyebrow mb-6">{faqSection.eyebrow}</p>
-          <h2 id="faq-title" className="display h-section">
+          <h2 id="faq-title" data-glitch className="display h-section">
             {faqSection.title}
           </h2>
           <p className="lede mt-6">{faqSection.intro}</p>

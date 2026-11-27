@@ -4,35 +4,65 @@ import { getProject } from "@/lib/content/projects";
 import { site } from "@/content/site";
 
 /**
- * One project, full width. Everything is pulled from its MDX file, and each
- * part is hidden while that field is empty — so the problem paragraph and the
- * results bullets appear as soon as the frontmatter has them.
+ * One project at full bleed: the biggest thing on the page.
  *
- * The screenshot sits in a browser frame that tilts with the cursor; the tilt
- * is bound by lib/animations.ts and is skipped for reduced motion and on
- * touch devices.
+ * The screenshot breaks out of the shell and rises out of a masked frame as it
+ * scrolls in (lib/animations.ts). Everything comes from the project's own MDX,
+ * and each part is hidden while its field is empty — the stat appears as soon
+ * as `results` has an entry, and never before.
  */
 export function FeaturedCase() {
   const project = getProject(site.featuredCase);
   if (!project) return null;
 
-  const results = project.results.slice(0, 3);
+  const stat = project.results[0];
+  const features = project.features.slice(0, 5);
 
   return (
-    <section className="relative py-28 md:py-36" aria-labelledby="featured-title">
+    <section className="featured band-panel" aria-labelledby="featured-title">
       <div className="shell">
-        <div className="grid items-center gap-12 lg:grid-cols-[1fr_1.15fr] lg:gap-20">
-          <div data-reveal>
+        <div
+          className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between"
+          data-reveal
+        >
+          <div className="max-w-2xl">
             <p className="eyebrow mb-6">Featured case study</p>
-            <h2 id="featured-title" className="display h-section">
+            <h2 id="featured-title" data-glitch className="display h-chapter">
               {project.title}
             </h2>
-            <p className="lede mt-6">{project.summary}</p>
+          </div>
+          <p className="lede max-w-sm md:ml-auto md:text-right">{project.summary}</p>
+        </div>
+      </div>
 
-            {/* What we built — hidden until the MDX lists features. */}
-            {project.features.length > 0 ? (
-              <ul className="mt-8 flex flex-wrap gap-2">
-                {project.features.map((f) => (
+      {/* Full bleed, and wider than 60vw at every breakpoint. */}
+      <div className="featured-stage">
+        <div className="featured-mask" data-featured-mask>
+          <Image
+            src={project.thumbnail.src}
+            alt={project.thumbnail.alt}
+            width={project.thumbnail.width}
+            height={project.thumbnail.height}
+            sizes="(min-width: 768px) 78vw, 94vw"
+            className="featured-shot"
+            data-featured-shot
+          />
+        </div>
+      </div>
+
+      <div className="shell">
+        <div className="featured-foot">
+          {stat ? (
+            <p className="featured-stat" data-reveal>
+              <span className="featured-stat-value">{stat.value}</span>
+              <span className="featured-stat-label">{stat.label}</span>
+            </p>
+          ) : null}
+
+          <div className="featured-foot-end" data-reveal>
+            {features.length > 0 ? (
+              <ul className="flex flex-wrap gap-2">
+                {features.map((f) => (
                   <li key={f} className="chip">
                     {f}
                   </li>
@@ -40,49 +70,11 @@ export function FeaturedCase() {
               </ul>
             ) : null}
 
-            {/* Results — only ever real numbers from the frontmatter. */}
-            {results.length > 0 ? (
-              <ul className="check-list mt-10">
-                {results.map((r) => (
-                  <li key={r.label}>
-                    <svg className="check-icon" viewBox="0 0 24 24" aria-hidden="true">
-                      <path d="M4 12.5l5 5L20 6.5" />
-                    </svg>
-                    <span>
-                      <strong className="text-text">{r.value}</strong> {r.label}
-                    </span>
-                  </li>
-                ))}
-              </ul>
-            ) : null}
-
             {project.hasCaseStudy ? (
-              <Link href={`/work/${project.slug}`} className="btn btn-ghost mt-10">
+              <Link href={`/work/${project.slug}`} className="btn btn-ghost mt-6">
                 View the case study <span aria-hidden="true">→</span>
               </Link>
             ) : null}
-          </div>
-
-          <div className="parallax" data-parallax data-reveal>
-            <figure className="frame frame-browser parallax-inner" data-parallax-inner>
-              <span className="frame-bar" aria-hidden="true">
-                <i />
-                <i />
-                <i />
-              </span>
-              <div
-                className="frame-screen"
-                style={{ aspectRatio: `${project.thumbnail.width} / ${project.thumbnail.height}` }}
-              >
-                <Image
-                  src={project.thumbnail.src}
-                  alt={project.thumbnail.alt}
-                  width={project.thumbnail.width}
-                  height={project.thumbnail.height}
-                  sizes="(min-width: 1024px) 55vw, 90vw"
-                />
-              </div>
-            </figure>
           </div>
         </div>
       </div>

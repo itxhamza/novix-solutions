@@ -27,7 +27,7 @@ export const about = {
     eyebrow: "About Novix",
     headline: "A small team that finishes what it starts.",
     subline:
-      "Novix Solutions is a software studio. We build mobile and web apps for businesses in the US and the Gulf, and we take over apps that other teams left unfinished.",
+      "Novix Solutions is a software studio. We build mobile and web apps for growing businesses, and we take over apps that other teams left unfinished.",
   },
 
   story: {

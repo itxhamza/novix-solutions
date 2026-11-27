@@ -12,12 +12,18 @@ export function Weekly() {
   return (
     <section className="relative py-28 md:py-36" aria-labelledby="weekly-title">
       <div className="shell">
-        <div className="max-w-3xl" data-reveal>
-          <p className="eyebrow mb-6">{weeklySection.eyebrow}</p>
-          <h2 id="weekly-title" className="display h-section">
-            {weeklySection.title}
-          </h2>
-          <p className="lede mt-6">{weeklySection.intro}</p>
+        <span className="divider mb-16" data-divider aria-hidden="true" />
+        <div
+          className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between"
+          data-reveal
+        >
+          <div className="max-w-2xl">
+            <p className="eyebrow mb-6">{weeklySection.eyebrow}</p>
+            <h2 id="weekly-title" data-glitch className="display h-section">
+              {weeklySection.title}
+            </h2>
+          </div>
+          <p className="lede max-w-sm md:text-right">{weeklySection.intro}</p>
         </div>
 
         <ol className="week" data-week>

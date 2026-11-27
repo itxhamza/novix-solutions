@@ -22,7 +22,7 @@ export const site = {
   seo: {
     title: "Novix Solutions — We build and rescue mobile and web apps",
     description:
-      "Novix Solutions is a software agency building and rescuing iOS, Android and web apps for growing businesses in the US and the Gulf. Backend, payments and launch included.",
+      "Novix Solutions is a software agency building and rescuing iOS, Android and web apps for growing businesses. Backend, payments and launch included.",
     ogAlt: "Novix Solutions — we build and rescue mobile and web apps for growing businesses",
   },
 
@@ -55,7 +55,7 @@ export const site = {
   cursorHref: "/contact",
 
   hero: {
-    eyebrow: "Software agency · US & Gulf",
+    eyebrow: "Software agency",
     headline: "We build and rescue mobile and web apps for growing businesses.",
     // Words from the headline that get the accent colour.
     headlineAccent: ["rescue"],
@@ -67,6 +67,8 @@ export const site = {
     statusBroken: "Repairing",
     statusFixed: "Repaired",
     scrollHint: "Scroll",
+    /** Proof line under the hero buttons, beside the testimonial attribution. */
+    proof: "Apps live on the App Store and Google Play",
   },
 
   /**

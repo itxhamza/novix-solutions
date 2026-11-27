@@ -86,6 +86,13 @@ export const TIMING = {
     tiltEase: 0.5,
   },
   reveal: { duration: 0.9, y: 36, start: "top 86%" },
+  detail: {
+    glitch: { offset: 0.14, duration: 0.55 }, // em out of register, seconds
+    magnet: { pull: 0.3, max: 14, ease: 0.4 }, // how hard a button leans, px cap
+    press: { down: 0.97, in: 0.12, out: 0.25 },
+    logo: { mark: 0.9, markStagger: 0.08, word: 0.7, wordStagger: 0.04 },
+    progressScrub: 0.3,
+  },
   send: { collapse: 0.4, progress: 2.6, finish: 0.3, morph: 0.45, check: 0.4 },
 } as const;
 
@@ -305,7 +312,12 @@ function prepareHero() {
 /* 4. Dot field (canvas)                                                      */
 /* -------------------------------------------------------------------------- */
 
-type Field = { pulse: (x?: number, y?: number) => void; destroy: () => void };
+type Field = {
+  pulse: (x?: number, y?: number) => void;
+  /** Re-read the themed colours; the canvas caches them per field. */
+  refresh: () => void;
+  destroy: () => void;
+};
 /** One per [data-field] canvas. The first is the hero's. */
 let fields: Field[] = [];
 
@@ -313,8 +325,8 @@ function createField(canvas: HTMLCanvasElement, animated: boolean): Field | null
   const ctx = canvas.getContext("2d");
   if (!ctx) return null;
   const F = TIMING.field;
-  const text = cssVar("--color-text") || "#f4f6f8";
-  const accent = cssVar("--color-accent") || "#3df57a";
+  let text = cssVar("--color-text") || "#f4f6f8";
+  let accent = cssVar("--color-accent") || "#3df57a";
 
   // Per node: x, y, homeX, homeY, vx, vy
   const STRIDE = 6;
@@ -511,6 +523,13 @@ function createField(canvas: HTMLCanvasElement, animated: boolean): Field | null
       pulses.push({ x, y, born: last || performance.now() });
       wake();
     },
+    refresh() {
+      text = cssVar("--color-text") || text;
+      accent = cssVar("--color-accent") || accent;
+      // A still field would otherwise keep the old colour until something
+      // else happened to wake it.
+      wake();
+    },
     destroy() {
       cancelAnimationFrame(raf);
       window.removeEventListener("pointermove", onMove);
@@ -616,6 +635,59 @@ function initCursor() {
 }
 
 /* -------------------------------------------------------------------------- */
+/* 5b. Hero product stack — slow float, and a lean toward the cursor          */
+/* -------------------------------------------------------------------------- */
+
+function initHeroStack(mm: gsap.MatchMedia) {
+  // A fine pointer only: on touch there is no cursor to lean toward, and the
+  // stack is not rendered below 1024px anyway.
+  mm.add("(min-width: 1024px) and (pointer: fine)", () => {
+    const stack = $("[data-hero-stack]");
+    if (!stack) return;
+
+    const devices = $$("[data-hero-device]", stack);
+    if (devices.length === 0) return;
+
+    gsap.set(stack, { transformPerspective: 1600, transformStyle: "preserve-3d" });
+
+    // Each frame drifts on its own clock, so the stack never moves as one block.
+    const floats = devices.map((el, i) =>
+      gsap.to(el, {
+        y: i % 2 ? 13 : -15,
+        duration: 4.6 + i * 0.9,
+        ease: "sine.inOut",
+        repeat: -1,
+        yoyo: true,
+      }),
+    );
+
+    // The whole stack turns toward the pointer; the nearer a frame, the further
+    // it slides, which is what reads as depth.
+    const NEARNESS: Record<string, number> = { back: 6, mid: 15, front: 24 };
+    const turnY = gsap.quickTo(stack, "rotationY", { duration: 0.8, ease: "power3.out" });
+    const turnX = gsap.quickTo(stack, "rotationX", { duration: 0.8, ease: "power3.out" });
+    const slide = devices.map((el) => gsap.quickTo(el, "x", { duration: 0.9, ease: "power3.out" }));
+
+    const onMove = (e: PointerEvent) => {
+      const box = stack.getBoundingClientRect();
+      const nx = gsap.utils.clamp(-1, 1, (e.clientX - (box.left + box.width / 2)) / (window.innerWidth / 2));
+      const ny = gsap.utils.clamp(-1, 1, (e.clientY - (box.top + box.height / 2)) / (window.innerHeight / 2));
+      turnY(nx * 9);
+      turnX(-ny * 6);
+      devices.forEach((el, i) => slide[i](nx * (NEARNESS[el.dataset.depth ?? ""] ?? 12)));
+    };
+
+    window.addEventListener("pointermove", onMove, { passive: true });
+
+    return () => {
+      window.removeEventListener("pointermove", onMove);
+      floats.forEach((t) => t.kill());
+      gsap.set([stack, ...devices], { clearProps: "all" });
+    };
+  });
+}
+
+/* -------------------------------------------------------------------------- */
 /* 6. Services — pinned horizontal scroll + looping demos                     */
 /* -------------------------------------------------------------------------- */
 
@@ -627,7 +699,21 @@ function initServicesScroll(mm: gsap.MatchMedia) {
     if (!pin || !track) return;
 
     pin.classList.add("is-horizontal");
-    const distance = () => Math.max(0, track.scrollWidth - window.innerWidth);
+
+    const panels = $$("[data-panel]", track);
+    const counter = $("[data-services-count]");
+
+    // Every panel is exactly one frame wide, so this is (panels - 1) frames.
+    // The pin therefore lasts precisely as long as the panels need: no empty
+    // screen before the first one or after the last.
+    const distance = () => Math.max(0, track.scrollWidth - pin.clientWidth);
+
+    const setCount = (progress: number) => {
+      if (!counter || panels.length === 0) return;
+      const index = Math.min(panels.length, Math.floor(progress * panels.length) + 1);
+      const text = String(index).padStart(2, "0");
+      if (counter.textContent !== text) counter.textContent = text;
+    };
 
     const scroll = gsap.to(track, {
       x: () => -distance(),
@@ -640,7 +726,9 @@ function initServicesScroll(mm: gsap.MatchMedia) {
         scrub: S.scrub,
         invalidateOnRefresh: true,
         anticipatePin: 1,
-        refreshPriority: 1, // pins must be measured before the triggers below them
+        refreshPriority: 1, // pins must be measured before the triggers below
+        onUpdate: (self) => setCount(self.progress),
+        onRefresh: (self) => setCount(self.progress),
       },
     });
 
@@ -650,8 +738,8 @@ function initServicesScroll(mm: gsap.MatchMedia) {
       scrollTrigger: { trigger: pin, start: "top top", end: () => `+=${distance()}`, scrub: true },
     });
 
-    // Each panel's copy slides in as the panel enters from the right.
-    $$("[data-panel]", track).forEach((panel) => {
+    // Each panel's copy slides in as that panel enters from the right.
+    panels.forEach((panel) => {
       gsap.from($$("[data-panel-copy] > *", panel), {
         x: S.panelSlide,
         opacity: 0,
@@ -667,7 +755,10 @@ function initServicesScroll(mm: gsap.MatchMedia) {
       });
     });
 
-    return () => pin.classList.remove("is-horizontal");
+    return () => {
+      pin.classList.remove("is-horizontal");
+      if (counter) counter.textContent = "01";
+    };
   });
 }
 
@@ -955,6 +1046,216 @@ export function bindTilt(root: ParentNode = document): () => void {
 }
 
 /* -------------------------------------------------------------------------- */
+/* 8b. Proof — the featured shot rising, and the quote arriving word by word  */
+/* -------------------------------------------------------------------------- */
+
+/**
+ * The featured screenshot rises out of its frame: the mask opens from the
+ * bottom edge while the image itself travels up behind it, which reads as the
+ * picture emerging rather than merely fading in.
+ */
+function initFeatured() {
+  const mask = $("[data-featured-mask]");
+  const shot = $("[data-featured-shot]");
+  if (!mask || !shot) return;
+
+  gsap
+    .timeline({
+      scrollTrigger: { trigger: mask, start: "top 88%", end: "top 32%", scrub: 0.5 },
+    })
+    .fromTo(
+      mask,
+      { clipPath: "inset(100% 0% 0% 0%)" },
+      { clipPath: "inset(0% 0% 0% 0%)", ease: "none" },
+      0,
+    )
+    .fromTo(shot, { yPercent: 12, scale: 1.08 }, { yPercent: 0, scale: 1, ease: "none" }, 0);
+}
+
+/**
+ * The quote arrives a word at a time as it crosses the screen. Words sit at
+ * full opacity in CSS, so with no JS, or with motion reduced, the whole quote
+ * is simply legible from the start.
+ */
+function initQuote() {
+  const quote = $("[data-quote]");
+  const words = $$("[data-quote-word]", quote ?? document);
+  if (!quote || words.length === 0) return;
+
+  gsap.fromTo(
+    words,
+    { opacity: 0.16, y: 6 },
+    {
+      opacity: 1,
+      y: 0,
+      ease: "none",
+      stagger: 1,
+      scrollTrigger: { trigger: quote, start: "top 78%", end: "bottom 62%", scrub: 0.35 },
+    },
+  );
+}
+
+/**
+ * Each hairline draws itself from the left as its section arrives. None of
+ * this runs under reduced motion, and the `.anim` class that collapses the
+ * line in CSS is never added there, so the line stays drawn.
+ */
+function initDividers() {
+  $$("[data-divider]").forEach((line) => {
+    gsap.fromTo(
+      line,
+      { scaleX: 0 },
+      {
+        scaleX: 1,
+        duration: 1.1,
+        ease: EASE.inOut,
+        scrollTrigger: {
+          // The line itself is 1px tall and starts with no painted width, so
+          // its own box is a poor trigger; the section around it is not.
+          trigger: line.closest("section") ?? line,
+          start: "top 70%",
+          // `once` also kills the trigger once it has fired. Without that a
+          // refresh — a resize, or the webfonts landing — re-evaluates a
+          // trigger the reader has already scrolled past, and the line is left
+          // sitting at scaleX 0. That is what happened at phone widths.
+          once: true,
+        },
+      },
+    );
+  });
+}
+
+/**
+ * A heading arrives a frame out of register and snaps together.
+ *
+ * The offset is a CSS variable the stylesheet turns into two coloured
+ * shadows, so the text is never duplicated into the accessibility tree the
+ * way a ::before/attr(content) glitch would duplicate it. The variable is
+ * removed on completion, so a settled heading paints no shadow at all.
+ */
+function initGlitch() {
+  const G = TIMING.detail.glitch;
+  $$("[data-glitch]").forEach((el) => {
+    const state = { v: G.offset };
+    gsap.to(state, {
+      v: 0,
+      duration: G.duration,
+      ease: "steps(6)",
+      onUpdate: () => el.style.setProperty("--gx", state.v + "em"),
+      onComplete: () => {
+        el.style.removeProperty("--gx");
+        el.classList.add("is-settled");
+      },
+      scrollTrigger: { trigger: el, start: "top 82%", once: true },
+    });
+  });
+}
+
+/**
+ * Buttons lean toward the pointer, and press in when you click.
+ *
+ * Fine pointers only: there is nothing to lean toward on a touch screen.
+ * The press has to live here rather than in CSS because the moment GSAP
+ * writes an inline transform it beats the stylesheet's :active scale — which
+ * still applies everywhere this never runs.
+ */
+function initMagnetic(mm: gsap.MatchMedia) {
+  const M = TIMING.detail.magnet;
+  const P = TIMING.detail.press;
+
+  mm.add("(hover: hover) and (pointer: fine)", () => {
+    const undo: Array<() => void> = [];
+
+    $$(".btn").forEach((btn) => {
+      const xTo = gsap.quickTo(btn, "x", { duration: M.ease, ease: EASE.out });
+      const yTo = gsap.quickTo(btn, "y", { duration: M.ease, ease: EASE.out });
+      const cap = (n: number) => Math.max(-M.max, Math.min(M.max, n));
+
+      const onMove = (e: PointerEvent) => {
+        const r = btn.getBoundingClientRect();
+        xTo(cap((e.clientX - (r.left + r.width / 2)) * M.pull));
+        yTo(cap((e.clientY - (r.top + r.height / 2)) * M.pull));
+      };
+      const onUp = () => gsap.to(btn, { scale: 1, duration: P.out, ease: EASE.out });
+      const onDown = () => gsap.to(btn, { scale: P.down, duration: P.in });
+      const onLeave = () => {
+        xTo(0);
+        yTo(0);
+        onUp();
+      };
+
+      btn.addEventListener("pointermove", onMove);
+      btn.addEventListener("pointerleave", onLeave);
+      btn.addEventListener("pointerdown", onDown);
+      btn.addEventListener("pointerup", onUp);
+
+      undo.push(() => {
+        btn.removeEventListener("pointermove", onMove);
+        btn.removeEventListener("pointerleave", onLeave);
+        btn.removeEventListener("pointerdown", onDown);
+        btn.removeEventListener("pointerup", onUp);
+        gsap.set(btn, { clearProps: "transform" });
+      });
+    });
+
+    return () => undo.forEach((fn) => fn());
+  });
+}
+
+/**
+ * The logotype draws itself once, as the loader clears.
+ *
+ * Returns the timeline paused so the caller can start it on the same beat as
+ * the hero rather than behind the loader, where nobody would see it. Only the
+ * header copy is marked [data-logo]; the footer's is static.
+ */
+function initLogo() {
+  const logo = $<SVGSVGElement>("[data-logo]");
+  if (!logo) return null;
+
+  const L = TIMING.detail.logo;
+  const marks = $$<SVGGeometryElement>("[data-logo-mark]", logo);
+  const words = $$<SVGGeometryElement>("[data-logo-word]", logo);
+  if (marks.length === 0) return null;
+
+  const tl = gsap.timeline({ paused: true });
+  tl.to(marks, {
+    strokeDashoffset: 0,
+    duration: L.mark,
+    ease: EASE.inOut,
+    stagger: L.markStagger,
+  });
+  if (words.length > 0) {
+    tl.to(
+      words,
+      { strokeDashoffset: 0, duration: L.word, ease: EASE.inOut, stagger: L.wordStagger },
+      "-=" + L.word * 0.6,
+    );
+  }
+  return tl;
+}
+
+/**
+ * The rule on the header's bottom edge, tracking position in the document.
+ *
+ * The only trigger here with no trigger element: start 0 to end "max" is the
+ * whole page, so it keeps working whatever the page is made of.
+ */
+function initScrollProgress() {
+  const bar = $("[data-scroll-progress]");
+  if (!bar) return;
+  gsap.fromTo(
+    bar,
+    { scaleX: 0 },
+    {
+      scaleX: 1,
+      ease: "none",
+      scrollTrigger: { start: 0, end: "max", scrub: TIMING.detail.progressScrub },
+    },
+  );
+}
+
+/* -------------------------------------------------------------------------- */
 /* 9. Reveals                                                                 */
 /* -------------------------------------------------------------------------- */
 
@@ -1153,10 +1454,16 @@ export function initAnimations(): () => void {
 
   // Reduced motion: draw the dot field once, and leave everything else as the
   // finished, static page it already is.
+  // ThemeToggle fires this after it swaps data-theme.
+  const onThemeChange = () => fields.forEach((f) => f.refresh());
+  window.addEventListener("themechange", onThemeChange);
+  cleanups.push(() => window.removeEventListener("themechange", onThemeChange));
+
   if (prefersReducedMotion()) {
     hideLoader($("[data-loader]"));
     fields = canvases.map((c) => createField(c, false)).filter((f): f is Field => Boolean(f));
     return () => {
+      cleanups.forEach((fn) => fn());
       fields.forEach((f) => f.destroy());
       fields = [];
     };
@@ -1169,17 +1476,30 @@ export function initAnimations(): () => void {
 
   const mm = gsap.matchMedia();
   const ctx = gsap.context(() => {
+    initHeroStack(mm);
     initServicesScroll(mm);
     initProcess();
     initReveals();
     initStats();
+    initFeatured();
+    initQuote();
+    initDividers();
+    initGlitch();
+    initMagnetic(mm);
+    initScrollProgress();
     initWeek();
     cleanups.push(initWork());
     cleanups.push(initParallax());
   });
   cleanups.push(initDemos());
 
-  runLoader().then(() => hero?.play());
+  const logoDraw = initLogo();
+  if (logoDraw) cleanups.push(() => logoDraw.kill());
+
+  runLoader().then(() => {
+    hero?.play();
+    logoDraw?.play();
+  });
 
   // Layout shifts when webfonts land; re-measure the scroll positions.
   document.fonts.ready.then(() => ScrollTrigger.refresh());

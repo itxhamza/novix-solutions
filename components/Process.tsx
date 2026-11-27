@@ -11,10 +11,13 @@ const ICONS: Record<string, string[]> = {
 export function Process() {
   return (
     <section id="process" data-process className="relative py-28 md:py-44" aria-labelledby="process-title">
+      <div className="shell">
+        <span className="divider mb-16" data-divider aria-hidden="true" />
+      </div>
       <div className="shell grid gap-16 lg:grid-cols-[0.9fr_1.1fr] lg:gap-24">
         <div className="lg:sticky lg:top-32 lg:self-start" data-reveal>
           <p className="eyebrow mb-6">{processSection.eyebrow}</p>
-          <h2 id="process-title" className="display h-section">
+          <h2 id="process-title" data-glitch className="display h-section">
             {processSection.title}
           </h2>
           <p className="lede mt-6">{processSection.intro}</p>
