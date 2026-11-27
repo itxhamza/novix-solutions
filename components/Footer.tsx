@@ -1,34 +1,40 @@
-import Image from "next/image";
 import Link from "next/link";
 import { site } from "@/content/site";
+import { Logo } from "./Logo";
 
+/**
+ * The last thing on every page, and the second place people look for a way to
+ * get in touch — so it carries real weight rather than a single thin row.
+ *
+ * Everything here already exists in content/site.ts. Social is its own column
+ * instead of being squeezed under the address, and renders only the channels
+ * that have a real URL.
+ *
+ * "Back to top" is a plain #top link, not a script: with no element of that
+ * id the HTML spec sends the browser to the top of the document, so it works
+ * with JS off, and the smooth scroll comes from scroll-behavior — which the
+ * reduced-motion block already turns off.
+ */
 export function Footer() {
   const { contact, footer } = site;
 
   return (
-    <footer className="relative z-10 border-t border-line pt-16 pb-10">
+    <footer className="site-footer relative z-10">
       <div className="shell">
-        <div className="grid gap-12 md:grid-cols-[1.2fr_1fr_1fr]">
-          <div>
-            <Link href="/" aria-label={`${site.name} — home`}>
-              <Image
-                src={site.brand.footerLogo}
-                alt=""
-                width={963}
-                height={311}
-                unoptimized
-                className="h-12 w-auto"
-              />
-            </Link>
-            <p className="mt-5 max-w-xs text-sm text-muted">{footer.line}</p>
-          </div>
+        <div className="footer-lead">
+          <Link href="/" aria-label={`${site.name} — home`}>
+            <Logo className="footer-logo" />
+          </Link>
+          <p className="footer-line">{footer.line}</p>
+        </div>
 
+        <div className="footer-cols">
           <nav aria-label="Footer">
             <h2 className="mono text-muted">Pages</h2>
             <ul className="mt-5 grid gap-3">
               {site.nav.map((item) => (
                 <li key={item.href}>
-                  <Link href={item.href} className="text-sm transition-colors hover:text-accent">
+                  <Link href={item.href} className="footer-link">
                     {item.label}
                   </Link>
                 </li>
@@ -38,46 +44,56 @@ export function Footer() {
 
           <div>
             <h2 className="mono text-muted">Contact</h2>
-            <ul className="mt-5 grid gap-3 text-sm">
+            <ul className="mt-5 grid gap-3">
               <li>
-                <a href={contact.emailHref} className="transition-colors hover:text-accent">
+                <a href={contact.emailHref} className="footer-email">
                   {contact.email}
                 </a>
               </li>
             </ul>
+          </div>
 
-            {/* Only channels with a real URL are listed. */}
-            {footer.social.length > 0 ? (
-              <ul className="mt-6 flex flex-wrap gap-x-5 gap-y-2 text-sm">
+          {footer.social.length > 0 ? (
+            <div>
+              <h2 className="mono text-muted">Elsewhere</h2>
+              <ul className="mt-5 grid gap-3">
                 {footer.social.map((s) => (
                   <li key={s.label}>
                     <a
                       href={s.href}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-muted transition-colors hover:text-accent"
+                      className="footer-link"
                     >
                       {s.label}
                     </a>
                   </li>
                 ))}
               </ul>
-            ) : null}
-          </div>
+            </div>
+          ) : null}
         </div>
 
-        <div className="mt-14 flex flex-col gap-3 border-t border-line pt-6 text-sm text-muted sm:flex-row sm:items-center sm:justify-between">
+        <div className="footer-base">
           <p>
             © {new Date().getFullYear()} {site.name}.
           </p>
-          <div className="flex gap-6">
-            <Link href="/privacy" className="transition-colors hover:text-accent">
+
+          <div className="footer-legal">
+            <Link href="/privacy" className="footer-link">
               Privacy policy
             </Link>
-            <Link href="/terms" className="transition-colors hover:text-accent">
+            <Link href="/terms" className="footer-link">
               Terms
             </Link>
           </div>
+
+          <a href="#top" className="to-top">
+            Back to top
+            <span className="to-top-arrow" aria-hidden="true">
+              ↑
+            </span>
+          </a>
         </div>
       </div>
     </footer>

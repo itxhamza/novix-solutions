@@ -10,7 +10,7 @@ import { pageMetadata } from "@/lib/seo";
 
 const title = "About — Novix Solutions";
 const description =
-  "Novix Solutions is a software studio that builds and rescues mobile and web apps for businesses in the US and the Gulf.";
+  "Novix Solutions is a software studio that builds and rescues mobile and web apps for growing businesses.";
 
 export const metadata: Metadata = pageMetadata({ title, description, path: "/about" });
 

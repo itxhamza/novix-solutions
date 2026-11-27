@@ -1,10 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import Image from "next/image";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { site } from "@/content/site";
+import { Logo } from "./Logo";
+import { ThemeToggle } from "./ThemeToggle";
 import { scrollToSection } from "./ScrollManager";
 
 /** /work also owns /work/<slug>, so a case study keeps "Work" highlighted. */
@@ -15,6 +16,24 @@ function isCurrent(pathname: string, href: string) {
 export function Header() {
   const pathname = usePathname() ?? "/";
   const [open, setOpen] = useState(false);
+  const [condensed, setCondensed] = useState(false);
+
+  // The bar shrinks once you leave the top of the page. The ref keeps the
+  // listener from calling setState on every scroll frame — only the crossing
+  // matters, not the position. Heights live in CSS so the transition shares
+  // the one easing token; reduced motion zeroes the duration globally.
+  const isCondensed = useRef(false);
+  useEffect(() => {
+    const onScroll = () => {
+      const next = window.scrollY > 24;
+      if (next === isCondensed.current) return;
+      isCondensed.current = next;
+      setCondensed(next);
+    };
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
   // Safety net: close the menu if the route changes any other way. Links close
   // it themselves, because "/#process" from the home page never changes the
@@ -35,19 +54,14 @@ export function Header() {
   }, [open]);
 
   return (
-    <header className="site-header fixed inset-x-0 top-0 z-50" data-header>
-      <div className="shell flex h-16 items-center justify-between gap-6 md:h-20">
+    <header
+      className={`site-header fixed inset-x-0 top-0 z-50${condensed ? " is-condensed" : ""}`}
+      data-header
+    >
+      <div className="shell header-bar flex items-center justify-between gap-6">
         <Link href="/" className="shrink-0" aria-label={`${site.name} — home`}>
-          <Image
-            src={site.brand.headerLogo}
-            alt=""
-            width={963}
-            height={311}
-            priority
-            unoptimized
-            // Taller than the name-only mark so "SOLUTIONS" stays legible.
-            className="h-9 w-auto md:h-11"
-          />
+          {/* Taller than the name-only mark so "SOLUTIONS" stays legible. */}
+          <Logo className="header-logo" draw />
         </Link>
 
         <nav aria-label="Main" className="hidden items-center gap-8 md:flex">
@@ -67,6 +81,8 @@ export function Header() {
         </nav>
 
         <div className="flex items-center gap-3">
+          <ThemeToggle />
+
           {/* The utility lives on the wrapper: .btn sets its own display and
               would otherwise beat `hidden` on source order. */}
           <span className="hidden sm:block">
@@ -96,6 +112,10 @@ export function Header() {
           </button>
         </div>
       </div>
+
+      {/* How far down the page you are. Decorative, and only drawn once the
+          animation layer is live — without JS it would sit at zero forever. */}
+      <span className="scroll-progress" data-scroll-progress aria-hidden="true" />
 
       {/* Mobile menu. Rendered only when open so nothing is focusable behind. */}
       {open ? (

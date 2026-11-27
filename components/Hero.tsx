@@ -1,4 +1,6 @@
 import { site } from "@/content/site";
+import { featuredTestimonial } from "@/content/testimonials";
+import { HeroStack } from "./HeroStack";
 
 // Positions (in %) of the frame lines that start out "broken" and snap into place.
 const GRID_LINES = [
@@ -34,46 +36,69 @@ export function Hero() {
       </div>
 
       <div className="shell relative">
-        <p className="eyebrow mb-6 md:mb-8" data-hero-fade>
-          {hero.eyebrow}
-        </p>
+        {/* Copy left, the products themselves right. */}
+        <div className="grid items-center gap-10 lg:grid-cols-[1.05fr_0.95fr] lg:gap-16">
+          <div>
+            <p className="eyebrow mb-6 md:mb-8" data-hero-fade>
+              {hero.eyebrow}
+            </p>
 
-        <div className="relative">
-          <h1 className="display h-hero max-w-[15ch]" data-hero-headline aria-label={hero.headline}>
-            {words.map((word, i) => {
-              const isAccent = accent.has(word.replace(/[^\p{L}]/gu, "").toLowerCase());
-              return (
-                <span key={i} aria-hidden="true">
-                  <span className={`hero-word${isAccent ? " hero-accent" : ""}`} data-word>
-                    {word}
+            <div className="relative">
+              <h1 className="display h-hero max-w-[15ch] lg:max-w-none" data-hero-headline aria-label={hero.headline}>
+                {words.map((word, i) => {
+                  const isAccent = accent.has(word.replace(/[^\p{L}]/gu, "").toLowerCase());
+                  return (
+                    <span key={i} aria-hidden="true">
+                      <span className={`hero-word${isAccent ? " hero-accent" : ""}`} data-word>
+                        {word}
+                      </span>
+                      {i < words.length - 1 ? " " : ""}
+                    </span>
+                  );
+                })}
+              </h1>
+              <span className="hero-scan" data-hero-scan aria-hidden="true" />
+              <span className="hero-flash" data-hero-flash aria-hidden="true" />
+            </div>
+
+            <p className="lede mt-7 max-w-xl" data-hero-fade>
+              {hero.subline}
+            </p>
+
+            <div className="mt-8 flex flex-wrap gap-3" data-hero-fade>
+              <a
+                href={contact.bookingHref}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn btn-primary"
+                data-cursor="talk"
+              >
+                {hero.primaryCta}
+              </a>
+              <a href={contact.emailHref} className="btn btn-ghost" data-cursor="talk">
+                {hero.secondaryCta}
+              </a>
+            </div>
+
+            {/* Proof, assembled from content that already exists: the approved
+                quote's attribution, and where the apps can be downloaded. The
+                first half disappears with the testimonial if it is withdrawn. */}
+            <p className="hero-proof mono mt-8" data-hero-fade>
+              {featuredTestimonial ? (
+                <>
+                  <span>
+                    <span className="text-text">{featuredTestimonial.name}</span>
+                    {`, ${featuredTestimonial.role}`}
+                    {featuredTestimonial.company ? `, ${featuredTestimonial.company}` : ""}
                   </span>
-                  {i < words.length - 1 ? " " : ""}
-                </span>
-              );
-            })}
-          </h1>
-          <span className="hero-scan" data-hero-scan aria-hidden="true" />
-          <span className="hero-flash" data-hero-flash aria-hidden="true" />
-        </div>
-
-        <div className="mt-8 flex flex-col gap-8 md:mt-12 md:flex-row md:items-end md:justify-between">
-          <p className="lede" data-hero-fade>
-            {hero.subline}
-          </p>
-          <div className="flex flex-wrap gap-3" data-hero-fade>
-            <a
-              href={contact.bookingHref}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="btn btn-primary"
-              data-cursor="talk"
-            >
-              {hero.primaryCta}
-            </a>
-            <a href={contact.emailHref} className="btn btn-ghost" data-cursor="talk">
-              {hero.secondaryCta}
-            </a>
+                  <span className="hero-proof-dot" aria-hidden="true" />
+                </>
+              ) : null}
+              <span>{hero.proof}</span>
+            </p>
           </div>
+
+          <HeroStack />
         </div>
 
         <div

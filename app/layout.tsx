@@ -39,7 +39,13 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#0b0f14",
+  // The browser chrome follows the theme. These match --color-bg in
+  // app/globals.css for each theme; the site's own default when neither
+  // matches is dark, as in the inline script below.
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#f4f6f8" },
+    { media: "(prefers-color-scheme: dark)", color: "#0b0f14" },
+  ],
   colorScheme: "dark",
 };
 
@@ -58,7 +64,6 @@ const jsonLd = {
       logo: `${site.url}/brand/novix-mark.svg`,
       description: site.seo.description,
       email: site.contact.email,
-      areaServed: ["US", "AE", "SA", "QA", "KW", "BH", "OM"],
       sameAs: site.footer.social.map((s) => s.href),
     },
     {
@@ -73,9 +78,17 @@ const jsonLd = {
   ],
 };
 
+const THEME_SCRIPT = "(function(){try{var t=localStorage.getItem('theme');if(t!=='light'&&t!=='dark'){t=window.matchMedia('(prefers-color-scheme: light)').matches?'light':'dark';}document.documentElement.dataset.theme=t;}catch(e){document.documentElement.dataset.theme='dark';}})();";
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${syne.variable} ${hanken.variable}`}>
+    <html lang="en" className={`${syne.variable} ${hanken.variable}`} suppressHydrationWarning>
+      <head>
+        {/* Sets data-theme before the first paint, so there is no flash of
+            the wrong theme. suppressHydrationWarning above is because this
+            adds an attribute React did not render. */}
+        <script dangerouslySetInnerHTML={{ __html: THEME_SCRIPT }} />
+      </head>
       <body>
         {children}
         <script

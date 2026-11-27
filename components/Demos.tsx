@@ -205,8 +205,8 @@ export function AiDemo() {
 }
 
 /**
- * Whether a service has the content its demo needs. Used by the panel layout:
- * a panel with no demo drops the demo column instead of leaving it empty.
+ * Whether a service has the content its demo needs. A panel without one
+ * renders no demo column at all, rather than reserving an empty half.
  */
 export function hasServiceDemo(id: string): boolean {
   if (id === "build" || id === "ai") return true;
